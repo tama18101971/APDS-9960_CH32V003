@@ -55,7 +55,7 @@ static bool rdBlock(uint8_t reg, uint8_t *buf, uint8_t len) {
  * Когда |g_ud_delta| или |g_lr_delta| превышает это значение,
  * жест считается определенным.
  */
-#define SENSITIVITY_1           10
+#define SENSITIVITY_1           5
 
 /*
  * MAX_FIFO_READS = 32 — Максимальное количество чтений FIFO
@@ -94,8 +94,12 @@ static int16_t  g_prev_lr;
 static uint8_t  g_has_prev;
 
 /*
- * g_motion — Результат: распознанный жест (gesture_t).
+ * g_packet_count — Количество обработанных действительных пакетов.
+ * Используется для фильтрации шума: жест не определяется
+ * при малом количестве пакетов.
  */
+static uint8_t  g_packet_count;
+
 static uint8_t  g_motion;
 
 /* Сброс всех переменных состояния жеста */
@@ -105,6 +109,7 @@ static void gesture_reset(void) {
     g_prev_ud = 0;
     g_prev_lr = 0;
     g_has_prev = 0;
+    g_packet_count = 0;
     g_motion = GESTURE_NONE;
 }
 
@@ -171,6 +176,7 @@ static void process_fifo_batch(void) {
         /* Запоминаем как предыдущий для следующего пакета */
         g_prev_ud = ud_ratio;
         g_prev_lr = lr_ratio;
+        g_packet_count++;
     }
 }
 
@@ -197,11 +203,17 @@ static bool decode_gesture(void) {
         return false;
     }
 
+    /* Фильтрация шума: нужно минимум 4 пакета для определения жеста */
+    if (g_packet_count < 4) {
+        printf("DEC: too few packets (%d)\r\n", g_packet_count);
+        return false;
+    }
+
     int16_t abs_ud = g_ud_acc < 0 ? -g_ud_acc : g_ud_acc;
     int16_t abs_lr = g_lr_acc < 0 ? -g_lr_acc : g_lr_acc;
 
-    printf("DEC: ud_acc=%d lr_acc=%d abs_ud=%d abs_lr=%d thr=%d\r\n",
-           g_ud_acc, g_lr_acc, abs_ud, abs_lr, SENSITIVITY_1);
+    printf("DEC: ud_acc=%d lr_acc=%d pkts=%d thr=%d\r\n",
+           g_ud_acc, g_lr_acc, g_packet_count, SENSITIVITY_1);
 
     /* Нет значимого движения */
     if (abs_ud < SENSITIVITY_1 && abs_lr < SENSITIVITY_1) {

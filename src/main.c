@@ -42,6 +42,15 @@ int main(void) {
 
     printf("APDS9960 ready.\r\n");
 
+    /* Задержка после инициализации — датчик стабилизируется,
+     * пропускаем первые шумовые данные */
+    Delay_Ms(200);
+
+    /* Сбрасываем любые шумовые данные, накопившиеся в FIFO */
+    while (apds_available()) {
+        apds_readGesture();
+    }
+
     /* Основной цикл опроса жестов */
     while (1) {
         /* Проверяем наличие данных жеста (GVALID в GSTATUS) */
@@ -55,7 +64,13 @@ int main(void) {
                 case GESTURE_RIGHT: printf("RIGHT\r\n"); break;
                 case GESTURE_UP:    printf("UP\r\n");    break;
                 case GESTURE_DOWN:  printf("DOWN\r\n");  break;
-                default: break; /* GESTURE_NONE — ничего не выводим */
+                default: break;
+            }
+
+            /* Кулдаун после жеста — пропускаем данные пока рука уходит */
+            if (g != GESTURE_NONE) {
+                Delay_Ms(300);
+                while (apds_available()) apds_readGesture();
             }
         }
     }
