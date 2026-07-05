@@ -170,7 +170,7 @@ typedef enum {
 /* Включение автокалибровки порогов proximity при apds_init().
  * 1 = включена (по умолчанию), 0 = отключена (используются APDS_PROX_THRESHOLD/GEXTH). */
 #ifndef APDS_ENABLE_CALIBRATION
-#define APDS_ENABLE_CALIBRATION     0
+#define APDS_ENABLE_CALIBRATION     1
 #endif
 
 /* Количество замеров PDATA для калибровки (на стеке, ~32 байт). */

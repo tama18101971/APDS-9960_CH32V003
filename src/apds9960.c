@@ -75,13 +75,13 @@ static bool rdBlock(uint8_t reg, uint8_t *buf, uint8_t len) {
  * Возвращает: floor(√n). */
 static uint8_t isqrt(uint16_t n) {
     if (n == 0) return 0;
-    uint8_t x = (uint8_t)n;
-    uint8_t y = (x + 1) / 2;
+    uint16_t x = n;
+    uint16_t y = (x + 1) / 2;
     while (y < x) {
         x = y;
-        y = (uint8_t)((x + n / x) / 2);
+        y = (uint16_t)((x + n / x) / 2);
     }
-    return x;
+    return (uint8_t)x;
 }
 #endif /* APDS_ENABLE_CALIBRATION */
 
@@ -126,6 +126,12 @@ static volatile uint8_t  g_reinit_count;
 /* g_last_error — Код последней ошибки для диагностики.
  * Устанавливается функциями драйвера при сбоях. */
 static volatile uint8_t  g_last_error;
+
+/* Сохранённые откалиброванные пороги (F7) */
+static uint8_t  g_cal_piht;
+static uint8_t  g_cal_gpenth;
+static uint8_t  g_cal_gexth;
+static uint8_t  g_cal_valid;    /* 1 если калибровка выполнена */
 
 /* Сброс всех переменных состояния жеста */
 static void gesture_reset(void) {
@@ -274,24 +280,44 @@ static bool decode_gesture(void) {
 
 #if APDS_ENABLE_CALIBRATION
 /* Автоматическая калибровка порогов proximity.
- * Собирает APDS_CAL_SAMPLES замеров PDATA, вычисляет среднее и σ,
- * устанавливает PIHT = mean + N*σ, GPENTH = PIHT, GEXTH = PIHT * 60%.
- * Датчик должен быть в режиме PON + PEN (proximity-only).
+ * Переключает датчик в proximity-only режим (PON+PEN),
+ * собирает APDS_CAL_SAMPLES замеров PDATA, вычисляет среднее и σ,
+ * устанавливает PIHT / GPENTH / GEXTH, сохраняет их для sensor_reinit()
+ * и возвращает в полноценный жестовый режим (PON+PEN+GEN+WEN).
  * Возвращает: true если калибровка успешна. */
 static bool calibrate_proximity(void) {
     uint8_t buf[APDS_CAL_SAMPLES];
 
-    for (uint8_t i = 0; i < APDS_CAL_SAMPLES; i++) {
+    /* Переключаем в proximity-only (без жестового режима — GEN выкл) */
+    if (!wr(REG_ENABLE, EN_PON | EN_PEN)) return false;
+    Delay_Ms(50);   /* Стабилизация proximity */
+
+    /* Сбор замеров PDATA */
+    uint8_t i = 0;
+    uint16_t pv_timeout = 100;  /* ~100 мс ожидание PVALID */
+    while (i < APDS_CAL_SAMPLES) {
+        uint8_t status;
+        if (!rd(REG_STATUS, &status)) return false;
+
+        if (!(status & ST_PVALID)) {
+            if (--pv_timeout == 0) return false;
+            Delay_Ms(1);
+            continue;
+        }
+
         if (!rd(REG_PDATA, &buf[i])) return false;
+        i++;
         Delay_Ms(10);
     }
 
+    /* Среднее */
     uint16_t sum = 0;
     for (uint8_t i = 0; i < APDS_CAL_SAMPLES; i++) {
         sum += buf[i];
     }
     uint8_t mean = (uint8_t)(sum / APDS_CAL_SAMPLES);
 
+    /* Дисперсия со сдвигом для избежания переполнения */
     uint16_t sum_sq = 0;
     for (uint8_t i = 0; i < APDS_CAL_SAMPLES; i++) {
         int16_t d = (int16_t)buf[i] - mean;
@@ -301,6 +327,7 @@ static bool calibrate_proximity(void) {
     uint16_t var = sum_sq / APDS_CAL_SAMPLES;
     uint8_t sigma = isqrt(var) * 4;
 
+    /* Вычисление порогов */
     uint16_t entry = (uint16_t)mean + (uint16_t)APDS_CAL_SIGMA_COEFF * sigma;
     uint16_t exit_th = entry * 6 / 10;
 
@@ -311,9 +338,19 @@ static bool calibrate_proximity(void) {
     uint8_t prox_th = (uint8_t)entry;
     uint8_t exit_val = (uint8_t)exit_th;
 
+    /* Сохраняем откалиброванные пороги для sensor_reinit() */
+    g_cal_piht   = prox_th;
+    g_cal_gpenth = prox_th;
+    g_cal_gexth  = exit_val;
+    g_cal_valid  = 1;
+
+    /* Запись порогов */
     if (!wr(REG_PIHT, prox_th)) return false;
     if (!wr(REG_GPENTH, prox_th)) return false;
     if (!wr(REG_GEXTH, exit_val)) return false;
+
+    /* Включаем полноценный жестовый режим */
+    if (!wr(REG_ENABLE, EN_PON | EN_PEN | EN_GEN | EN_WEN)) return false;
 
 #ifdef APDS9960_DEBUG
     printf("CAL: mean=%d sigma=%d gpenth=%d gexth=%d\r\n",
@@ -383,9 +420,15 @@ static bool configure_registers(void) {
 }
 
 /* Полная переинициализация датчика.
- * Используется при переполнении FIFO или ошибках I2C. */
+ * Используется при переполнении FIFO или ошибках I2C.
+ * После аппаратной настройки восстанавливает откалиброванные пороги. */
 static void sensor_reinit(void) {
     configure_registers();
+    if (g_cal_valid) {
+        wr(REG_PIHT,   g_cal_piht);
+        wr(REG_GPENTH, g_cal_gpenth);
+        wr(REG_GEXTH,  g_cal_gexth);
+    }
 }
 
 /* ============================================================================
@@ -533,13 +576,7 @@ uint8_t apds_getReinitCount(void) {
 
 bool apds_recalibrate(void) {
 #if APDS_ENABLE_CALIBRATION
-    if (!wr(REG_ENABLE, EN_PON | EN_PEN)) return false;
-    Delay_Ms(20);
-
-    if (!calibrate_proximity()) return false;
-
-    if (!wr(REG_ENABLE, EN_PON | EN_PEN | EN_GEN | EN_WEN)) return false;
-    return true;
+    return calibrate_proximity();
 #else
     (void)0;
     return true;
