@@ -69,6 +69,22 @@ static bool rdBlock(uint8_t reg, uint8_t *buf, uint8_t len) {
  */
 #define RETRY_LIMIT             3
 
+#if APDS_ENABLE_CALIBRATION
+/* Целочисленный квадратный корень (алгоритм Ньютона).
+ * Используется при калибровке для вычисления σ.
+ * Возвращает: floor(√n). */
+static uint8_t isqrt(uint16_t n) {
+    if (n == 0) return 0;
+    uint8_t x = (uint8_t)n;
+    uint8_t y = (x + 1) / 2;
+    while (y < x) {
+        x = y;
+        y = (uint8_t)((x + n / x) / 2);
+    }
+    return x;
+}
+#endif /* APDS_ENABLE_CALIBRATION */
+
 /* ============================================================================
  * СОСТОЯНИЕ ЖЕСТА (статические переменные)
  * ============================================================================ */
@@ -78,29 +94,38 @@ static bool rdBlock(uint8_t reg, uint8_t *buf, uint8_t len) {
  * С каждым новым действительным пакетом вычисляется дельта
  * от предыдущего пакета и прибавляется к аккумулятору.
  */
-static int16_t  g_ud_acc;
-static int16_t  g_lr_acc;
+static volatile int16_t  g_ud_acc;
+static volatile int16_t  g_lr_acc;
 
 /*
  * g_prev_ud / g_prev_lr — Ratio предыдущего действительного пакета.
  * Используются для вычисления дельты между соседними пакетами.
  */
-static int16_t  g_prev_ud;
-static int16_t  g_prev_lr;
+static volatile int16_t  g_prev_ud;
+static volatile int16_t  g_prev_lr;
 
 /*
  * g_has_prev — флаг: был ли обработан хотя бы один действительный пакет.
  */
-static uint8_t  g_has_prev;
+static volatile uint8_t  g_has_prev;
 
 /*
  * g_packet_count — Количество обработанных действительных пакетов.
  * Используется для фильтрации шума: жест не определяется
  * при малом количестве пакетов.
  */
-static uint8_t  g_packet_count;
+static volatile uint8_t  g_packet_count;
 
-static uint8_t  g_motion;
+static volatile uint8_t  g_motion;
+
+/* g_reinit_count — Счётчик последовательных переинициализаций.
+ * Сбрасывается при успешном чтении GSTATUS.
+ * Если превышает RETRY_LIMIT — датчик считается неисправным. */
+static volatile uint8_t  g_reinit_count;
+
+/* g_last_error — Код последней ошибки для диагностики.
+ * Устанавливается функциями драйвера при сбоях. */
+static volatile uint8_t  g_last_error;
 
 /* Сброс всех переменных состояния жеста */
 static void gesture_reset(void) {
@@ -111,6 +136,7 @@ static void gesture_reset(void) {
     g_has_prev = 0;
     g_packet_count = 0;
     g_motion = GESTURE_NONE;
+    g_reinit_count = 0;
 }
 
 /* ============================================================================
@@ -243,13 +269,60 @@ static bool decode_gesture(void) {
 }
 
 /* ============================================================================
- * ПЕРЕИНИЦИАЛИЗАЦИЯ ДАТЧИКА (при ошибках FIFO / I2C)
- *
- * Полный повторный набор всех регистров. Используется при:
- *   - переполнении FIFO (GFOV = 1)
- *   - зависании датчика
- *   - ошибке I2C шины
+ * КАЛИБРОВКА ПОРОГОВ PROXIMITY
  * ============================================================================ */
+
+#if APDS_ENABLE_CALIBRATION
+/* Автоматическая калибровка порогов proximity.
+ * Собирает APDS_CAL_SAMPLES замеров PDATA, вычисляет среднее и σ,
+ * устанавливает PIHT = mean + N*σ, GPENTH = PIHT, GEXTH = PIHT * 60%.
+ * Датчик должен быть в режиме PON + PEN (proximity-only).
+ * Возвращает: true если калибровка успешна. */
+static bool calibrate_proximity(void) {
+    uint8_t buf[APDS_CAL_SAMPLES];
+
+    for (uint8_t i = 0; i < APDS_CAL_SAMPLES; i++) {
+        if (!rd(REG_PDATA, &buf[i])) return false;
+        Delay_Ms(10);
+    }
+
+    uint16_t sum = 0;
+    for (uint8_t i = 0; i < APDS_CAL_SAMPLES; i++) {
+        sum += buf[i];
+    }
+    uint8_t mean = (uint8_t)(sum / APDS_CAL_SAMPLES);
+
+    uint16_t sum_sq = 0;
+    for (uint8_t i = 0; i < APDS_CAL_SAMPLES; i++) {
+        int16_t d = (int16_t)buf[i] - mean;
+        int16_t d4 = d / 4;
+        sum_sq += (uint16_t)(d4 * d4);
+    }
+    uint16_t var = sum_sq / APDS_CAL_SAMPLES;
+    uint8_t sigma = isqrt(var) * 4;
+
+    uint16_t entry = (uint16_t)mean + (uint16_t)APDS_CAL_SIGMA_COEFF * sigma;
+    uint16_t exit_th = entry * 6 / 10;
+
+    if (entry > APDS_CAL_PROX_MAX) entry = APDS_CAL_PROX_MAX;
+    if (entry < APDS_CAL_PROX_MIN) entry = APDS_CAL_PROX_MIN;
+    if (exit_th < 1) exit_th = 1;
+
+    uint8_t prox_th = (uint8_t)entry;
+    uint8_t exit_val = (uint8_t)exit_th;
+
+    if (!wr(REG_PIHT, prox_th)) return false;
+    if (!wr(REG_GPENTH, prox_th)) return false;
+    if (!wr(REG_GEXTH, exit_val)) return false;
+
+#ifdef APDS9960_DEBUG
+    printf("CAL: mean=%d sigma=%d gpenth=%d gexth=%d\r\n",
+           mean, sigma, prox_th, exit_val);
+#endif
+
+    return true;
+}
+#endif /* APDS_ENABLE_CALIBRATION */
 
 /* Полная конфигурация всех регистров датчика.
  * Отключает все функции, настраивает тайминги, proximity, CONTROL, 
@@ -257,8 +330,7 @@ static bool decode_gesture(void) {
 static bool configure_registers(void) {
     if (!wr(REG_ENABLE, 0x00)) return false;
 
-    /* Задержка ~1 мс (NOP-цикл на 48 МГц) */
-    for (volatile uint16_t d = 0; d < 2000; d++) { __asm__ volatile("nop"); }
+    Delay_Ms(1);
 
     /* --- Тайминги --- */
     if (!wr(REG_ATIME, 0xDB)) return false;    /* ALS интегрирование 140 мс */
@@ -335,22 +407,29 @@ static void sensor_reinit(void) {
  *
  * Возвращает: true если датчик отвечает и настроен. */
 bool apds_init(void) {
-    /* Проверка ID датчика: 0xAB (оригинал), 0xA8, 0x9C, 0x9E (клоны) */
     uint8_t id;
     if (!rd(REG_ID, &id)) return false;
     if (id != 0xAB && id != 0xA8 && id != 0x9C && id != 0x9E) {
         return false;
     }
 
-    /* Полная конфигурация всех регистров */
-    if (!configure_registers()) return false;
+    for (uint8_t attempt = 0; attempt < RETRY_LIMIT; attempt++) {
+        if (configure_registers()) {
+            uint8_t en;
+            if (rd(REG_ENABLE, &en) && (en & EN_PON)) {
+                gesture_reset();
 
-    /* Проверка PON */
-    uint8_t en;
-    if (!rd(REG_ENABLE, &en) || !(en & EN_PON)) return false;
+#if APDS_ENABLE_CALIBRATION
+                if (!calibrate_proximity()) return false;
+#endif
+                return true;
+            }
+        }
+        Delay_Ms(10);
+    }
 
-    gesture_reset();
-    return true;
+    g_last_error = APDS_ERR_SENSOR_HANG;
+    return false;
 }
 
 /* Перевод датчика в режим сна.
@@ -370,14 +449,22 @@ bool apds_wakeup(void) {
 
 bool apds_available(void) {
     uint8_t gs;
-    if (!rd(REG_GSTATUS, &gs)) return false;
-
-    if (gs & GST_GFOV) {
-        gesture_reset();
-        sensor_reinit();
+    if (!rd(REG_GSTATUS, &gs)) {
+        g_last_error = APDS_ERR_I2C;
         return false;
     }
 
+    if (gs & GST_GFOV) {
+        gesture_reset();
+        g_last_error = APDS_ERR_FIFO_OVERFLOW;
+        if (g_reinit_count < RETRY_LIMIT) {
+            g_reinit_count++;
+            sensor_reinit();
+        }
+        return false;
+    }
+
+    g_reinit_count = 0;
     return (gs & GST_GVALID) != 0;
 }
 
@@ -402,7 +489,10 @@ gesture_t apds_readGesture(void) {
 
     while (loops < MAX_FIFO_READS && elapsed_ms < APDS_GESTURE_TIMEOUT_MS) {
         uint8_t gs;
-        if (!rd(REG_GSTATUS, &gs)) break;
+        if (!rd(REG_GSTATUS, &gs)) {
+            g_last_error = APDS_ERR_I2C;
+            break;
+        }
 
         if (!(gs & GST_GVALID)) {
             decode_gesture();
@@ -423,4 +513,35 @@ gesture_t apds_readGesture(void) {
 
     decode_gesture();
     return g_motion;
+}
+
+bool apds_readProximity(uint8_t *value) {
+    return rd(REG_PDATA, value);
+}
+
+bool apds_readStatus(uint8_t *value) {
+    return rd(REG_STATUS, value);
+}
+
+uint8_t apds_getLastError(void) {
+    return g_last_error;
+}
+
+uint8_t apds_getReinitCount(void) {
+    return g_reinit_count;
+}
+
+bool apds_recalibrate(void) {
+#if APDS_ENABLE_CALIBRATION
+    if (!wr(REG_ENABLE, EN_PON | EN_PEN)) return false;
+    Delay_Ms(20);
+
+    if (!calibrate_proximity()) return false;
+
+    if (!wr(REG_ENABLE, EN_PON | EN_PEN | EN_GEN | EN_WEN)) return false;
+    return true;
+#else
+    (void)0;
+    return true;
+#endif
 }

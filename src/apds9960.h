@@ -164,6 +164,43 @@ typedef enum {
 #endif
 
 /* ============================================================================
+ * ПАРАМЕТРЫ АВТОМАТИЧЕСКОЙ КАЛИБРОВКИ
+ * ============================================================================ */
+
+/* Включение автокалибровки порогов proximity при apds_init().
+ * 1 = включена (по умолчанию), 0 = отключена (используются APDS_PROX_THRESHOLD/GEXTH). */
+#ifndef APDS_ENABLE_CALIBRATION
+#define APDS_ENABLE_CALIBRATION     0
+#endif
+
+/* Количество замеров PDATA для калибровки (на стеке, ~32 байт). */
+#ifndef APDS_CAL_SAMPLES
+#define APDS_CAL_SAMPLES            32
+#endif
+
+/* Коэффициент σ для порога: порог = mean + N * σ.
+ * 3 = промышленный стандарт, 2 = более чувствительно, 5 = жёстче. */
+#ifndef APDS_CAL_SIGMA_COEFF
+#define APDS_CAL_SIGMA_COEFF        3
+#endif
+
+/* Минимальный порог proximity (защита от шума при нулевом фоне). */
+#ifndef APDS_CAL_PROX_MIN
+#define APDS_CAL_PROX_MIN           10
+#endif
+
+/* Максимальный порог proximity (насыщение). */
+#ifndef APDS_CAL_PROX_MAX
+#define APDS_CAL_PROX_MAX           200
+#endif
+
+/* Коды ошибок драйвера */
+#define APDS_ERR_NONE           0   /* Ошибок нет */
+#define APDS_ERR_I2C            1   /* Ошибка I2C (NACK, таймаут) */
+#define APDS_ERR_FIFO_OVERFLOW  2   /* Переполнение FIFO */
+#define APDS_ERR_SENSOR_HANG    3   /* Датчик не отвечает */
+
+/* ============================================================================
  * ПУБЛИЧНЫЙ API
  * ============================================================================ */
 
@@ -204,5 +241,27 @@ bool apds_available(void);
  *
  * Возвращает: gesture_t — тип жеста или GESTURE_NONE */
 gesture_t apds_readGesture(void);
+
+/* Чтение текущего значения proximity-канала (0-255).
+ * Возвращает: true если чтение успешно. */
+bool apds_readProximity(uint8_t *value);
+
+/* Чтение регистра STATUS (0x93) для диагностики.
+ * Возвращает: true если чтение успешно. */
+bool apds_readStatus(uint8_t *value);
+
+/* Получение кода последней ошибки драйвера.
+ * Возвращает: APDS_ERR_* (0 = нет ошибок). */
+uint8_t apds_getLastError(void);
+
+/* Получение количества последовательных переинициализаций.
+ * 0 = нормальная работа, >0 = возможны проблемы с датчиком. */
+uint8_t apds_getReinitCount(void);
+
+/* Переинициализация датчика с повторной калибровкой порогов proximity.
+ * Полезно при изменении условий освещения или положения датчика.
+ * Доступна только если APDS_ENABLE_CALIBRATION = 1.
+ * Возвращает: true если калибровка успешна. */
+bool apds_recalibrate(void);
 
 #endif /* APDS9960_H */
