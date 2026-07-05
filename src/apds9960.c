@@ -353,16 +353,12 @@ static void process_fifo_batch(void) {
 /* Декодирование: определяет направление по накопленным изменениям.
  * Возвращает: true если жест определен. */
 static bool decode_gesture(void) {
+    if (!g_has_prev) {
 #ifdef APDS9960_DEBUG
-    if (!g_has_prev) {
         printf("DEC: no data\r\n");
-        return false;
-    }
-#else
-    if (!g_has_prev) {
-        return false;
-    }
 #endif
+        return false;
+    }
 
     if (g_packet_count < APDS_FIFO_MIN_PACKETS) {
 #ifdef APDS9960_DEBUG
