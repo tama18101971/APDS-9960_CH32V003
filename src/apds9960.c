@@ -184,8 +184,8 @@ static bool calibrate_proximity(void) {
     uint8_t prox_th = (uint8_t)entry;
     uint8_t exit_val = (uint8_t)exit_th;
 
-    /* Sanity check: если порог > 100 — среда загрязнена, используем дефолты */
-    if (prox_th > 100) {
+    /* Sanity check: порог выше 100 — загрязнённая среда, ниже дефолта — шум */
+    if (prox_th > 100 || prox_th < APDS_PROX_THRESHOLD) {
         prox_th = APDS_PROX_THRESHOLD;
         exit_val = APDS_GESTURE_EXIT_TH;
         g_cal_valid = 0;
