@@ -104,25 +104,36 @@ static void sort_u8(uint8_t *arr, uint8_t n) {
 }
 
 /* Автоматическая калибровка порогов proximity.
- * Переключает датчик в proximity-only режим (PON+PEN),
- * собирает APDS_CAL_SAMPLES замеров PDATA с отсевом насыщения (>FILTER_MAX),
+ * Работает в gesture mode (PON+PEN+GEN+WEN) — без переключения режимов.
+ * Собирает APDS_CAL_SAMPLES замеров PDATA с отсевом насыщения (>FILTER_MAX),
  * вычисляет медиану и σ, устанавливает PIHT / GPENTH / GEXTH,
- * сохраняет их для sensor_reinit() и возвращается в gesture mode.
- * Если калибровка невозможна (насыщение/рука рядом) — используются дефолты.
- * Возвращает: true (всегда — датчик остаётся в gesture mode). */
+ * сохраняет их для sensor_reinit().
+ * Gesture FIFO дрainится перед каждым чтением PDATA для предотвращения GFOV.
+ * Если калибровка невозможна — используются дефолты.
+ * Возвращает: true (датчик остаётся в gesture mode). */
 static bool calibrate_proximity(void) {
     uint8_t buf[APDS_CAL_SAMPLES];
     uint8_t valid_cnt = 0;
 
-    /* Переключаем в proximity-only (без жестового режима — GEN выкл) */
-    if (!wr(REG_ENABLE, EN_PON | EN_PEN)) return false;
-    Delay_Ms(50);   /* Стабилизация proximity */
+    /* Датчик уже в gesture mode (PON+PEN+GEN+WEN) после configure_registers().
+     * Переключение в proximity-only НЕ требуется — PDATA в gesture mode
+     * отражает реальные условия работы (GLDRIVE + GGAIN, без LED_BOOST). */
+    Delay_Ms(100);  /* Стабилизация gesture mode (больше чем proximity-only) */
 
-    /* Сбор замеров PDATA с фильтрацией насыщения */
+    /* Сбор замеров PDATA с фильтрацией насыщения и drain FIFO */
     {
         uint16_t pv_timeout = 100;
         uint8_t total = 0;
         while (valid_cnt < APDS_CAL_SAMPLES && total < APDS_CAL_SAMPLES * 2) {
+            /* Drain gesture FIFO — предотвращаем GFOV во время калибровки */
+            uint8_t fifo_level;
+            if (!rd(REG_GFLVL, &fifo_level)) return false;
+            while (fifo_level > 0) {
+                uint8_t dummy[4];
+                if (!rdBlock(REG_GFIFO_U, dummy, 4)) return false;
+                fifo_level--;
+            }
+
             uint8_t status;
             if (!rd(REG_STATUS, &status)) return false;
 
@@ -143,10 +154,9 @@ static bool calibrate_proximity(void) {
         }
     }
 
-    /* Если валидных замеров меньше половины — датчик насыщен, используем дефолты */
+    /* Если валидных замеров меньше половины — среда загрязнена, используем дефолты */
     if (valid_cnt < APDS_CAL_SAMPLES / 2) {
         g_cal_valid = 0;
-        if (!wr(REG_ENABLE, EN_PON | EN_PEN | EN_GEN | EN_WEN)) return false;
 #ifdef APDS9960_DEBUG
         printf("CAL: FAIL (saturated, valid=%d) using defaults gpenth=%d gexth=%d\r\n",
                valid_cnt, APDS_PROX_THRESHOLD, APDS_GESTURE_EXIT_TH);
@@ -174,8 +184,19 @@ static bool calibrate_proximity(void) {
     uint8_t sigma = isqrt(var) * 4;
 
     /* Вычисление порогов */
-    uint16_t entry = (uint16_t)median + (uint16_t)APDS_CAL_SIGMA_COEFF * sigma;
-    uint16_t exit_th = entry * 6 / 10;
+    uint16_t entry;
+    uint16_t exit_th;
+
+    if (median > 100) {
+        /* Gesture mode: порог НИЖЕ фона (gesture engine всегда активен).
+         * GPENTH = median / 4, GEXTH = GPENTH * 60% */
+        entry = (uint16_t)median / 4;
+        exit_th = entry * 6 / 10;
+    } else {
+        /* Proximity mode: порог ВЫШЕ фона (median + N*sigma) */
+        entry = (uint16_t)median + (uint16_t)APDS_CAL_SIGMA_COEFF * sigma;
+        exit_th = entry * 6 / 10;
+    }
 
     if (entry > APDS_CAL_PROX_MAX) entry = APDS_CAL_PROX_MAX;
     if (entry < APDS_CAL_PROX_MIN) entry = APDS_CAL_PROX_MIN;
@@ -184,26 +205,37 @@ static bool calibrate_proximity(void) {
     uint8_t prox_th = (uint8_t)entry;
     uint8_t exit_val = (uint8_t)exit_th;
 
-    /* Sanity check: порог выше 100 — загрязнённая среда, ниже дефолта — шум */
-    if (prox_th > 100 || prox_th < APDS_PROX_THRESHOLD) {
-        prox_th = APDS_PROX_THRESHOLD;
-        exit_val = APDS_GESTURE_EXIT_TH;
-        g_cal_valid = 0;
+    /* Sanity check + сохранение откалиброванных порогов */
+    if (median > 100) {
+        /* Gesture mode: порог должен быть ниже фона, но не > 100 */
+        if (prox_th > 100) {
+            prox_th = APDS_PROX_THRESHOLD;
+            exit_val = APDS_GESTURE_EXIT_TH;
+            g_cal_valid = 0;
+        } else {
+            g_cal_piht   = prox_th;
+            g_cal_gpenth = prox_th;
+            g_cal_gexth  = exit_val;
+            g_cal_valid  = 1;
+        }
     } else {
-        /* Сохраняем откалиброванные пороги для sensor_reinit() */
-        g_cal_piht   = prox_th;
-        g_cal_gpenth = prox_th;
-        g_cal_gexth  = exit_val;
-        g_cal_valid  = 1;
+        /* Proximity mode: порог выше фона, не > 100 и не < дефолта */
+        if (prox_th > 100 || prox_th < APDS_PROX_THRESHOLD) {
+            prox_th = APDS_PROX_THRESHOLD;
+            exit_val = APDS_GESTURE_EXIT_TH;
+            g_cal_valid = 0;
+        } else {
+            g_cal_piht   = prox_th;
+            g_cal_gpenth = prox_th;
+            g_cal_gexth  = exit_val;
+            g_cal_valid  = 1;
+        }
     }
 
-    /* Запись порогов */
+    /* Запись порогов (датчик уже в gesture mode — не переключаем) */
     if (!wr(REG_PIHT, prox_th)) return false;
     if (!wr(REG_GPENTH, prox_th)) return false;
     if (!wr(REG_GEXTH, exit_val)) return false;
-
-    /* Включаем полноценный жестовый режим */
-    if (!wr(REG_ENABLE, EN_PON | EN_PEN | EN_GEN | EN_WEN)) return false;
 
 #ifdef APDS9960_DEBUG
     printf("CAL: median=%d valid=%d sigma=%d gpenth=%d gexth=%d\r\n",

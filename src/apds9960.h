@@ -197,7 +197,7 @@ typedef enum {
 /* Порог отсева выбросов калибровки: PDATA > FILTER_MAX считаются насыщением и отбрасываются.
  * Если >50% замеров отброшены — калибровка неуспешна, используются дефолты. */
 #ifndef APDS_CAL_FILTER_MAX
-#define APDS_CAL_FILTER_MAX         60
+#define APDS_CAL_FILTER_MAX         200
 #endif
 
 /* Коды ошибок драйвера */
