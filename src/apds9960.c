@@ -12,24 +12,24 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdio.h>
+#include <debug.h>
 
 /* ============================================================================
  * ОБЕРТКИ НАД I2C (адрес датчика 0x39)
  * ============================================================================ */
 
 /* Чтение одного регистра датчика.
- * reg — адрес регистра (0x80-0xFF).
- * Возвращает: значение регистра (0-255). */
-static uint8_t rd(uint8_t reg) {
-    uint8_t v = 0;
-    i2c_read_register(APDS9960_I2C_ADDR, reg, &v);
-    return v;
+ * reg — адрес регистра (0x80-0xFF), out — указатель для значения.
+ * Возвращает: true если I2C успешен. */
+static bool rd(uint8_t reg, uint8_t *out) {
+    return i2c_read_register(APDS9960_I2C_ADDR, reg, out) == I2C_OK;
 }
 
 /* Запись одного регистра датчика.
- * reg — адрес регистра, val — записываемое значение. */
-static void wr(uint8_t reg, uint8_t val) {
-    i2c_write_register(APDS9960_I2C_ADDR, reg, val);
+ * reg — адрес регистра, val — записываемое значение.
+ * Возвращает: true если I2C успешен. */
+static bool wr(uint8_t reg, uint8_t val) {
+    return i2c_write_register(APDS9960_I2C_ADDR, reg, val) == I2C_OK;
 }
 
 /* Блочное чтение из регистра (автоинкремент адреса).
@@ -51,8 +51,8 @@ static bool rdBlock(uint8_t reg, uint8_t *buf, uint8_t len) {
 #define THRESH_OUT              10
 
 /*
- * SENSITIVITY_1 = 50 — Порог накопленной дельты для определения направления.
- * Когда |g_ud_delta| или |g_lr_delta| превышает это значение,
+ * SENSITIVITY_1 = 5 — Порог накопленной дельты для определения направления.
+ * Когда |g_ud_acc| или |g_lr_acc| превышает это значение,
  * жест считается определенным.
  */
 #define SENSITIVITY_1           5
@@ -140,8 +140,8 @@ static void gesture_reset(void) {
  * Каждый новый пакет: вычисляем дельту от предыдущего и прибавляем к аккумулятору.
  * Ratio = (U-D)*100/(U+D), диапазон -100..+100 */
 static void process_fifo_batch(void) {
-    uint8_t fifo_level = rd(REG_GFLVL);
-    if (fifo_level == 0) return;
+    uint8_t fifo_level = 0;
+    if (!rd(REG_GFLVL, &fifo_level) || fifo_level == 0) return;
 
     uint8_t buf[4]; /* [U, D, L, R] */
 
@@ -198,36 +198,47 @@ static void process_fifo_batch(void) {
 /* Декодирование: определяет направление по накопленным изменениям.
  * Возвращает: true если жест определен. */
 static bool decode_gesture(void) {
+#ifdef APDS9960_DEBUG
     if (!g_has_prev) {
         printf("DEC: no data\r\n");
         return false;
     }
+#else
+    if (!g_has_prev) {
+        return false;
+    }
+#endif
 
-    /* Фильтрация шума: нужно минимум 4 пакета для определения жеста */
-    if (g_packet_count < 4) {
+    if (g_packet_count < APDS_FIFO_MIN_PACKETS) {
+#ifdef APDS9960_DEBUG
         printf("DEC: too few packets (%d)\r\n", g_packet_count);
+#endif
         return false;
     }
 
     int16_t abs_ud = g_ud_acc < 0 ? -g_ud_acc : g_ud_acc;
     int16_t abs_lr = g_lr_acc < 0 ? -g_lr_acc : g_lr_acc;
 
+#ifdef APDS9960_DEBUG
     printf("DEC: ud_acc=%d lr_acc=%d pkts=%d thr=%d\r\n",
            g_ud_acc, g_lr_acc, g_packet_count, SENSITIVITY_1);
+#endif
 
-    /* Нет значимого движения */
     if (abs_ud < SENSITIVITY_1 && abs_lr < SENSITIVITY_1) {
+#ifdef APDS9960_DEBUG
         printf("DEC: no motion (below threshold)\r\n");
+#endif
         return false;
     }
 
-    /* Определяем доминирующую ось */
     if (abs_ud > abs_lr) {
         g_motion = (g_ud_acc > 0) ? GESTURE_UP : GESTURE_DOWN;
     } else {
         g_motion = (g_lr_acc > 0) ? GESTURE_LEFT : GESTURE_RIGHT;
     }
+#ifdef APDS9960_DEBUG
     printf("DEC: motion=%d\r\n", g_motion);
+#endif
     return true;
 }
 
@@ -240,85 +251,69 @@ static bool decode_gesture(void) {
  *   - ошибке I2C шины
  * ============================================================================ */
 
-/* Полная переинициализация датчика APDS9960.
- * Сбрасывает все регистры к начальным значениям.
- * Аналогично apds_init(), но без проверки ID. */
-static void sensor_reinit(void) {
-    /* Отключаем все функции (регистр ENABLE = 0x00) */
-    wr(REG_ENABLE, 0x00);
+/* Полная конфигурация всех регистров датчика.
+ * Отключает все функции, настраивает тайминги, proximity, CONTROL, 
+ * жестовый режим и включает PON+PEN+GEN+WEN. */
+static bool configure_registers(void) {
+    if (!wr(REG_ENABLE, 0x00)) return false;
 
     /* Задержка ~1 мс (NOP-цикл на 48 МГц) */
     for (volatile uint16_t d = 0; d < 2000; d++) { __asm__ volatile("nop"); }
 
     /* --- Тайминги --- */
-    /* ATIME = 0xDB (219): время интегрирования ALS = (256-219)*3.8мс = 140 мс */
-    wr(REG_ATIME, 0xDB);
-    /* WTIME = 0xFF (255): время ожидания = (256-255)*2.8мс = 2.8 мс */
-    wr(REG_WTIME, 0xFF);
+    if (!wr(REG_ATIME, 0xDB)) return false;    /* ALS интегрирование 140 мс */
+    if (!wr(REG_WTIME, 0xFF)) return false;    /* ожидание 2.8 мс */
 
     /* --- Proximity --- */
-    /* PPULSE = 0x87: длина импульса 16 мкс, количество 8 импульсов.
-     * Биты [7:6] = 10 (16 мкс), биты [5:0] = 000111 (7+1=8 импульсов) */
-    wr(REG_PPULSE, 0x87);
-    /* Смещения proximity: 0 = без коррекции */
-    wr(REG_POFFSET_UR, 0x00);
-    wr(REG_POFFSET_DL, 0x00);
-    /* Пороги proximity: PILT=0 (минимум), PIHT=50 (верхний порог) */
-    wr(REG_PILT, 0x00);
-    wr(REG_PIHT, (uint8_t)(APDS_PROX_THRESHOLD > 255 ? 255 : APDS_PROX_THRESHOLD));
+    if (!wr(REG_PPULSE, 0x87)) return false;   /* 16 мкс x 8 импульсов */
+    if (!wr(REG_POFFSET_UR, 0x00)) return false;
+    if (!wr(REG_POFFSET_DL, 0x00)) return false;
+    if (!wr(REG_PILT, 0x00)) return false;
+    if (!wr(REG_PIHT, (uint8_t)(APDS_PROX_THRESHOLD > 255 ? 255 : APDS_PROX_THRESHOLD))) return false;
 
-    /* --- Регистр CONTROL (0x8F) --- */
-    /* [7:6] LEDDRIVE=0 (100mA), [3:2] PGAIN=2 (4x), [1:0] AGAIN=0 (1x) */
+    /* --- CONTROL (0x8F) --- */
     uint8_t ctrl = ((uint8_t)APDS_LED_CURRENT << CTRL_LED_SHIFT) |
                    ((uint8_t)APDS_GAIN << CTRL_PGAIN_SHIFT);
-    wr(REG_CONTROL, ctrl);
+    if (!wr(REG_CONTROL, ctrl)) return false;
 
     /* --- Конфигурация --- */
-    /* CONFIG1 = 0x60: бит 5 = без 12x множителя WTIME */
-    wr(REG_CONFIG1, 0x60);
-    /* CONFIG2 = 0x31: LED_BOOST=300% (биты [5:4]=11), без прерываний насыщения */
-    wr(REG_CONFIG2, 0x31);
-    /* CONFIG3 = 0x00: все фотодиоды активны, без SAI (автономный сон) */
-    wr(REG_CONFIG3, 0x00);
-    /* PERS = 0x11: персистентность = 2 подряд для prox/ALS прерывания */
-    wr(REG_PERS, 0x11);
+    if (!wr(REG_CONFIG1, 0x60)) return false;
+    if (!wr(REG_CONFIG2, 0x31)) return false;
+    if (!wr(REG_CONFIG3, 0x00)) return false;
+    if (!wr(REG_PERS, 0x11)) return false;
 
     /* --- Жестовый режим --- */
-    /* GPENTH = 50: порог входа в жестовый режим */
-    wr(REG_GPENTH, APDS_PROX_THRESHOLD);
-    /* GEXTH = 30: порог выхода из жестового режима */
-    wr(REG_GEXTH, APDS_GESTURE_EXIT_TH);
-    /* GCONF1 = 0x40: 4 события FIFO для прерывания, 1 для выхода */
-    wr(REG_GCONF1, 0x40);
+    if (!wr(REG_GPENTH, APDS_PROX_THRESHOLD)) return false;
+    if (!wr(REG_GEXTH, APDS_GESTURE_EXIT_TH)) return false;
+    if (!wr(REG_GCONF1, 0x40)) return false;
 
     /* --- GCONF2 (0xA3) --- */
-    /* [6:5] GGLDRIVE=0 (100mA), [4:3] GGAIN=2 (4x), [2:0] GWTIME=1 (2.8мс) */
     uint8_t gconf2 = ((uint8_t)APDS_GLDRIVE << GCONF2_GLDRIVE_SHIFT) |
                      ((uint8_t)APDS_GGAIN << GCONF2_GGAIN_SHIFT) |
                      ((uint8_t)APDS_GWTIME);
-    wr(REG_GCONF2, gconf2);
+    if (!wr(REG_GCONF2, gconf2)) return false;
 
-    /* Смещения жестовых фотодиодов: 0 = без коррекции */
-    wr(REG_GOFFSET_U, 0x00);
-    wr(REG_GOFFSET_D, 0x00);
-    wr(REG_GOFFSET_L, 0x00);
-    wr(REG_GOFFSET_R, 0x00);
+    if (!wr(REG_GOFFSET_U, 0x00)) return false;
+    if (!wr(REG_GOFFSET_D, 0x00)) return false;
+    if (!wr(REG_GOFFSET_L, 0x00)) return false;
+    if (!wr(REG_GOFFSET_R, 0x00)) return false;
 
-    /* GPULSE = 0xC9: длина импульса 32 мкс, количество 10 импульсов.
-     * Биты [7:6] = 11 (32 мкс), биты [5:0] = 001001 (9+1=10 импульсов) */
-    wr(REG_GPULSE, 0xC9);
+    /* GPULSE = 0xC9: 32 мкс x 10 импульсов */
+    if (!wr(REG_GPULSE, 0xC9)) return false;
 
-    /* GCONF3 = 0x00: все 4 фотодиода активны во время жеста */
-    wr(REG_GCONF3, 0x00);
-
-    /* GCONF4 = 0x01: GMODE=1 (жестовый конечный автомат включен),
-     * GIEN=0 (прерывания выключены).
-     * GMODE=1 обязателен — без него GVALID никогда не станет 1 */
-    wr(REG_GCONF4, 0x01);
+    if (!wr(REG_GCONF3, 0x00)) return false;
+    if (!wr(REG_GCONF4, 0x01)) return false;
 
     /* --- Включение --- */
-    /* ENABLE = 0x4D: PON(0x01) | PEN(0x04) | GEN(0x40) | WEN(0x08) = 0x4D */
-    wr(REG_ENABLE, EN_PON | EN_PEN | EN_GEN | EN_WEN);
+    if (!wr(REG_ENABLE, EN_PON | EN_PEN | EN_GEN | EN_WEN)) return false;
+
+    return true;
+}
+
+/* Полная переинициализация датчика.
+ * Используется при переполнении FIFO или ошибках I2C. */
+static void sensor_reinit(void) {
+    configure_registers();
 }
 
 /* ============================================================================
@@ -340,86 +335,19 @@ static void sensor_reinit(void) {
  *
  * Возвращает: true если датчик отвечает и настроен. */
 bool apds_init(void) {
-    /* --- Шаг 1: Проверка ID датчика --- */
-    /* Известные ID: 0xAB (оригинал), 0xA8, 0x9C, 0x9E (клоны) */
-    uint8_t id = rd(REG_ID);
+    /* Проверка ID датчика: 0xAB (оригинал), 0xA8, 0x9C, 0x9E (клоны) */
+    uint8_t id;
+    if (!rd(REG_ID, &id)) return false;
     if (id != 0xAB && id != 0xA8 && id != 0x9C && id != 0x9E) {
-        return false; /* Датчик не распознан или не отвечает по I2C */
+        return false;
     }
 
-    /* --- Шаг 2: Отключение всех функций --- */
-    wr(REG_ENABLE, 0x00);
+    /* Полная конфигурация всех регистров */
+    if (!configure_registers()) return false;
 
-    /* --- Шаг 3: Тайминги --- */
-    /* ATIME = 0xDB (219): ALS интегрирование = 140 мс */
-    wr(REG_ATIME, 0xDB);
-    /* WTIME = 0xFF (255): ожидание = 2.8 мс */
-    wr(REG_WTIME, 0xFF);
-
-    /* --- Шаг 4: Proximity --- */
-    /* PPULSE = 0x87: 16 мкс x 8 импульсов */
-    wr(REG_PPULSE, 0x87);
-    /* POFFSET_UR = 0x00: смещение UP/RIGHT = 0 */
-    wr(REG_POFFSET_UR, 0x00);
-    /* POFFSET_DL = 0x00: смещение DOWN/LEFT = 0 */
-    wr(REG_POFFSET_DL, 0x00);
-    /* PILT = 0x00: нижний порог proximity = 0 (всегда выше) */
-    wr(REG_PILT, 0x00);
-    /* PIHT = 50: верхний порог proximity (APDS_PROX_THRESHOLD) */
-    wr(REG_PIHT, (uint8_t)(APDS_PROX_THRESHOLD > 255 ? 255 : APDS_PROX_THRESHOLD));
-
-    /* --- Шаг 5: CONTROL (0x8F) --- */
-    /* [7:6] LEDDRIVE = 0 (100mA), [3:2] PGAIN = 2 (4x), [1:0] AGAIN = 0 (1x) */
-    uint8_t ctrl = ((uint8_t)APDS_LED_CURRENT << CTRL_LED_SHIFT) |
-                   ((uint8_t)APDS_GAIN << CTRL_PGAIN_SHIFT);
-    wr(REG_CONTROL, ctrl);
-
-    /* --- Шаг 6: Конфигурация --- */
-    /* CONFIG1 = 0x60: WTIME x 1 (без 12x множителя) */
-    wr(REG_CONFIG1, 0x60);
-    /* CONFIG2 = 0x31: LED_BOOST 300%, без прерываний */
-    wr(REG_CONFIG2, 0x31);
-    /* CONFIG3 = 0x00: все фотодиоды, без SAI */
-    wr(REG_CONFIG3, 0x00);
-    /* PERS = 0x11: 2 подряд prox/ALS для прерывания */
-    wr(REG_PERS, 0x11);
-
-    /* --- Шаг 7: Жестовый режим --- */
-    /* GPENTH = 50: порог входа в gesture mode */
-    wr(REG_GPENTH, APDS_PROX_THRESHOLD);
-    /* GEXTH = 30: порог выхода из gesture mode */
-    wr(REG_GEXTH, APDS_GESTURE_EXIT_TH);
-    /* GCONF1 = 0x40: 4 FIFO для int, 1 для exit */
-    wr(REG_GCONF1, 0x40);
-
-    /* GCONF2: [6:5]=GGLDRIVE(0=100mA), [4:3]=GGAIN(2=4x), [2:0]=GWTIME(1=2.8мс) */
-    uint8_t gconf2 = ((uint8_t)APDS_GLDRIVE << GCONF2_GLDRIVE_SHIFT) |
-                     ((uint8_t)APDS_GGAIN << GCONF2_GGAIN_SHIFT) |
-                     ((uint8_t)APDS_GWTIME);
-    wr(REG_GCONF2, gconf2);
-
-    /* Смещения: все 0 (без коррекции) */
-    wr(REG_GOFFSET_U, 0x00);
-    wr(REG_GOFFSET_D, 0x00);
-    wr(REG_GOFFSET_L, 0x00);
-    wr(REG_GOFFSET_R, 0x00);
-
-    /* GPULSE = 0xC9: 32 мкс x 10 импульсов */
-    wr(REG_GPULSE, 0xC9);
-
-    /* GCONF3 = 0x00: все фотодиоды активны */
-    wr(REG_GCONF3, 0x00);
-
-    /* GCONF4 = 0x01: GMODE=1 (жестовый конечный автомат включен),
-     * GIEN=0 (прерывания выключены) */
-    wr(REG_GCONF4, 0x01);
-
-    /* --- Шаг 8: Включение --- */
-    /* ENABLE = 0x4D: PON | PEN | GEN | WEN */
-    wr(REG_ENABLE, EN_PON | EN_PEN | EN_GEN | EN_WEN);
-
-    /* --- Шаг 9: Проверка PON --- */
-    if (!(rd(REG_ENABLE) & EN_PON)) return false;
+    /* Проверка PON */
+    uint8_t en;
+    if (!rd(REG_ENABLE, &en) || !(en & EN_PON)) return false;
 
     gesture_reset();
     return true;
@@ -430,37 +358,26 @@ bool apds_init(void) {
  * Потребление: ~1 мкА (питание только на логику).
  * Возвращает: true всегда. */
 bool apds_sleep(void) {
-    /* ENABLE = 0x01: только PON (питание включено, функции выключены) */
     wr(REG_ENABLE, EN_PON);
     return true;
 }
 
-/* Пробуждение датчика из режима сна.
- * Включает PEN + GEN + WEN обратно.
- * Возвращает: true если PON установлен после записи. */
 bool apds_wakeup(void) {
-    /* ENABLE = 0x4D: PON | PEN | GEN | WEN */
-    wr(REG_ENABLE, EN_PON | EN_PEN | EN_GEN | EN_WEN);
-    return (rd(REG_ENABLE) & EN_PON) != 0;
+    if (!wr(REG_ENABLE, EN_PON | EN_PEN | EN_GEN | EN_WEN)) return false;
+    uint8_t en;
+    return rd(REG_ENABLE, &en) && (en & EN_PON) != 0;
 }
 
-/* Проверка наличия данных жеста.
- * Читает регистр GSTATUS (0xAF):
- *   Бит 0 (GVALID): 1 = данные в FIFO готовы к чтению
- *   Бит 1 (GFOV):   1 = переполнение FIFO (нужна переинициализация)
- * При переполнении FIFO вызывает sensor_reinit().
- * Возвращает: true если данные готовы. */
 bool apds_available(void) {
-    uint8_t gs = rd(REG_GSTATUS);
+    uint8_t gs;
+    if (!rd(REG_GSTATUS, &gs)) return false;
 
-    /* Переполнение FIFO -> сброс и переинициализация */
     if (gs & GST_GFOV) {
         gesture_reset();
         sensor_reinit();
         return false;
     }
 
-    /* GVALID = 1 -> данные готовы */
     return (gs & GST_GVALID) != 0;
 }
 
@@ -481,30 +398,29 @@ gesture_t apds_readGesture(void) {
     gesture_reset();
 
     uint16_t loops = 0;
-    while (loops < MAX_FIFO_READS) {
-        uint8_t gs = rd(REG_GSTATUS);
+    uint32_t elapsed_ms = 0;
 
-        /* GVALID=0 -> поток данных завершен, декодируем накопленное */
+    while (loops < MAX_FIFO_READS && elapsed_ms < APDS_GESTURE_TIMEOUT_MS) {
+        uint8_t gs;
+        if (!rd(REG_GSTATUS, &gs)) break;
+
         if (!(gs & GST_GVALID)) {
             decode_gesture();
             return g_motion;
         }
 
-        /* GFOV=1 -> переполнение FIFO, прерываем */
         if (gs & GST_GFOV) {
             gesture_reset();
             return GESTURE_NONE;
         }
 
-        /* Обрабатываем батч пакетов из FIFO */
         process_fifo_batch();
         loops++;
 
-        /* Задержка ~0.1 мс (NOP-цикл) для накопления данных в FIFO */
-        for (volatile uint16_t d = 0; d < 500; d++) { __asm__ volatile("nop"); }
+        Delay_Ms(1);
+        elapsed_ms += 1;
     }
 
-    /* Достигнут лимит итераций — декодируем что есть */
     decode_gesture();
     return g_motion;
 }
