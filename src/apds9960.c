@@ -69,6 +69,12 @@ static bool rdBlock(uint8_t reg, uint8_t *buf, uint8_t len) {
  */
 #define RETRY_LIMIT             3
 
+/* Сохранённые откалиброванные пороги (F7) — объявлены до calibrate_proximity() */
+static uint8_t  g_cal_piht;
+static uint8_t  g_cal_gpenth;
+static uint8_t  g_cal_gexth;
+static uint8_t  g_cal_valid;
+
 #if APDS_ENABLE_CALIBRATION
 /* Целочисленный квадратный корень (алгоритм Ньютона).
  * Используется при калибровке для вычисления σ.
@@ -82,6 +88,129 @@ static uint8_t isqrt(uint16_t n) {
         y = (uint16_t)((x + n / x) / 2);
     }
     return (uint8_t)x;
+}
+
+/* Простейшая сортировка вставками для uint8_t (32 элемента). */
+static void sort_u8(uint8_t *arr, uint8_t n) {
+    for (uint8_t i = 1; i < n; i++) {
+        uint8_t key = arr[i];
+        int8_t j = (int8_t)i - 1;
+        while (j >= 0 && arr[j] > key) {
+            arr[j + 1] = arr[j];
+            j--;
+        }
+        arr[j + 1] = key;
+    }
+}
+
+/* Автоматическая калибровка порогов proximity.
+ * Переключает датчик в proximity-only режим (PON+PEN),
+ * собирает APDS_CAL_SAMPLES замеров PDATA с отсевом насыщения (>FILTER_MAX),
+ * вычисляет медиану и σ, устанавливает PIHT / GPENTH / GEXTH,
+ * сохраняет их для sensor_reinit() и возвращается в gesture mode.
+ * Если калибровка невозможна (насыщение/рука рядом) — используются дефолты.
+ * Возвращает: true (всегда — датчик остаётся в gesture mode). */
+static bool calibrate_proximity(void) {
+    uint8_t buf[APDS_CAL_SAMPLES];
+    uint8_t valid_cnt = 0;
+
+    /* Переключаем в proximity-only (без жестового режима — GEN выкл) */
+    if (!wr(REG_ENABLE, EN_PON | EN_PEN)) return false;
+    Delay_Ms(50);   /* Стабилизация proximity */
+
+    /* Сбор замеров PDATA с фильтрацией насыщения */
+    {
+        uint16_t pv_timeout = 100;
+        uint8_t total = 0;
+        while (valid_cnt < APDS_CAL_SAMPLES && total < APDS_CAL_SAMPLES * 2) {
+            uint8_t status;
+            if (!rd(REG_STATUS, &status)) return false;
+
+            if (!(status & ST_PVALID)) {
+                if (--pv_timeout == 0) break;
+                Delay_Ms(1);
+                continue;
+            }
+
+            uint8_t data;
+            if (!rd(REG_PDATA, &data)) return false;
+            total++;
+            if (data > APDS_CAL_FILTER_MAX) continue;  /* насыщение — пропускаем */
+
+            buf[valid_cnt++] = data;
+            pv_timeout = 100;
+            Delay_Ms(10);
+        }
+    }
+
+    /* Если валидных замеров меньше половины — датчик насыщен, используем дефолты */
+    if (valid_cnt < APDS_CAL_SAMPLES / 2) {
+        g_cal_valid = 0;
+        if (!wr(REG_ENABLE, EN_PON | EN_PEN | EN_GEN | EN_WEN)) return false;
+#ifdef APDS9960_DEBUG
+        printf("CAL: FAIL (saturated, valid=%d) using defaults gpenth=%d gexth=%d\r\n",
+               valid_cnt, APDS_PROX_THRESHOLD, APDS_GESTURE_EXIT_TH);
+#endif
+        return true;
+    }
+
+    /* Сортируем и берём медиану */
+    sort_u8(buf, valid_cnt);
+    uint8_t median;
+    if (valid_cnt & 1) {
+        median = buf[valid_cnt / 2];
+    } else {
+        median = (uint8_t)(((uint16_t)buf[valid_cnt / 2 - 1] + (uint16_t)buf[valid_cnt / 2]) / 2);
+    }
+
+    /* Дисперсия от медианы (со сдвигом /4 для избежания переполнения) */
+    uint16_t sum_sq = 0;
+    for (uint8_t i = 0; i < valid_cnt; i++) {
+        int16_t d = (int16_t)buf[i] - (int16_t)median;
+        int16_t d4 = d / 4;
+        sum_sq += (uint16_t)(d4 * d4);
+    }
+    uint16_t var = sum_sq / valid_cnt;
+    uint8_t sigma = isqrt(var) * 4;
+
+    /* Вычисление порогов */
+    uint16_t entry = (uint16_t)median + (uint16_t)APDS_CAL_SIGMA_COEFF * sigma;
+    uint16_t exit_th = entry * 6 / 10;
+
+    if (entry > APDS_CAL_PROX_MAX) entry = APDS_CAL_PROX_MAX;
+    if (entry < APDS_CAL_PROX_MIN) entry = APDS_CAL_PROX_MIN;
+    if (exit_th < 1) exit_th = 1;
+
+    uint8_t prox_th = (uint8_t)entry;
+    uint8_t exit_val = (uint8_t)exit_th;
+
+    /* Sanity check: если порог > 100 — среда загрязнена, используем дефолты */
+    if (prox_th > 100) {
+        prox_th = APDS_PROX_THRESHOLD;
+        exit_val = APDS_GESTURE_EXIT_TH;
+        g_cal_valid = 0;
+    } else {
+        /* Сохраняем откалиброванные пороги для sensor_reinit() */
+        g_cal_piht   = prox_th;
+        g_cal_gpenth = prox_th;
+        g_cal_gexth  = exit_val;
+        g_cal_valid  = 1;
+    }
+
+    /* Запись порогов */
+    if (!wr(REG_PIHT, prox_th)) return false;
+    if (!wr(REG_GPENTH, prox_th)) return false;
+    if (!wr(REG_GEXTH, exit_val)) return false;
+
+    /* Включаем полноценный жестовый режим */
+    if (!wr(REG_ENABLE, EN_PON | EN_PEN | EN_GEN | EN_WEN)) return false;
+
+#ifdef APDS9960_DEBUG
+    printf("CAL: median=%d valid=%d sigma=%d gpenth=%d gexth=%d\r\n",
+           median, valid_cnt, sigma, prox_th, exit_val);
+#endif
+
+    return true;
 }
 #endif /* APDS_ENABLE_CALIBRATION */
 
@@ -126,12 +255,6 @@ static volatile uint8_t  g_reinit_count;
 /* g_last_error — Код последней ошибки для диагностики.
  * Устанавливается функциями драйвера при сбоях. */
 static volatile uint8_t  g_last_error;
-
-/* Сохранённые откалиброванные пороги (F7) */
-static uint8_t  g_cal_piht;
-static uint8_t  g_cal_gpenth;
-static uint8_t  g_cal_gexth;
-static uint8_t  g_cal_valid;    /* 1 если калибровка выполнена */
 
 /* Сброс всех переменных состояния жеста */
 static void gesture_reset(void) {
@@ -277,89 +400,6 @@ static bool decode_gesture(void) {
 /* ============================================================================
  * КАЛИБРОВКА ПОРОГОВ PROXIMITY
  * ============================================================================ */
-
-#if APDS_ENABLE_CALIBRATION
-/* Автоматическая калибровка порогов proximity.
- * Переключает датчик в proximity-only режим (PON+PEN),
- * собирает APDS_CAL_SAMPLES замеров PDATA, вычисляет среднее и σ,
- * устанавливает PIHT / GPENTH / GEXTH, сохраняет их для sensor_reinit()
- * и возвращает в полноценный жестовый режим (PON+PEN+GEN+WEN).
- * Возвращает: true если калибровка успешна. */
-static bool calibrate_proximity(void) {
-    uint8_t buf[APDS_CAL_SAMPLES];
-
-    /* Переключаем в proximity-only (без жестового режима — GEN выкл) */
-    if (!wr(REG_ENABLE, EN_PON | EN_PEN)) return false;
-    Delay_Ms(50);   /* Стабилизация proximity */
-
-    /* Сбор замеров PDATA */
-    uint8_t i = 0;
-    uint16_t pv_timeout = 100;  /* ~100 мс ожидание PVALID */
-    while (i < APDS_CAL_SAMPLES) {
-        uint8_t status;
-        if (!rd(REG_STATUS, &status)) return false;
-
-        if (!(status & ST_PVALID)) {
-            if (--pv_timeout == 0) return false;
-            Delay_Ms(1);
-            continue;
-        }
-
-        if (!rd(REG_PDATA, &buf[i])) return false;
-        i++;
-        Delay_Ms(10);
-    }
-
-    /* Среднее */
-    uint16_t sum = 0;
-    for (uint8_t i = 0; i < APDS_CAL_SAMPLES; i++) {
-        sum += buf[i];
-    }
-    uint8_t mean = (uint8_t)(sum / APDS_CAL_SAMPLES);
-
-    /* Дисперсия со сдвигом для избежания переполнения */
-    uint16_t sum_sq = 0;
-    for (uint8_t i = 0; i < APDS_CAL_SAMPLES; i++) {
-        int16_t d = (int16_t)buf[i] - mean;
-        int16_t d4 = d / 4;
-        sum_sq += (uint16_t)(d4 * d4);
-    }
-    uint16_t var = sum_sq / APDS_CAL_SAMPLES;
-    uint8_t sigma = isqrt(var) * 4;
-
-    /* Вычисление порогов */
-    uint16_t entry = (uint16_t)mean + (uint16_t)APDS_CAL_SIGMA_COEFF * sigma;
-    uint16_t exit_th = entry * 6 / 10;
-
-    if (entry > APDS_CAL_PROX_MAX) entry = APDS_CAL_PROX_MAX;
-    if (entry < APDS_CAL_PROX_MIN) entry = APDS_CAL_PROX_MIN;
-    if (exit_th < 1) exit_th = 1;
-
-    uint8_t prox_th = (uint8_t)entry;
-    uint8_t exit_val = (uint8_t)exit_th;
-
-    /* Сохраняем откалиброванные пороги для sensor_reinit() */
-    g_cal_piht   = prox_th;
-    g_cal_gpenth = prox_th;
-    g_cal_gexth  = exit_val;
-    g_cal_valid  = 1;
-
-    /* Запись порогов */
-    if (!wr(REG_PIHT, prox_th)) return false;
-    if (!wr(REG_GPENTH, prox_th)) return false;
-    if (!wr(REG_GEXTH, exit_val)) return false;
-
-    /* Включаем полноценный жестовый режим */
-    if (!wr(REG_ENABLE, EN_PON | EN_PEN | EN_GEN | EN_WEN)) return false;
-
-#ifdef APDS9960_DEBUG
-    printf("CAL: mean=%d sigma=%d gpenth=%d gexth=%d\r\n",
-           mean, sigma, prox_th, exit_val);
-#endif
-
-    return true;
-}
-#endif /* APDS_ENABLE_CALIBRATION */
 
 /* Полная конфигурация всех регистров датчика.
  * Отключает все функции, настраивает тайминги, proximity, CONTROL, 

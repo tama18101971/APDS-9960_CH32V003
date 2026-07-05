@@ -140,7 +140,7 @@ typedef enum {
 
 /* Отладочный вывод: раскомментируйте следующую строку или определите
  * APDS9960_DEBUG при сборке (-DAPDS9960_DEBUG) для включения printf */
-/* #define APDS9960_DEBUG */
+ #define APDS9960_DEBUG 
 
 /*
  * APDS_GWTIME — Время ожидания между жестовыми измерениями
@@ -192,6 +192,12 @@ typedef enum {
 /* Максимальный порог proximity (насыщение). */
 #ifndef APDS_CAL_PROX_MAX
 #define APDS_CAL_PROX_MAX           200
+#endif
+
+/* Порог отсева выбросов калибровки: PDATA > FILTER_MAX считаются насыщением и отбрасываются.
+ * Если >50% замеров отброшены — калибровка неуспешна, используются дефолты. */
+#ifndef APDS_CAL_FILTER_MAX
+#define APDS_CAL_FILTER_MAX         60
 #endif
 
 /* Коды ошибок драйвера */
