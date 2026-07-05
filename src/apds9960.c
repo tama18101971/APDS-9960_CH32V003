@@ -67,7 +67,7 @@ static bool rdBlock(uint8_t reg, uint8_t *buf, uint8_t len) {
 /*
  * RETRY_LIMIT = 3 — Количество повторных попыток при ошибках I2C.
  */
-#define RETRY_LIMIT             3
+#define RETRY_LIMIT             6
 
 /* Сохранённые откалиброванные пороги (F7) — объявлены до calibrate_proximity() */
 static uint8_t  g_cal_piht;
