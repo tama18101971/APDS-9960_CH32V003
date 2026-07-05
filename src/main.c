@@ -52,7 +52,18 @@ int main(void) {
     }
 
     /* Основной цикл опроса жестов */
+    uint32_t cooldown_end = 0;
+
     while (1) {
+        /* Кулдаун: просто дропаем FIFO, ждём пока таймер истечёт */
+        if (cooldown_end != 0) {
+            if ((int32_t)(SysTick->CNT - cooldown_end) < 0) {
+                while (apds_available()) apds_readGesture();
+                continue;
+            }
+            cooldown_end = 0;
+        }
+
         /* Проверяем наличие данных жеста (GVALID в GSTATUS) */
         if (apds_available()) {
             /* Читаем жест (блокирующая функция, ~10-60 мс) */
@@ -67,9 +78,9 @@ int main(void) {
                 default: break;
             }
 
-            /* Кулдаун после жеста — пропускаем данные пока рука уходит */
+            /* Кулдаун после жеста — 300 мс неблокирующе (SysTick counts down) */
             if (g != GESTURE_NONE) {
-                Delay_Ms(300);
+                cooldown_end = SysTick->CNT - (48000 * 300);
                 while (apds_available()) apds_readGesture();
             }
         }
