@@ -536,7 +536,7 @@ bool apds_init(void) {
                 return true;
             }
         }
-        Delay_Ms(10);
+        Delay_Ms(50);
     }
 
     g_last_error = APDS_ERR_SENSOR_HANG;
