@@ -26,8 +26,9 @@ No test framework configured. Manual testing via UART output (PD5, 115200 baud).
 | File | Purpose |
 |------|---------|
 | `src/apds9960.h` | Public API + all configurable #defines |
-| `src/apds9960.c` | Driver implementation (~580 lines) |
+| `src/apds9960.c` | Driver implementation (~700 lines) |
 | `src/apds9960_regs.h` | APDS9960 register map |
+| `src/int_config.h` / `src/int_config.c` | EXTI interrupt setup (INT→PC3) |
 | `src/i2c.c` / `src/i2c.h` | I2C driver for CH32V003 |
 | `src/main.c` | Entry point, usage example |
 
@@ -39,6 +40,7 @@ No test framework configured. Manual testing via UART output (PD5, 115200 baud).
 - **`sensor_reinit()`** restores calibrated thresholds after FIFO overflow or I2C errors. Uses static `g_cal_*` variables.
 - **Cooldown** in main loop uses `SysTick->CNT` (32-bit down counter, 48 MHz) — non-blocking. Do NOT use `Delay_Ms()` for cooldown.
 - **Power states:** `apds_sleep()` keeps PON (~1 µA), `apds_shutdown()` clears PON (<1 µA, IR LED off). `apds_wakeup()` handles both correctly (PON first, 1ms delay, then enable everything).
+- **Interrupt mode:** `APDS_INT_MODE=1` enables gesture interrupt on PC3 (EXTI3 falling-edge). ISR sets `g_apds_int_flag`, main loop uses `__WFI()`. Cooldown disables NVIC, delays, drains FIFO, re-enables NVIC.
 - **I2C retries:** `RETRY_LIMIT=6` in `apds9960.h`. All I2C writes go through `wr()` which retries on failure.
 
 ## Gotchas
@@ -46,4 +48,5 @@ No test framework configured. Manual testing via UART output (PD5, 115200 baud).
 - PDATA in proximity-only mode saturates (~247) due to LED_BOOST=300% + PGAIN=8x. Gesture mode gives realistic values (~188-191). Calibration works correctly only in gesture mode.
 - `SysTick->CNT` counts DOWN on CH32V003. Use `start_time - SysTick->CNT` (wraps correctly for 32-bit unsigned).
 - `APDS9960_DEBUG` macro gates all printf output. Comment it out to enable debug prints (costs ~2400 bytes flash).
+- Interrupt mode requires `RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE)` before `GPIO_EXTILineConfig()`. Without it, EXTI mapping is silently ignored.
 

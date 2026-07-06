@@ -45,8 +45,9 @@ src/
   apds9960.h         — Public API and configurable parameters
   apds9960.c         — Driver implementation
   apds9960_regs.h    — Register map and bit definitions
+  int_config.h / int_config.c — EXTI interrupt setup (PC3)
   i2c.h / i2c.c      — I2C driver for CH32V003
-  main.c             — Usage example
+  main.c             — Usage example (polling + interrupt modes)
 ```
 
 ## Build
@@ -95,6 +96,15 @@ uint8_t apds_getReinitCount(void);
 
 // Recalibrate thresholds
 bool apds_recalibrate(void);
+
+// Enable gesture interrupt (GIEN=1, INT pin active-low)
+void apds_enableInterrupt(void);
+
+// Disable gesture interrupt (GIEN=0)
+void apds_disableInterrupt(void);
+
+// Clear interrupt: read GSTATUS → INT pin goes high
+void apds_clearInterrupt(void);
 ```
 
 ### Gesture Types
@@ -120,6 +130,64 @@ typedef enum {
 
 ## Usage Example
 
+### Interrupt Mode (recommended)
+
+```c
+#include <ch32v00x.h>
+#include <debug.h>
+#include "i2c.h"
+#include "apds9960.h"
+#include "int_config.h"
+
+int main(void) {
+    SystemCoreClockUpdate();
+    Delay_Init();
+    USART_Printf_Init(115200);
+
+    i2c_init(100000);
+
+    if (!apds_init()) {
+        printf("Sensor not found!\r\n");
+        while (1) {}
+    }
+
+    // INT → PC3 (EXTI3, falling-edge)
+    apds_exti_init();
+    apds_enableInterrupt();
+
+    while (1) {
+        // CPU sleeps until ISR sets flag
+        while (g_apds_int_flag == 0) { __WFI(); }
+        g_apds_int_flag = 0;
+
+        apds_clearInterrupt();
+
+        if (apds_available()) {
+            gesture_t g = apds_readGesture();
+            switch (g) {
+                case GESTURE_LEFT:  printf("LEFT\r\n");  break;
+                case GESTURE_RIGHT: printf("RIGHT\r\n"); break;
+                case GESTURE_UP:    printf("UP\r\n");    break;
+                case GESTURE_DOWN:  printf("DOWN\r\n");  break;
+                default: break;
+            }
+
+            // 300 ms cooldown: disable EXTI, delay, drain FIFO
+            if (g != GESTURE_NONE) {
+                apds_exti_disable();
+                Delay_Ms(300);
+                while (apds_available()) apds_readGesture();
+                g_apds_int_flag = 0;
+                apds_clearInterrupt();
+                apds_exti_enable();
+            }
+        }
+    }
+}
+```
+
+### Polling Mode
+
 ```c
 #include <ch32v00x.h>
 #include <debug.h>
@@ -138,12 +206,9 @@ int main(void) {
         while (1) {}
     }
 
-    printf("Ready. Wave your hand!\r\n");
-
     uint32_t cooldown_end = 0;
 
     while (1) {
-        // Non-blocking cooldown
         if (cooldown_end != 0) {
             if ((int32_t)(SysTick->CNT - cooldown_end) < 0) {
                 while (apds_available()) apds_readGesture();
@@ -162,7 +227,6 @@ int main(void) {
                 default: break;
             }
 
-            // 300 ms cooldown after gesture
             if (g != GESTURE_NONE) {
                 cooldown_end = SysTick->CNT - (48000 * 300);
                 while (apds_available()) apds_readGesture();
@@ -288,6 +352,7 @@ Override defaults by defining before including `apds9960.h`:
 #define APDS_GESTURE_EXIT_TH    30  // Proximity exit threshold (0-255)
 #define APDS_GWTIME             1   // Gesture wait: 0=0ms, 1=2.8ms, ..., 7=39.2ms
 #define APDS_GESTURE_TIMEOUT_MS 300 // Gesture timeout (ms)
+#define APDS_INT_MODE           1   // 0=polling, 1=interrupt (PC3)
 ```
 
 ### Tuning Tips
@@ -339,8 +404,7 @@ Gesture: LEFT
 
 ## Limitations
 
-- Blocking API — `apds_readGesture()` blocks for the duration of the gesture
-- No interrupt-driven mode (polling only)
+- `apds_readGesture()` blocks for the duration of the gesture (~10-60 ms)
 - No RGB, ALS, or proximity-only API (gesture mode only)
 - Calibration works best in gesture mode (proximity-only saturates)
 
