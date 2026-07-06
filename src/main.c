@@ -24,13 +24,24 @@
 void NMI_Handler(void) __attribute__((interrupt("WCH-Interrupt-fast")));
 void HardFault_Handler(void) __attribute__((interrupt("WCH-Interrupt-fast")));
 
+/* Вывод имени распознанного жеста в UART (общий код для polling/interrupt режимов) */
+static void print_gesture(gesture_t g) {
+    switch (g) {
+        case GESTURE_LEFT:  printf("LEFT\r\n");  break;
+        case GESTURE_RIGHT: printf("RIGHT\r\n"); break;
+        case GESTURE_UP:    printf("UP\r\n");    break;
+        case GESTURE_DOWN:  printf("DOWN\r\n");  break;
+        default: break;
+    }
+}
+
 int main(void) {
     SystemCoreClockUpdate();
     Delay_Init();
     USART_Printf_Init(115200);
     printf("APDS9960 gesture driver init...\r\n");
 
-    i2c_init(100000);
+    i2c_init(400000);
 
     if (!apds_init()) {
         printf("ERROR: APDS9960 not responding!\r\n");
@@ -61,6 +72,12 @@ int main(void) {
      * Main loop засыпает (__WFI) пока ISR не установит g_apds_int_flag.
      * Прерывание срабатывает при GVALID=1 (falling edge на INT pin).
      * После пробуждения: читаем жест через существующий API.
+     *
+     * Искусственный кулдаун после жеста не требуется: apds_readGesture()
+     * теперь ждёт настоящего завершения жеста (GVALID=0) по дедлайну
+     * SysTick вместо фиксированного числа итераций, поэтому "хвост"
+     * одного физического взмаха руки больше не декодируется как отдельный
+     * второй жест. Оставляем лишь безусловный дренаж FIFO — обычно no-op.
      * ======================================================================== */
     while (1) {
         while (g_apds_int_flag == 0) {
@@ -72,24 +89,8 @@ int main(void) {
 
         if (apds_available()) {
             gesture_t g = apds_readGesture();
-
-            switch (g) {
-                case GESTURE_LEFT:  printf("LEFT\r\n");  break;
-                case GESTURE_RIGHT: printf("RIGHT\r\n"); break;
-                case GESTURE_UP:    printf("UP\r\n");    break;
-                case GESTURE_DOWN:  printf("DOWN\r\n");  break;
-                default: break;
-            }
-
-            if (g != GESTURE_NONE) {
-                /* Кулдаун: отключаем прерывание, ждём 300 мс, сбрасываем FIFO */
-                apds_exti_disable();
-                Delay_Ms(300);
-                while (apds_available()) apds_readGesture();
-                g_apds_int_flag = 0;
-                apds_clearInterrupt();
-                apds_exti_enable();
-            }
+            print_gesture(g);
+            while (apds_available()) apds_readGesture();
         }
     }
 
@@ -97,30 +98,12 @@ int main(void) {
     /* ========================================================================
      * POLLING MODE (оригинальный код)
      * ======================================================================== */
-    uint32_t cooldown_end = 0;
-
     while (1) {
-        if (cooldown_end != 0) {
-            if ((int32_t)(SysTick->CNT - cooldown_end) < 0) {
-                while (apds_available()) apds_readGesture();
-                continue;
-            }
-            cooldown_end = 0;
-        }
-
         if (apds_available()) {
             gesture_t g = apds_readGesture();
-
-            switch (g) {
-                case GESTURE_LEFT:  printf("LEFT\r\n");  break;
-                case GESTURE_RIGHT: printf("RIGHT\r\n"); break;
-                case GESTURE_UP:    printf("UP\r\n");    break;
-                case GESTURE_DOWN:  printf("DOWN\r\n");  break;
-                default: break;
-            }
+            print_gesture(g);
 
             if (g != GESTURE_NONE) {
-                cooldown_end = SysTick->CNT - (48000 * 300);
                 while (apds_available()) apds_readGesture();
             }
         }

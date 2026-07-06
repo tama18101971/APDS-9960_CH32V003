@@ -58,14 +58,24 @@ static bool rdBlock(uint8_t reg, uint8_t *buf, uint8_t len) {
 #define SENSITIVITY_1           5
 
 /*
- * MAX_FIFO_READS = 32 — Максимальное количество чтений FIFO
- * за один вызов readGesture(). Каждое чтение ~1-2 мс.
- * 32 x ~2 мс = ~64 мс максимум блокировки.
+ * FIFO_BATCH_MAX = 32 — Максимальная глубина аппаратного FIFO жестов
+ * (датчик поддерживает до 32 пакетов U/D/L/R по 4 байта = 128 байт).
+ * Используется как размер статического буфера пакетного чтения FIFO
+ * и как защитный потолок для значения GFLVL.
  */
-#define MAX_FIFO_READS          32
+#define FIFO_BATCH_MAX          32
 
 /*
- * RETRY_LIMIT = 3 — Количество повторных попыток при ошибках I2C.
+ * RETRY_LIMIT = 6 — Количество повторных попыток ПОЛНОЙ конфигурации
+ * датчика в apds_init() (весь configure_registers() целиком, а не
+ * отдельный I2C-вызов), а также потолок счётчика последовательных
+ * sensor_reinit() в apds_available() (защита от бесконечного цикла
+ * переинициализаций при неисправном датчике).
+ * @note Это НЕ поканальный retry внутри rd()/wr()/rdBlock() — при сбое
+ * одной I2C-операции внутри process_fifo_batch()/configure_registers()
+ * функция просто возвращает false, без повторной попытки этой конкретной
+ * операции. Отказоустойчивость на уровне шины обеспечивает i2c.c
+ * (bus recovery), но не автоматический retry на уровне регистра.
  */
 #define RETRY_LIMIT             6
 
@@ -324,18 +334,22 @@ static void gesture_reset(void) {
  * ============================================================================ */
 
 /* Обработка одного батча пакетов FIFO.
+ * Все доступные пакеты читаются ОДНОЙ I2C-транзакцией (а не по одной на пакет) —
+ * это кратно снижает накладные расходы шины и риск переполнения FIFO (GFOV),
+ * так как датчик может заполнить все 32 пакета быстрее, чем их можно вычитать
+ * по одному пакету за транзакцию.
  * Каждый новый пакет: вычисляем дельту от предыдущего и прибавляем к аккумулятору.
  * Ratio = (U-D)*100/(U+D), диапазон -100..+100 */
 static void process_fifo_batch(void) {
     uint8_t fifo_level = 0;
     if (!rd(REG_GFLVL, &fifo_level) || fifo_level == 0) return;
+    if (fifo_level > FIFO_BATCH_MAX) fifo_level = FIFO_BATCH_MAX; /* защита от некорректных данных */
 
-    uint8_t buf[4]; /* [U, D, L, R] */
+    uint8_t buf[FIFO_BATCH_MAX * 4]; /* [U,D,L,R] x до 32 пакетов */
+    if (!rdBlock(REG_GFIFO_U, buf, (uint8_t)(fifo_level * 4))) return;
 
     for (uint8_t i = 0; i < fifo_level; i++) {
-        if (!rdBlock(REG_GFIFO_U, buf, 4)) return;
-
-        uint8_t u = buf[0], d = buf[1], l = buf[2], r = buf[3];
+        uint8_t u = buf[i * 4 + 0], d = buf[i * 4 + 1], l = buf[i * 4 + 2], r = buf[i * 4 + 3];
 
         /* Фильтр: насыщение (> 250) или шум (все < 10) */
         if (u > 250 || d > 250 || l > 250 || r > 250) continue;
@@ -611,22 +625,30 @@ bool apds_available(void) {
  *
  * Алгоритм:
  *   1. Сбрасывает состояние
- *   2. Цикл пока GVALID=1 (макс. MAX_FIFO_READS=32 итераций):
+ *   2. Цикл пока GVALID=1 (реальный дедлайн по SysTick, до APDS_GESTURE_TIMEOUT_MS):
  *      a. Читает GSTATUS
- *      b. Если GVALID=0 -> жест завершен, декодируем
+ *      b. Если GVALID=0 -> жест физически завершён, декодируем
  *      c. Если GFOV=1 -> переполнение, выходим
- *      d. Обрабатываем батч FIFO (process_fifo_batch)
- *      e. Задержка ~500 NOP (ожидание новых данных)
+ *      d. Обрабатываем батч FIFO (process_fifo_batch, одна I2C-транзакция на весь батч)
+ *      e. Небольшая пауза перед следующим опросом GSTATUS
  *   3. Декодируем финальное направление
+ *
+ * @note Дедлайн считается по SysTick->CNT (аппаратный таймер, считает ВНИЗ на
+ * CH32V003), а не по счётчику итераций — иначе цикл может завершиться заметно
+ * раньше APDS_GESTURE_TIMEOUT_MS (например, если I2C-транзакции внутри цикла
+ * суммарно занимают больше времени, чем предполагает фиксированная задержка),
+ * что раньше приводило к обрыву распознавания на середине физического жеста
+ * и его "двоению" (вторая половина того же взмаха руки трактовалась как
+ * отдельный жест).
  *
  * Возвращает: gesture_t — тип жеста или GESTURE_NONE. */
 gesture_t apds_readGesture(void) {
     gesture_reset();
 
-    uint16_t loops = 0;
-    uint32_t elapsed_ms = 0;
+    uint32_t start_tick = SysTick->CNT;
+    uint32_t timeout_ticks = (SystemCoreClock / 1000UL) * APDS_GESTURE_TIMEOUT_MS;
 
-    while (loops < MAX_FIFO_READS && elapsed_ms < APDS_GESTURE_TIMEOUT_MS) {
+    while ((int32_t)(start_tick - SysTick->CNT) < (int32_t)timeout_ticks) {
         uint8_t gs;
         if (!rd(REG_GSTATUS, &gs)) {
             g_last_error = APDS_ERR_I2C;
@@ -644,10 +666,8 @@ gesture_t apds_readGesture(void) {
         }
 
         process_fifo_batch();
-        loops++;
 
         Delay_Ms(1);
-        elapsed_ms += 1;
     }
 
     decode_gesture();
