@@ -80,6 +80,16 @@ int main(void) {
                 case GESTURE_DOWN:  printf("DOWN\r\n");  break;
                 default: break;
             }
+
+            if (g != GESTURE_NONE) {
+                /* Кулдаун: отключаем прерывание, ждём 300 мс, сбрасываем FIFO */
+                apds_exti_disable();
+                Delay_Ms(300);
+                while (apds_available()) apds_readGesture();
+                g_apds_int_flag = 0;
+                apds_clearInterrupt();
+                apds_exti_enable();
+            }
         }
     }
 

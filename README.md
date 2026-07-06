@@ -5,12 +5,13 @@ Compact gesture recognition driver for the APDS9960 proximity/light/color sensor
 ## Features
 
 - Minimal RAM usage (~476 bytes total)
-- Minimal Flash footprint (~9 KB)
+- Minimal Flash footprint (~9 KB polling, ~10 KB interrupt)
 - No dynamic memory allocation (`malloc`/`free`)
 - No floating-point math — integer-only arithmetic
 - Configurable parameters via `#define`
 - Auto-calibration of proximity thresholds
 - Auto-recovery on FIFO overflow
+- Interrupt-driven mode (APDS9960 INT → EXTI3 on PC3)
 - Non-blocking cooldown (SysTick-based)
 - Clone-compatible ID check (supports original + Chinese clones)
 - Diagnostic API (error codes, reinit count)
@@ -32,6 +33,7 @@ Compact gesture recognition driver for the APDS9960 proximity/light/color sensor
 |----------|----------|----------|
 | PC1 | SDA | I2C Data |
 | PC2 | SCL | I2C Clock |
+| PC3 | INT | Gesture interrupt (active-low, falling-edge) |
 | PD5 | — | UART TX (debug output) |
 
 Sensor I2C address: `0x39`
