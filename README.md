@@ -4,15 +4,15 @@ Compact gesture recognition driver for the APDS9960 proximity/light/color sensor
 
 ## Features
 
-- Minimal RAM usage (~476 bytes total)
-- Minimal Flash footprint (~9 KB polling, ~10 KB interrupt)
+- Minimal RAM usage (~496 bytes static + small transient stack)
+- Minimal Flash footprint (~9.6 KB polling, ~9.7 KB interrupt)
 - No dynamic memory allocation (`malloc`/`free`)
 - No floating-point math — integer-only arithmetic
 - Configurable parameters via `#define`
 - Auto-calibration of proximity thresholds
 - Auto-recovery on FIFO overflow
 - Interrupt-driven mode (APDS9960 INT → EXTI3 on PC3)
-- Non-blocking cooldown (SysTick-based)
+- Real SysTick-deadline gesture read (no artificial cooldown needed)
 - Clone-compatible ID check (supports original + Chinese clones)
 - Diagnostic API (error codes, reinit count)
 - Platform-agnostic C code (no HAL, no Arduino)
@@ -25,7 +25,7 @@ Compact gesture recognition driver for the APDS9960 proximity/light/color sensor
 |-----------|-------|
 | Microcontroller | CH32V003 (WCH) |
 | Sensor | APDS9960 (including clones) |
-| Interface | I2C (100 kHz Standard Mode) |
+| Interface | I2C (100 kHz or 400 kHz Fast-mode) |
 
 ### Pin Connections
 
@@ -58,6 +58,13 @@ Requires [PlatformIO](https://platformio.org/) with the `ch32v` platform.
 pio run            # build
 pio run -t upload  # flash via WCH-Link
 ```
+
+## Using This Driver in Other Projects
+
+See [`INTEGRATION.md`](INTEGRATION.md) for step-by-step instructions on
+reusing this driver (`i2c.*`, `apds9960.*`, `apds9960_regs.h`, `int_config.*`)
+in other CH32V003/PlatformIO projects — quick copy, shared local library
+folder, or a dedicated git-based PlatformIO library.
 
 ## API
 
@@ -144,7 +151,7 @@ int main(void) {
     Delay_Init();
     USART_Printf_Init(115200);
 
-    i2c_init(100000);
+    i2c_init(400000);
 
     if (!apds_init()) {
         printf("Sensor not found!\r\n");
@@ -172,15 +179,11 @@ int main(void) {
                 default: break;
             }
 
-            // 300 ms cooldown: disable EXTI, delay, drain FIFO
-            if (g != GESTURE_NONE) {
-                apds_exti_disable();
-                Delay_Ms(300);
-                while (apds_available()) apds_readGesture();
-                g_apds_int_flag = 0;
-                apds_clearInterrupt();
-                apds_exti_enable();
-            }
+            // No artificial cooldown needed: apds_readGesture() already blocks
+            // on a real SysTick deadline until GVALID actually clears, so the
+            // tail of a single physical swipe is never decoded as a second
+            // gesture. This drain is a safety net and is usually a no-op.
+            while (apds_available()) apds_readGesture();
         }
     }
 }
@@ -199,24 +202,14 @@ int main(void) {
     Delay_Init();
     USART_Printf_Init(115200);
 
-    i2c_init(100000);
+    i2c_init(400000);
 
     if (!apds_init()) {
         printf("Sensor not found!\r\n");
         while (1) {}
     }
 
-    uint32_t cooldown_end = 0;
-
     while (1) {
-        if (cooldown_end != 0) {
-            if ((int32_t)(SysTick->CNT - cooldown_end) < 0) {
-                while (apds_available()) apds_readGesture();
-                continue;
-            }
-            cooldown_end = 0;
-        }
-
         if (apds_available()) {
             gesture_t g = apds_readGesture();
             switch (g) {
@@ -228,7 +221,6 @@ int main(void) {
             }
 
             if (g != GESTURE_NONE) {
-                cooldown_end = SysTick->CNT - (48000 * 300);
                 while (apds_available()) apds_readGesture();
             }
         }
@@ -362,7 +354,7 @@ Override defaults by defining before including `apds9960.h`:
 | Gestures not detected | Increase `APDS_GAIN` and `APDS_GGAIN` to 3 (8x) |
 | False positives | Increase proximity threshold or gesture sensitivity |
 | Slow gestures not working | Decrease `SENSITIVITY_1` in `apds9960.c` (default: 5) |
-| Multiple gestures per swipe | Increase cooldown delay in `main.c` (default: 300 ms) |
+| Multiple gestures per swipe | Should not happen anymore — `apds_readGesture()` blocks on a real SysTick deadline until GVALID clears, not a fixed iteration count. If it still happens, check I2C signal integrity at 400 kHz. |
 | Calibration fails | Check sensor orientation, ensure no direct sunlight |
 
 ### Power States
@@ -399,12 +391,12 @@ Gesture: LEFT
 
 | Resource | Used | Limit |
 |----------|------|-------|
-| RAM | 476 bytes | 2048 bytes |
-| Flash | 9068 bytes | 16384 bytes |
+| RAM | ~496 bytes (static) | 2048 bytes |
+| Flash | ~9.6 KB | 16384 bytes |
 
 ## Limitations
 
-- `apds_readGesture()` blocks for the duration of the gesture (~10-60 ms)
+- `apds_readGesture()` blocks for the duration of the gesture (up to `APDS_GESTURE_TIMEOUT_MS`, default 300 ms)
 - No RGB, ALS, or proximity-only API (gesture mode only)
 - Calibration works best in gesture mode (proximity-only saturates)
 
