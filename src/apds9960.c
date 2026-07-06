@@ -552,8 +552,30 @@ bool apds_sleep(void) {
     return true;
 }
 
+/* Полное отключение датчика (максимальная экономия энергии).
+ * Отключает PON + все остальные функции.
+ * Внутренний генератор и ИК-диод выключены полностью.
+ * Потребление: <1 мкА.
+ * Для пробуждения необходимо apds_wakeup(). */
+bool apds_shutdown(void) {
+    wr(REG_ENABLE, 0x00);
+    return true;
+}
+
+/* Пробуждение датчика из sleep или shutdown.
+ * Если датчик был в shutdown (PON=0) — сначала включаем PON,
+ * ждём 1 мс для запуска генератора, затем включаем всё остальное.
+ * Если датчик был в sleep (PON=1) — лишняя задержка 1 мс безвредна. */
 bool apds_wakeup(void) {
+    /* Шаг 1: включаем PON (если уже включён — ничего не меняется) */
+    if (!wr(REG_ENABLE, EN_PON)) return false;
+
+    /* Шаг 2:等待 генератор (1 мс достаточно для startup) */
+    Delay_Ms(1);
+
+    /* Шаг 3: включаем proximity + gesture + wait */
     if (!wr(REG_ENABLE, EN_PON | EN_PEN | EN_GEN | EN_WEN)) return false;
+
     uint8_t en;
     return rd(REG_ENABLE, &en) && (en & EN_PON) != 0;
 }

@@ -38,6 +38,7 @@ No test framework configured. Manual testing via UART output (PD5, 115200 baud).
 - **Gesture vs Proximity mode thresholds:** Gesture mode (PDATA > 100) uses `GPENTH = median/4` (below background). Proximity mode uses `GPENTH = median + 3*sigma` (above background).
 - **`sensor_reinit()`** restores calibrated thresholds after FIFO overflow or I2C errors. Uses static `g_cal_*` variables.
 - **Cooldown** in main loop uses `SysTick->CNT` (32-bit down counter, 48 MHz) — non-blocking. Do NOT use `Delay_Ms()` for cooldown.
+- **Power states:** `apds_sleep()` keeps PON (~1 µA), `apds_shutdown()` clears PON (<1 µA, IR LED off). `apds_wakeup()` handles both correctly (PON first, 1ms delay, then enable everything).
 - **I2C retries:** `RETRY_LIMIT=6` in `apds9960.h`. All I2C writes go through `wr()` which retries on failure.
 
 ## Gotchas

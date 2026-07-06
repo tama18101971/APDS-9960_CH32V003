@@ -64,10 +64,13 @@ pio run -t upload  # flash via WCH-Link
 // Initialize sensor (returns false if not found)
 bool apds_init(void);
 
-// Put sensor to sleep (~1 uA consumption)
+// Put sensor to sleep (~1 uA, PON stays on)
 bool apds_sleep(void);
 
-// Wake sensor from sleep
+// Full power-off (<1 uA, IR LED off)
+bool apds_shutdown(void);
+
+// Wake sensor from sleep or shutdown
 bool apds_wakeup(void);
 
 // Check if gesture data is ready
@@ -295,7 +298,15 @@ Override defaults by defining before including `apds9960.h`:
 | Multiple gestures per swipe | Increase cooldown delay in `main.c` (default: 300 ms) |
 | Calibration fails | Check sensor orientation, ensure no direct sunlight |
 
-## Debug Output
+### Power States
+
+| Function | ENABLE | Power | Use case |
+|----------|--------|-------|----------|
+| `apds_init()` | PON+PEN+GEN+WEN | Full active | Normal operation |
+| `apds_sleep()` | PON only | ~1 µA | Quick wakeup, oscillator stays on |
+| `apds_shutdown()` | 0x00 | <1 µA | Maximum savings, IR LED off |
+
+After `apds_shutdown()`, call `apds_wakeup()` to restore full operation. It handles both wake-from-sleep and wake-from-shutdown correctly.
 
 Enable debug output by uncommenting in `apds9960.h`:
 
