@@ -200,6 +200,17 @@ typedef enum {
 #define APDS_CAL_FILTER_MAX         200
 #endif
 
+/* ============================================================================
+ * ПАРАМЕТРЫ ПРЕРЫВАНИЙ
+ * ============================================================================ */
+
+/* Режим прерывания INT (вывод PC3):
+ *   0 = отключено (polling, по умолчанию)
+ *   1 = GVALID (данные жеста готовы — falling edge) */
+#ifndef APDS_INT_MODE
+#define APDS_INT_MODE               1
+#endif
+
 /* Коды ошибок драйвера */
 #define APDS_ERR_NONE           0   /* Ошибок нет */
 #define APDS_ERR_I2C            1   /* Ошибка I2C (NACK, таймаут) */
@@ -276,5 +287,15 @@ uint8_t apds_getReinitCount(void);
  * Доступна только если APDS_ENABLE_CALIBRATION = 1.
  * Возвращает: true если калибровка успешна. */
 bool apds_recalibrate(void);
+
+/* Включение прерывания жеста (GIEN=1).
+ * INT pin становится низким когда GVALID=1. */
+void apds_enableInterrupt(void);
+
+/* Отключение прерывания жеста (GIEN=0). */
+void apds_disableInterrupt(void);
+
+/* Сброс прерывания: чтение GSTATUS очищает GINT, INT pin → высокий. */
+void apds_clearInterrupt(void);
 
 #endif /* APDS9960_H */

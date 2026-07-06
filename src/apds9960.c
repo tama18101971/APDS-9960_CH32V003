@@ -479,7 +479,13 @@ static bool configure_registers(void) {
     if (!wr(REG_GPULSE, 0xC9)) return false;
 
     if (!wr(REG_GCONF3, 0x00)) return false;
-    if (!wr(REG_GCONF4, 0x01)) return false;
+
+    /* GCONF4: GMODE=1 (gesture mode), GIEN по APDS_INT_MODE */
+    uint8_t gconf4 = 0x01;  /* GMODE=1 */
+#if APDS_INT_MODE == 1
+    gconf4 |= GC4_GIEN;    /* Gesture Interrupt Enable */
+#endif
+    if (!wr(REG_GCONF4, gconf4)) return false;
 
     /* --- Включение --- */
     if (!wr(REG_ENABLE, EN_PON | EN_PEN | EN_GEN | EN_WEN)) return false;
@@ -671,4 +677,24 @@ bool apds_recalibrate(void) {
     (void)0;
     return true;
 #endif
+}
+
+/* ============================================================================
+ * ПРЕРЫВАНИЯ
+ * ============================================================================ */
+
+void apds_enableInterrupt(void) {
+    /* GMODE=1 | GIEN=1: gesture interrupt при GVALID=1 */
+    wr(REG_GCONF4, 0x03);
+}
+
+void apds_disableInterrupt(void) {
+    /* GMODE=1, GIEN=0: interrupt отключен */
+    wr(REG_GCONF4, 0x01);
+}
+
+void apds_clearInterrupt(void) {
+    /* Чтение GSTATUS сбрасывает GINT → INT pin → HIGH */
+    uint8_t dummy;
+    rd(REG_GSTATUS, &dummy);
 }
