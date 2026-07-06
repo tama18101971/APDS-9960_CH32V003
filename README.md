@@ -4,13 +4,16 @@ Compact gesture recognition driver for the APDS9960 proximity/light/color sensor
 
 ## Features
 
-- Minimal RAM usage (~20 bytes static)
-- Minimal Flash footprint (~1.5 KB excluding I2C driver)
+- Minimal RAM usage (~476 bytes total)
+- Minimal Flash footprint (~9 KB)
 - No dynamic memory allocation (`malloc`/`free`)
 - No floating-point math — integer-only arithmetic
 - Configurable parameters via `#define`
+- Auto-calibration of proximity thresholds
 - Auto-recovery on FIFO overflow
+- Non-blocking cooldown (SysTick-based)
 - Clone-compatible ID check (supports original + Chinese clones)
+- Diagnostic API (error codes, reinit count)
 - Platform-agnostic C code (no HAL, no Arduino)
 
 ## Hardware
@@ -40,7 +43,7 @@ src/
   apds9960.h         — Public API and configurable parameters
   apds9960.c         — Driver implementation
   apds9960_regs.h    — Register map and bit definitions
-  i2c.h / i2c.c      — I2C driver for CH32V003 (existing)
+  i2c.h / i2c.c      — I2C driver for CH32V003
   main.c             — Usage example
 ```
 
@@ -49,8 +52,8 @@ src/
 Requires [PlatformIO](https://platformio.org/) with the `ch32v` platform.
 
 ```bash
-pio run
-pio run -t upload
+pio run            # build
+pio run -t upload  # flash via WCH-Link
 ```
 
 ## API
@@ -72,6 +75,21 @@ bool apds_available(void);
 
 // Read detected gesture (blocking, ~10-60 ms)
 gesture_t apds_readGesture(void);
+
+// Read proximity value (0-255)
+bool apds_readProximity(uint8_t *value);
+
+// Read STATUS register for diagnostics
+bool apds_readStatus(uint8_t *value);
+
+// Get last error code (APDS_ERR_*)
+uint8_t apds_getLastError(void);
+
+// Get reinit count (0 = normal, >0 = problems)
+uint8_t apds_getReinitCount(void);
+
+// Recalibrate thresholds
+bool apds_recalibrate(void);
 ```
 
 ### Gesture Types
@@ -84,6 +102,15 @@ typedef enum {
     GESTURE_UP,         // Swipe up
     GESTURE_DOWN        // Swipe down
 } gesture_t;
+```
+
+### Error Codes
+
+```c
+#define APDS_ERR_NONE           0   // No error
+#define APDS_ERR_I2C            1   // I2C error (NACK, timeout)
+#define APDS_ERR_FIFO_OVERFLOW  2   // FIFO overflow
+#define APDS_ERR_SENSOR_HANG    3   // Sensor not responding
 ```
 
 ## Usage Example
@@ -108,7 +135,18 @@ int main(void) {
 
     printf("Ready. Wave your hand!\r\n");
 
+    uint32_t cooldown_end = 0;
+
     while (1) {
+        // Non-blocking cooldown
+        if (cooldown_end != 0) {
+            if ((int32_t)(SysTick->CNT - cooldown_end) < 0) {
+                while (apds_available()) apds_readGesture();
+                continue;
+            }
+            cooldown_end = 0;
+        }
+
         if (apds_available()) {
             gesture_t g = apds_readGesture();
             switch (g) {
@@ -119,9 +157,9 @@ int main(void) {
                 default: break;
             }
 
-            // Cooldown: ignore data while hand moves away
+            // 300 ms cooldown after gesture
             if (g != GESTURE_NONE) {
-                Delay_Ms(300);
+                cooldown_end = SysTick->CNT - (48000 * 300);
                 while (apds_available()) apds_readGesture();
             }
         }
@@ -201,6 +239,37 @@ After all FIFO data is processed (GVALID goes low):
 - **Noise filter**: packets with all channels < 10 are discarded
 - **Minimum packets**: gesture requires >= 4 valid packets
 
+## Calibration
+
+The driver performs automatic calibration of proximity thresholds during `apds_init()`. This ensures optimal gesture detection regardless of ambient conditions.
+
+### How It Works
+
+1. Takes 32 PDATA samples in gesture mode
+2. Filters out saturated values (>200)
+3. Computes median and standard deviation
+4. Sets GPENTH (entry) and GEXTH (exit) thresholds
+5. Stores thresholds for use by `sensor_reinit()`
+
+### Calibration Parameters
+
+```c
+#define APDS_ENABLE_CALIBRATION     1   // Enable/disable calibration
+#define APDS_CAL_SAMPLES            32  // Number of samples
+#define APDS_CAL_SIGMA_COEFF        3   // Sigma coefficient (2-5)
+#define APDS_CAL_PROX_MIN           10  // Minimum threshold
+#define APDS_CAL_PROX_MAX           200 // Maximum threshold
+#define APDS_CAL_FILTER_MAX         200 // Outlier filter threshold
+```
+
+### Thresholds
+
+| Register | Purpose | Gesture Mode | Proximity Mode |
+|----------|---------|--------------|----------------|
+| GPENTH | Entry threshold | median/4 | median + 3*sigma |
+| GEXTH | Exit threshold | GPENTH * 0.6 | GPENTH * 0.6 |
+| PIHT | Interrupt threshold | Same as GPENTH | Same as GPENTH |
+
 ## Configuration
 
 Override defaults by defining before including `apds9960.h`:
@@ -213,6 +282,7 @@ Override defaults by defining before including `apds9960.h`:
 #define APDS_PROX_THRESHOLD     50  // Proximity enter threshold (0-255)
 #define APDS_GESTURE_EXIT_TH    30  // Proximity exit threshold (0-255)
 #define APDS_GWTIME             1   // Gesture wait: 0=0ms, 1=2.8ms, ..., 7=39.2ms
+#define APDS_GESTURE_TIMEOUT_MS 300 // Gesture timeout (ms)
 ```
 
 ### Tuning Tips
@@ -223,19 +293,43 @@ Override defaults by defining before including `apds9960.h`:
 | False positives | Increase proximity threshold or gesture sensitivity |
 | Slow gestures not working | Decrease `SENSITIVITY_1` in `apds9960.c` (default: 5) |
 | Multiple gestures per swipe | Increase cooldown delay in `main.c` (default: 300 ms) |
+| Calibration fails | Check sensor orientation, ensure no direct sunlight |
+
+## Debug Output
+
+Enable debug output by uncommenting in `apds9960.h`:
+
+```c
+#define APDS9960_DEBUG
+```
+
+Or define at build time:
+
+```ini
+build_flags = -DAPDS9960_DEBUG
+```
+
+Example output:
+
+```
+APDS9960: ID=0x9E
+CAL: median=191 valid=32 sigma=0 gpenth=47 gexth=28
+Gesture: LEFT
+```
 
 ## Memory Footprint
 
 | Resource | Used | Limit |
 |----------|------|-------|
-| RAM (static) | ~20 bytes | 64 bytes |
-| Flash | ~1.5 KB | 2 KB |
+| RAM | 476 bytes | 2048 bytes |
+| Flash | 9068 bytes | 16384 bytes |
 
 ## Limitations
 
 - Blocking API — `apds_readGesture()` blocks for the duration of the gesture
 - No interrupt-driven mode (polling only)
 - No RGB, ALS, or proximity-only API (gesture mode only)
+- Calibration works best in gesture mode (proximity-only saturates)
 
 ## License
 
