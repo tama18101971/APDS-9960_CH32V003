@@ -1,5 +1,7 @@
 # APDS9960 Gesture Driver for CH32V003
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 Compact gesture recognition driver for the APDS9960 proximity/light/color sensor, targeting the CH32V003 microcontroller. Detects four directional gestures: **Left**, **Right**, **Up**, **Down**.
 
 ## Features
@@ -406,4 +408,4 @@ Gesture: LEFT
 
 ## License
 
-MIT
+[MIT](LICENSE)
