@@ -1,59 +1,61 @@
-# Подключение драйвера APDS9960 как библиотеки в другие проекты
+# Integrating the APDS9960 Driver as a Library in Other Projects
 
-Этот документ описывает, как использовать драйвер жестов APDS9960 (файлы
-`apds9960.*`, `apds9960_regs.h`, `int_config.*`) в **других** PlatformIO-проектах
-на CH32V003, без копирования `main.c` (он — только демо-пример этого репозитория).
+🇬🇧 English | [🇷🇺 Русский](INTEGRATION_RU.md)
 
-Драйвер I2C подключается как внешняя библиотека `I2C-CH32V003` через `lib_deps`.
+This document describes how to use the APDS9960 gesture driver (`apds9960.*`,
+`apds9960_regs.h`, `int_config.*`) in **other** PlatformIO projects on CH32V003,
+without copying `main.c` (it is only a demo example for this repository).
 
-## 1. Какие файлы входят в библиотеку
+The I2C driver is included as an external dependency (`I2C-CH32V003`) via `lib_deps`.
 
-| Файл | Обязателен? | Назначение |
-|------|-------------|------------|
-| `apds9960_regs.h` | ✅ Всегда | Карта регистров APDS9960 |
-| `apds9960.h` / `apds9960.c` | ✅ Всегда | Сам драйвер жестов |
-| `int_config.h` / `int_config.c` | ⚙️ Только если `APDS_INT_MODE=1` | EXTI3 (PC3) для interrupt-режима |
+## 1. Library Files
 
-Драйвер I2C (`i2c.h` / `i2c.c`) — **внешняя зависимость**
+| File | Required? | Purpose |
+|------|-----------|---------|
+| `apds9960_regs.h` | Always | APDS9960 register map |
+| `apds9960.h` / `apds9960.c` | Always | Gesture driver itself |
+| `int_config.h` / `int_config.c` | Only if `APDS_INT_MODE=1` | EXTI3 (PC3) for interrupt mode |
+
+The I2C driver (`i2c.h` / `i2c.c`) is an **external dependency**
 [`I2C-CH32V003`](https://github.com/tama18101971/I2C-CH32V003.git).
-Подключается через `lib_deps` в `platformio.ini`, копировать в проект не нужно.
+Connected via `lib_deps` in `platformio.ini`, no need to copy it into your project.
 
-Если новый проект работает только в polling-режиме (`APDS_INT_MODE=0`),
-`int_config.h`/`int_config.c` можно не копировать вовсе.
+If the new project only works in polling mode (`APDS_INT_MODE=0`),
+`int_config.h` / `int_config.c` can be omitted entirely.
 
-## 2. Требования к целевому проекту
+## 2. Target Project Requirements
 
-Драйвер написан под конкретную платформу и НЕ является MCU-агностичным:
+The driver is written for a specific platform and is NOT MCU-agnostic:
 
-- PlatformIO платформа `ch32v`, framework `noneos-sdk` (НЕ Arduino, НЕ FreeRTOS).
-- Реальный чип CH32V003 (или совместимый по регистрам I2C1/EXTI/SysTick).
-- `platformio.ini` целевого проекта должен содержать как минимум:
+- PlatformIO platform `ch32v`, framework `noneos-sdk` (NOT Arduino, NOT FreeRTOS).
+- Actual CH32V003 chip (or register-compatible with I2C1/EXTI/SysTick).
+- The target project's `platformio.ini` must contain at minimum:
 
 ```ini
 [env:my_board]
 platform = ch32v
-board = ch32v003f4p6_evt_r0   ; или другая ваша плата на CH32V003
+board = ch32v003f4p6_evt_r0   ; or another CH32V003 board
 framework = noneos-sdk
 lib_deps =
     https://github.com/tama18101971/I2C-CH32V003.git
 ```
 
-Для Способа C добавьте также саму библиотеку (см. раздел 5.2).
+For Method C, also add the library itself (see section 5.2).
 
-- Свободные пины: **PC1 (SDA)**, **PC2 (SCL)**, и (только для interrupt-режима)
-  **PC3 (INT)**. Если эти пины заняты другой периферией в целевом проекте —
-  нужно либо освободить их, либо переопределить параметры пина прерывания
+- Free pins: **PC1 (SDA)**, **PC2 (SCL)**, and (only for interrupt mode)
+  **PC3 (INT)**. If these pins are occupied by other peripherals in the target
+  project, you need to either free them or override the interrupt pin parameters
   (`APDS_INT_PORT`, `APDS_INT_PIN`, `APDS_INT_LINE`, `APDS_INT_PORT_SOURCE`,
-  `APDS_INT_PIN_SOURCE`) через `build_flags` (см. раздел 8).
-- Свободна шина I2C1 (или уже используется только устройствами, совместимыми
-  по адресу — APDS9960 сидит на `0x39`).
+  `APDS_INT_PIN_SOURCE`) via `build_flags` (see section 8).
+- I2C1 bus is free (or already used only by devices compatible by address —
+  APDS9960 sits on `0x39`).
 
-## 3. Способ A — быстрое копирование (для разовой интеграции)
+## 3. Method A — Quick Copy (for one-time integration)
 
-Самый простой вариант, без создания отдельного git-репозитория.
+The simplest option, no separate git repository needed.
 
-1. Создайте в целевом проекте папку `lib/APDS9960/` (PlatformIO автоматически
-   подключает всё из `lib/*` к сборке, не смешивая с `src/`):
+1. Create a `lib/APDS9960/` folder in the target project (PlatformIO automatically
+   includes everything from `lib/*` into the build, without mixing with `src/`):
 
    ```
    your_project/
@@ -62,21 +64,21 @@ lib_deps =
          apds9960.h
          apds9960.c
          apds9960_regs.h
-         int_config.h      (опционально)
-         int_config.c      (опционально)
+         int_config.h      (optional)
+         int_config.c      (optional)
      src/
-       main.c              (ваш собственный main() — НЕ из этого репозитория)
+       main.c              (your own main() — NOT from this repository)
    ```
 
-2. Скопируйте туда файлы из раздела 1 (без `main.c`).
-3. В `platformio.ini` добавьте зависимость I2C:
+2. Copy the files from section 1 (without `main.c`).
+3. Add the I2C dependency in `platformio.ini`:
 
    ```ini
    lib_deps =
        https://github.com/tama18101971/I2C-CH32V003.git
    ```
 
-4. В своём `src/main.c` подключайте как обычно:
+4. In your `src/main.c`, include as usual:
 
    ```c
    #include "i2c.h"
@@ -86,21 +88,21 @@ lib_deps =
    #endif
    ```
 
-5. `pio run` — PlatformIO подхватит `lib/APDS9960/` и `I2C-CH32V003` автоматически.
+5. `pio run` — PlatformIO will pick up `lib/APDS9960/` and `I2C-CH32V003` automatically.
 
-**Минус способа A:** при исправлении багов в этом репозитории изменения нужно
-руками копировать в каждый проект, где лежит копия.
+**Downside of Method A:** when bugs are fixed in this repository, changes must be
+manually copied to every project that has a local copy.
 
-## 4. Способ B — общая папка на диске (несколько локальных проектов, один разработчик)
+## 4. Method B — Shared Local Folder (multiple local projects, one developer)
 
-Если у вас несколько проектов на одной машине и не хочется дублировать файлы —
-храните библиотеку в одном месте и подключайте её через `lib_extra_dirs`.
+If you have multiple projects on one machine and don't want to duplicate files —
+keep the library in one place and connect it via `lib_extra_dirs`.
 
-1. Разместите файлы драйвера (без `main.c`) в отдельной папке, например:
-   `C:\Projects\shared_libs\APDS9960_CH32V003\` (плоско, либо в подпапке `src/` —
-   PlatformIO ищет заголовки/исходники рекурсивно).
+1. Place the driver files (without `main.c`) in a separate folder, e.g.:
+   `C:\Projects\shared_libs\APDS9960_CH32V003\` (flat, or inside a `src/` subfolder —
+   PlatformIO searches for headers/sources recursively).
 
-2. В `platformio.ini` **каждого** проекта, где нужен драйвер:
+2. In `platformio.ini` of **each** project that needs the driver:
 
    ```ini
    [env:my_board]
@@ -110,26 +112,26 @@ lib_deps =
    lib_extra_dirs = C:\Projects\shared_libs
    ```
 
-3. `pio run` подключит `APDS9960_CH32V003` как обычную библиотеку из
+3. `pio run` will include `APDS9960_CH32V003` as a regular library from
    `lib_extra_dirs`.
 
-**Плюс:** один источник правды на диске, правите в одном месте — подхватывается
-везде при следующей сборке. **Минус:** работает только на этой машине, не
-подходит для CI/других разработчиков без синхронизации папки.
+**Pro:** single source of truth on disk, edit in one place — picked up everywhere
+on next build. **Con:** works only on this machine, not suitable for CI/other
+developers without folder synchronization.
 
-## 5. Способ C — отдельный git-репозиторий + `lib_deps` (рекомендуется для нескольких проектов)
+## 5. Method C — Separate Git Repository + `lib_deps` (recommended for multiple projects)
 
-Самый правильный вариант, если драйвер используется в нескольких проектах и/или
-несколькими людьми/машинами: выделить драйвер в собственный git-репозиторий
-(или git submodule) и подключать через `lib_deps` — PlatformIO сам скачает и
-закеширует библиотеку при сборке.
+The most correct approach when the driver is used in multiple projects and/or
+by multiple people/machines: extract the driver into its own git repository
+(or git submodule) and connect via `lib_deps` — PlatformIO will download and
+cache the library automatically during build.
 
-### 5.1. Подготовка репозитория библиотеки (сделать один раз)
+### 5.1. Preparing the Library Repository (one-time)
 
-Текущий репозиторий уже имеет готовую структуру для публикации как библиотеки:
+This repository already has a ready-made structure for publishing as a library:
 
 ```
-APDS9960_CH32V003/            (корень git-репозитория библиотеки)
+APDS-9960_CH32V003/            (git repository root)
   library.json
   src/
     apds9960.h
@@ -139,16 +141,16 @@ APDS9960_CH32V003/            (корень git-репозитория библ�
     int_config.c
   examples/
     basic/
-      main.c                   (демо-пример, НЕ компилируется как часть библиотеки)
+      main.c                   (demo example, NOT compiled as part of the library)
 ```
 
-Содержимое `library.json` — см. в корне репозитория. Он уже включает зависимость
-`I2C-CH32V003` и исключает `examples/` из компиляции библиотеки.
+See `library.json` in the repository root. It already includes the `I2C-CH32V003`
+dependency and excludes `examples/` from library compilation.
 
-Если вы создаёте **собственный** репозиторий библиотеки — скопируйте файлы из `src/`
-и создайте аналогичный `library.json`.
+If you are creating your **own** library repository — copy the files from `src/`
+and create an analogous `library.json`.
 
-### 5.2. Подключение в целевом проекте
+### 5.2. Connecting in the Target Project
 
 ```ini
 [env:my_board]
@@ -159,25 +161,25 @@ lib_deps =
     https://github.com/tama18101971/APDS-9960_CH32V003.git
 ```
 
-Или с фиксацией версии (тег/коммит/ветка):
+Or with version pinning (tag/commit/branch):
 
 ```ini
 lib_deps =
     https://github.com/tama18101971/APDS-9960_CH32V003.git#v1.0.0
 ```
 
-Если вы создаёте **собственный** форк/репозиторий библиотеки — замените путь
-на свой: `<ваш_аккаунт>/APDS9960_CH32V003.git`.
+If you are creating your **own** fork/repository of the library — replace the
+path with your own: `<your_account>/APDS9960_CH32V003.git`.
 
-`I2C-CH32V003` подтягивается **автоматически** — он объявлен в `dependencies`
-файла `library.json`, поэтому указывать его в `lib_deps` не нужно.
+`I2C-CH32V003` is installed **automatically** — it is declared in the `dependencies`
+field of `library.json`, so there is no need to list it in `lib_deps`.
 
-`pio run` сам клонирует репозиторий в `.pio/libdeps/<env>/` при первой сборке.
+`pio run` will clone the repository into `.pio/libdeps/<env>/` on first build.
 
-**Плюс:** единый источник правды, версионирование, работает на любой машине и
-в CI. **Минус:** требует первоначальной настройки (git-репозиторий + `library.json`).
+**Pro:** single source of truth, versioning, works on any machine and in CI.
+**Con:** requires initial setup (git repository + `library.json`).
 
-## 6. Минимальный пример использования (после подключения любым из способов)
+## 6. Minimal Usage Example (after connecting by any method)
 
 ```c
 #include <ch32v00x.h>
@@ -193,7 +195,7 @@ int main(void) {
     Delay_Init();
     USART_Printf_Init(115200);
 
-    i2c_init(400000);              /* Fast-mode I2C, датчик и I2C-CH32V003 это поддерживают */
+    i2c_init(400000);              /* Fast-mode I2C, sensor and I2C-CH32V003 both support it */
 
     if (!apds_init()) {
         printf("APDS9960 not responding!\r\n");
@@ -225,27 +227,26 @@ int main(void) {
 }
 ```
 
-Полный рабочий пример (оба режима, с примером ISR) — см. `examples/basic/main.c` в этом
-репозитории.
+Full working example (both modes, with ISR example) — see `examples/basic/main.c`
+in this repository.
 
-## 7. Подключение пинов (не меняется независимо от способа интеграции)
+## 7. Pin Connections (same regardless of integration method)
 
-| CH32V003 | APDS9960 | Назначение |
-|----------|----------|------------|
-| PC1 | SDA | I2C данные |
-| PC2 | SCL | I2C тактирование |
-| PC3 | INT | Прерывание жеста (активный низкий уровень), только для `APDS_INT_MODE=1` |
-| PD5 | — | UART TX (диагностика, опционально) |
+| CH32V003 | APDS9960 | Function |
+|----------|----------|----------|
+| PC1 | SDA | I2C data |
+| PC2 | SCL | I2C clock |
+| PC3 | INT | Gesture interrupt (active-low), only for `APDS_INT_MODE=1` |
+| PD5 | — | UART TX (diagnostics, optional) |
 
-I2C-адрес датчика: `0x39`.
+Sensor I2C address: `0x39`.
 
-## 8. Настройка под конкретный проект
+## 8. Project-Specific Configuration
 
-Все параметры переопределяются через `#define` **до** `#include "apds9960.h"`,
-либо через `build_flags` в `platformio.ini` (например `-DAPDS_INT_MODE=0`):
+All parameters are overridden via `#define` **before** `#include "apds9960.h"`,
+or via `build_flags` in `platformio.ini` (e.g. `-DAPDS_INT_MODE=0`):
 
-Параметры `int_config.h` (пин прерывания) также переопределяются через
-`build_flags`:
+Interrupt pin parameters from `int_config.h` are also overridden via `build_flags`:
 
 ```ini
 build_flags =
@@ -257,56 +258,56 @@ build_flags =
 ```
 
 ```c
-#define APDS_GAIN               3     /* усиление proximity: 0=1x..3=8x */
-#define APDS_LED_CURRENT         0     /* ток LED: 0=100mA..3=12.5mA */
-#define APDS_GGAIN               3     /* усиление gesture: 0=1x..3=8x */
-#define APDS_GLDRIVE             0     /* ток gesture LED: 0=100mA..3=12.5mA */
-#define APDS_PROX_THRESHOLD      50    /* порог входа в gesture mode (до калибровки) */
-#define APDS_GESTURE_EXIT_TH     30    /* порог выхода (до калибровки) */
-#define APDS_GESTURE_TIMEOUT_MS  300   /* максимальное время одного жеста, мс */
-#define APDS_GWTIME              1     /* пауза между выборками жеста */
-#define APDS_ENABLE_CALIBRATION  1     /* авто-калибровка порогов при apds_init() */
+#define APDS_GAIN               3     /* proximity gain: 0=1x..3=8x */
+#define APDS_LED_CURRENT         0     /* LED current: 0=100mA..3=12.5mA */
+#define APDS_GGAIN               3     /* gesture gain: 0=1x..3=8x */
+#define APDS_GLDRIVE             0     /* gesture LED current: 0=100mA..3=12.5mA */
+#define APDS_PROX_THRESHOLD      50    /* gesture mode entry threshold (before calibration) */
+#define APDS_GESTURE_EXIT_TH     30    /* exit threshold (before calibration) */
+#define APDS_GESTURE_TIMEOUT_MS  300   /* max gesture duration, ms */
+#define APDS_GWTIME              1     /* gesture sample wait time */
+#define APDS_ENABLE_CALIBRATION  1     /* auto-calibrate thresholds in apds_init() */
 #define APDS_INT_MODE            1     /* 0=polling, 1=interrupt (PC3/EXTI3) */
-/* #define APDS9960_DEBUG */          /* включить printf-диагностику (~2.4 КБ Flash) */
+/* #define APDS9960_DEBUG */          /* enable printf diagnostics (~2.4 KB Flash) */
 
 #include "apds9960.h"
 ```
 
-Полный список и описание — в комментариях `apds9960.h`.
+Full list and description — in `apds9960.h` comments.
 
-## 9. Бюджет ресурсов (учитывайте в новом проекте)
+## 9. Resource Budget (consider for new projects)
 
-На чипе CH32V003 (RAM 2 КБ, Flash 16 КБ) сам драйвер занимает примерно:
+On the CH32V003 chip (RAM 2 KB, Flash 16 KB), the driver itself uses approximately:
 
-- **RAM:** ~20 байт статики + до ~150 байт стека на пике (пакетное чтение FIFO)
-- **Flash:** ~2.0 КБ (только `apds9960.c` + `int_config.c`, без I2C-библиотеки)
+- **RAM:** ~20 bytes static + up to ~150 bytes stack at peak (batch FIFO read)
+- **Flash:** ~2.0 KB (`apds9960.c` + `int_config.c` only, without I2C library)
 
-Если в целевом проекте уже используется значительная часть Flash/RAM другим
-кодом — проверьте фактический бюджет через `pio run` (вывод "RAM:"/"Flash:").
+If the target project already uses a significant portion of Flash/RAM with other
+code — verify the actual budget via `pio run` (output "RAM:" / "Flash:").
 
-## 10. Чек-лист совместимости перед переносом
+## 10. Compatibility Checklist Before Porting
 
-- [ ] Целевой проект — `platform = ch32v`, `framework = noneos-sdk`
-- [ ] PC1/PC2 (и PC3, если interrupt-режим) свободны
-- [ ] I2C1 не занят другим устройством на адресе `0x39`
-- [ ] Хватает Flash/RAM (см. раздел 9)
-- [ ] В `platformio.ini` добавлена `lib_deps` с `I2C-CH32V003`
+- [ ] Target project uses `platform = ch32v`, `framework = noneos-sdk`
+- [ ] PC1/PC2 (and PC3, if interrupt mode) are free
+- [ ] I2C1 is not occupied by another device at address `0x39`
+- [ ] Enough Flash/RAM available (see section 9)
+- [ ] `lib_deps` with `I2C-CH32V003` added to `platformio.ini`
 
-## 11. Типичные проблемы при переносе
+## 11. Common Porting Issues
 
-| Симптом | Причина | Решение |
-|---------|---------|---------|
-| `apds_init()` возвращает `false` | Неверная разводка I2C, либо PC1/PC2 заняты другой периферией | Проверить пины, `APDS9960_DEBUG` для вывода ID |
-| Жесты не распознаются | Слишком слабый сигнал / неверная калибровка | Увеличить `APDS_GAIN`/`APDS_GGAIN`, проверить освещение (не под прямым солнцем) |
-| Жесты "двоятся" | Старая версия `apds9960.c` с искусственным обрывом `apds_readGesture()` по числу итераций | Убедиться, что скопирована актуальная версия драйвера из этого репозитория |
-| Сборка не находит `ch32v00x.h`/`debug.h` | Не тот `framework`/`platform` в `platformio.ini` целевого проекта | См. раздел 2 |
-| Сборка не находит `i2c.h` | Не добавлена `lib_deps` с `I2C-CH32V003` в `platformio.ini` | Добавить `https://github.com/tama18101971/I2C-CH32V003.git` в `lib_deps` |
-| Конфликт `main()` при подключении через `lib_deps` на весь репозиторий | В библиотеку случайно попал `main.c` | Не копировать/не включать `main.c` в библиотечный репозиторий (см. раздел 1 и 5.1) |
+| Symptom | Cause | Solution |
+|---------|-------|----------|
+| `apds_init()` returns `false` | Incorrect I2C wiring, or PC1/PC2 occupied by other peripherals | Check pins, use `APDS9960_DEBUG` to print ID |
+| Gestures not detected | Signal too weak / incorrect calibration | Increase `APDS_GAIN` / `APDS_GGAIN`, check lighting (avoid direct sunlight) |
+| Gestures "duplicated" | Old version of `apds9960.c` with artificial `apds_readGesture()` cutoff by iteration count | Ensure the latest driver version from this repository is copied |
+| Build can't find `ch32v00x.h` / `debug.h` | Wrong `framework` / `platform` in target project's `platformio.ini` | See section 2 |
+| Build can't find `i2c.h` | `lib_deps` with `I2C-CH32V003` not added to `platformio.ini` | Add `https://github.com/tama18101971/I2C-CH32V003.git` to `lib_deps` |
+| `main()` conflict when connecting via `lib_deps` on the entire repository | `main.c` accidentally ended up in the library | Do not copy/include `main.c` in the library repository (see sections 1 and 5.1) |
 
-## 12. Обратная синхронизация исправлений
+## 12. Back-Syncing Fixes
 
-Если после переноса в другой проект вы найдёте баг или улучшите алгоритм —
-переносите исправление обратно в этот репозиторий (источник истины), а затем
-обновляйте копии/зависимости в других проектах тем же способом, каким они были
-подключены (Способ A — вручную скопировать заново, Способ B — правка одной
-папки на диске подхватится сама, Способ C — обновить тег/коммит в `lib_deps`).
+If you find a bug or improve the algorithm after porting to another project —
+back-port the fix to this repository (source of truth), then update copies/
+dependencies in other projects using the same method they were connected with
+(Method A — manually copy again, Method B — editing the single folder on disk
+is automatically picked up, Method C — update tag/commit in `lib_deps`).
