@@ -7,7 +7,7 @@ Compact gesture recognition driver for the APDS9960 proximity/light/color sensor
 ## Features
 
 - Minimal RAM usage (~496 bytes static + small transient stack)
-- Minimal Flash footprint (~9.6 KB polling, ~9.7 KB interrupt)
+- Minimal Flash footprint (~2.0 KB driver only, ~9.7 KB full demo project)
 - No dynamic memory allocation (`malloc`/`free`)
 - No floating-point math — integer-only arithmetic
 - Configurable parameters via `#define`
@@ -395,10 +395,14 @@ Gesture: LEFT
 
 ## Memory Footprint
 
-| Resource | Used | Limit |
-|----------|------|-------|
-| RAM | ~496 bytes (static) | 2048 bytes |
-| Flash | ~9.6 KB | 16384 bytes |
+| Resource | Driver only | Full demo project | Limit |
+|----------|-------------|-------------------|-------|
+| RAM | ~20 bytes static | ~496 bytes | 2048 bytes |
+| Flash | ~2.0 KB | ~9.7 KB | 16384 bytes |
+
+Driver-only numbers exclude I2C library (`I2C-CH32V003`), `main.c`, startup
+code, and framework libraries. Full project includes all of the above plus
+`printf`-based debug output.
 
 ## Limitations
 
