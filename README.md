@@ -46,10 +46,11 @@ src/
   apds9960.c         — Driver implementation
   apds9960_regs.h    — Register map and bit definitions
   int_config.h / int_config.c — EXTI interrupt setup (PC3)
-  main.c             — Usage example (polling + interrupt modes)
-
-Library (via lib_deps):
-  I2C-CH32V003       — I2C driver for CH32V003
+examples/
+  basic/
+    main.c           — Usage example (polling + interrupt modes)
+library.json         — PlatformIO library manifest
+platformio.ini       — Build config (uses src_filter to compile src/ + examples/basic/)
 ```
 
 ## Build

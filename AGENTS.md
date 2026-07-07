@@ -29,8 +29,9 @@ No test framework configured. Manual testing via UART output (PD5, 115200 baud).
 | `src/apds9960.c` | Driver implementation (~700 lines) |
 | `src/apds9960_regs.h` | APDS9960 register map |
 | `src/int_config.h` / `src/int_config.c` | EXTI interrupt setup (INT→PC3) |
-| `src/main.c` | Entry point, usage example |
+| `examples/basic/main.c` | Example usage (polling + interrupt modes) |
 | `platformio.ini` | Build config, library deps (`I2C-CH32V003`) |
+| `library.json` | PlatformIO library manifest (for `lib_deps`) |
 | **Library:** `I2C-CH32V003` | I2C driver (via `lib_deps` in `platformio.ini`) |
 
 ## Architecture Notes
