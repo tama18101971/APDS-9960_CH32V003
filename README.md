@@ -6,7 +6,7 @@ Compact gesture recognition driver for the APDS9960 proximity/light/color sensor
 
 ## Features
 
-- Minimal RAM usage (~496 bytes static + small transient stack)
+- Minimal RAM usage (~20 bytes static driver + ~150 bytes transient stack for FIFO batch read)
 - Minimal Flash footprint (~2.0 KB driver only, ~9.7 KB full demo project)
 - No dynamic memory allocation (`malloc`/`free`)
 - No floating-point math — integer-only arithmetic
