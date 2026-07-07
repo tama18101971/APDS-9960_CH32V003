@@ -29,8 +29,9 @@ No test framework configured. Manual testing via UART output (PD5, 115200 baud).
 | `src/apds9960.c` | Driver implementation (~700 lines) |
 | `src/apds9960_regs.h` | APDS9960 register map |
 | `src/int_config.h` / `src/int_config.c` | EXTI interrupt setup (INT→PC3) |
-| `src/i2c.c` / `src/i2c.h` | I2C driver for CH32V003 |
 | `src/main.c` | Entry point, usage example |
+| `platformio.ini` | Build config, library deps (`I2C-CH32V003`) |
+| **Library:** `I2C-CH32V003` | I2C driver (via `lib_deps` in `platformio.ini`) |
 
 ## Architecture Notes
 
@@ -43,7 +44,7 @@ No test framework configured. Manual testing via UART output (PD5, 115200 baud).
 - **Interrupt mode:** `APDS_INT_MODE=1` enables gesture interrupt on PC3 (EXTI3 falling-edge). ISR sets `g_apds_int_flag`, main loop uses `__WFI()`. No NVIC disable/enable dance around gesture handling — the ISR is trivial (flag + clear pending) and safe to leave enabled during I2C polling.
 - **I2C retries:** `RETRY_LIMIT=6` in `apds9960.c` gates two things only: (1) how many times `apds_init()` retries the *entire* `configure_registers()` sequence, and (2) the ceiling on consecutive `sensor_reinit()` calls in `apds_available()`. It is NOT a per-call retry inside `rd()`/`wr()`/`rdBlock()` — a single failed I2C register access is not automatically retried at that level.
 - **FIFO reads are batched.** `process_fifo_batch()` reads all `GFLVL` packets in one `rdBlock()` transaction (up to 32×4=128 bytes) instead of one I2C transaction per packet — keeps up with the sensor's fill rate and reduces GFOV risk.
-- **I2C runs at 400 kHz** (Fast-mode, set in `main.c`). The `i2c.c` driver supports both 100 kHz/400 kHz.
+- **I2C runs at 400 kHz** (Fast-mode, set in `main.c`). The `I2C-CH32V003` library supports both 100 kHz/400 kHz.
 
 ## Gotchas
 
