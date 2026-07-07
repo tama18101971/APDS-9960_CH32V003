@@ -46,8 +46,10 @@ src/
   apds9960.c         — Driver implementation
   apds9960_regs.h    — Register map and bit definitions
   int_config.h / int_config.c — EXTI interrupt setup (PC3)
-  i2c.h / i2c.c      — I2C driver for CH32V003
   main.c             — Usage example (polling + interrupt modes)
+
+Library (via lib_deps):
+  I2C-CH32V003       — I2C driver for CH32V003
 ```
 
 ## Build
@@ -62,9 +64,10 @@ pio run -t upload  # flash via WCH-Link
 ## Using This Driver in Other Projects
 
 See [`INTEGRATION.md`](INTEGRATION.md) for step-by-step instructions on
-reusing this driver (`i2c.*`, `apds9960.*`, `apds9960_regs.h`, `int_config.*`)
+reusing this driver (`apds9960.*`, `apds9960_regs.h`, `int_config.*`)
 in other CH32V003/PlatformIO projects — quick copy, shared local library
-folder, or a dedicated git-based PlatformIO library.
+folder, or a dedicated git-based PlatformIO library. I2C driver is
+included as an external dependency (`I2C-CH32V003`) via `lib_deps`.
 
 ## API
 
