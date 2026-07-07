@@ -52,7 +52,7 @@ examples/
   basic/
     main.c           — Usage example (polling + interrupt modes)
 library.json         — PlatformIO library manifest
-platformio.ini       — Build config (uses src_filter to compile src/ + examples/basic/)
+platformio.ini       — Build config (uses build_src_filter to compile src/ + examples/basic/)
 ```
 
 ## Build

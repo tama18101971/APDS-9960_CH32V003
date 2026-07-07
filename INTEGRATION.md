@@ -42,8 +42,9 @@ lib_deps =
 
 - Свободные пины: **PC1 (SDA)**, **PC2 (SCL)**, и (только для interrupt-режима)
   **PC3 (INT)**. Если эти пины заняты другой периферией в целевом проекте —
-  нужно либо освободить их, либо переопределить `APDS_INT_PIN`/`APDS_INT_LINE`
-  в `int_config.h` под другой пин EXTI.
+  нужно либо освободить их, либо переопределить параметры пина прерывания
+  (`APDS_INT_PORT`, `APDS_INT_PIN`, `APDS_INT_LINE`, `APDS_INT_PORT_SOURCE`,
+  `APDS_INT_PIN_SOURCE`) через `build_flags` (см. раздел 8).
 - Свободна шина I2C1 (или уже используется только устройствами, совместимыми
   по адресу — APDS9960 сидит на `0x39`).
 
@@ -155,17 +156,21 @@ platform = ch32v
 board = ch32v003f4p6_evt_r0
 framework = noneos-sdk
 lib_deps =
-    https://github.com/<ваш_аккаунт>/APDS9960_CH32V003.git
-    https://github.com/tama18101971/I2C-CH32V003.git
+    https://github.com/tama18101971/APDS-9960_CH32V003.git
 ```
 
 Или с фиксацией версии (тег/коммит/ветка):
 
 ```ini
 lib_deps =
-    https://github.com/<ваш_аккаунт>/APDS9960_CH32V003.git#v1.0.0
-    https://github.com/tama18101971/I2C-CH32V003.git
+    https://github.com/tama18101971/APDS-9960_CH32V003.git#v1.0.0
 ```
+
+Если вы создаёте **собственный** форк/репозиторий библиотеки — замените путь
+на свой: `<ваш_аккаунт>/APDS9960_CH32V003.git`.
+
+`I2C-CH32V003` подтягивается **автоматически** — он объявлен в `dependencies`
+файла `library.json`, поэтому указывать его в `lib_deps` не нужно.
 
 `pio run` сам клонирует репозиторий в `.pio/libdeps/<env>/` при первой сборке.
 
