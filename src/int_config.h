@@ -18,11 +18,21 @@
  * НАСТРОЙКА ПИНА INT (APDS9960 → CH32V003)
  * ============================================================================ */
 
+#ifndef APDS_INT_PORT
 #define APDS_INT_PORT           GPIOC
+#endif
+#ifndef APDS_INT_PIN
 #define APDS_INT_PIN            GPIO_Pin_3
+#endif
+#ifndef APDS_INT_LINE
 #define APDS_INT_LINE           EXTI_Line3
+#endif
+#ifndef APDS_INT_PORT_SOURCE
 #define APDS_INT_PORT_SOURCE    GPIO_PortSourceGPIOC
+#endif
+#ifndef APDS_INT_PIN_SOURCE
 #define APDS_INT_PIN_SOURCE     GPIO_PinSource3
+#endif
 
 /* ============================================================================
  * ФЛАГ ПРЕРЫВАНИЯ (доступен из ISR и main loop)
