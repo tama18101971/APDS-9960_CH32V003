@@ -122,6 +122,67 @@ void apds_disableInterrupt(void);
 void apds_clearInterrupt(void);
 ```
 
+### EXTI Interrupt API (`int_config.h`)
+
+```c
+#include "int_config.h"
+
+// Init EXTI3 + NVIC for APDS9960 interrupt on PC3
+void apds_exti_init(void);
+
+// Enable/disable EXTI7_0 interrupt in NVIC
+void apds_exti_enable(void);
+void apds_exti_disable(void);
+
+// Check APDS_INT_LINE and set g_apds_int_flag (does NOT clear pending bit)
+void apds_handle_exti(void);
+
+// Clear pending bit for APDS_INT_LINE
+void apds_clear_exti(void);
+
+// Weak callback — called from default EXTI7_0_IRQHandler, override to add custom EXTI handling
+void apds_exti_callback(void);
+```
+
+### Custom EXTI Handler
+
+On CH32V003, all EXTI lines 0-7 share a single interrupt vector (`EXTI7_0_IRQHandler`).
+The library's `EXTI7_0_IRQHandler` is declared `__weak`, so you can override it
+to handle additional EXTI lines while still using the APDS9960 interrupt support:
+
+```c
+#include "int_config.h"
+
+void EXTI7_0_IRQHandler(void) __attribute__((interrupt("WCH-Interrupt-fast")));
+void EXTI7_0_IRQHandler(void) {
+    // Check APDS9960 interrupt (sets g_apds_int_flag, pending bit NOT cleared yet)
+    apds_handle_exti();
+
+    // Now check your other EXTI lines — pending bits are still set
+    if (EXTI_GetITStatus(EXTI_Line5) != RESET) {
+        // ... handle EXTI5 ...
+        EXTI_ClearITPendingBit(EXTI_Line5);
+    }
+
+    // Clear APDS9960 pending bit last
+    apds_clear_exti();
+}
+```
+
+Or, if you only need to add logic after the default handling, override the weak callback instead:
+
+```c
+#include "int_config.h"
+
+void apds_exti_callback(void) {
+    // Called after default EXTI7_0_IRQHandler handles APDS9960
+    if (EXTI_GetITStatus(EXTI_Line5) != RESET) {
+        // ... handle EXTI5 ...
+        EXTI_ClearITPendingBit(EXTI_Line5);
+    }
+}
+```
+
 ### Gesture Types
 
 ```c

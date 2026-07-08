@@ -47,16 +47,37 @@ void apds_exti_disable(void) {
 }
 
 /* ============================================================================
+ * Обработка прерывания APDS9960 — проверяет EXTI_Line3 и ставит флаг.
+ * НЕ сбрасывает pending bit — вызывайте apds_clear_exti() после.
+ * ============================================================================ */
+void apds_handle_exti(void) {
+    if (EXTI_GetITStatus(APDS_INT_LINE) != RESET) {
+        g_apds_int_flag = 1;
+    }
+}
+
+/* ============================================================================
+ * Сброс pending bit EXTI_Line3
+ * ============================================================================ */
+void apds_clear_exti(void) {
+    EXTI_ClearITPendingBit(APDS_INT_LINE);
+}
+
+/* ============================================================================
+ * User callback — слабый, пользователь может переопределить
+ * ============================================================================ */
+void apds_exti_callback(void) __attribute__((weak));
+void apds_exti_callback(void) {}
+
+/* ============================================================================
  * ISR: EXTI7_0_IRQHandler
  *
  * Все EXTI 0-7 делят один вектор на CH32V003.
- * Проверяем EXTI_Line3 и сбрасываем pending bit.
  * ============================================================================ */
-void EXTI7_0_IRQHandler(void) __attribute__((interrupt("WCH-Interrupt-fast")));
+void __attribute__((weak)) EXTI7_0_IRQHandler(void) __attribute__((interrupt("WCH-Interrupt-fast")));
 
 void EXTI7_0_IRQHandler(void) {
-    if (EXTI_GetITStatus(APDS_INT_LINE) != RESET) {
-        g_apds_int_flag = 1;
-        EXTI_ClearITPendingBit(APDS_INT_LINE);
-    }
+    apds_handle_exti();
+    apds_clear_exti();
+    apds_exti_callback();
 }

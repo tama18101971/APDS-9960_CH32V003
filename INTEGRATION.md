@@ -230,6 +230,61 @@ int main(void) {
 Full working example (both modes, with ISR example) — see `examples/basic/main.c`
 in this repository.
 
+## 7. Custom EXTI Handler (multiple EXTI lines)
+
+On CH32V003, all EXTI lines 0-7 share a single vector (`EXTI7_0_IRQHandler`).
+The library provides two options for handling additional EXTI lines:
+
+### Option A: Override the entire handler
+
+The library's `EXTI7_0_IRQHandler` is declared `__weak`. Define your own to handle
+all EXTI lines. Use `apds_handle_exti()` to check APDS9960 and `apds_clear_exti()`
+to clear its pending bit:
+
+```c
+#include "int_config.h"
+
+void EXTI7_0_IRQHandler(void) __attribute__((interrupt("WCH-Interrupt-fast")));
+void EXTI7_0_IRQHandler(void) {
+    /* Check APDS9960 — sets g_apds_int_flag, pending bit still active */
+    apds_handle_exti();
+
+    /* Check your other EXTI lines while pending bits are still set */
+    if (EXTI_GetITStatus(EXTI_Line5) != RESET) {
+        /* ... handle EXTI5 ... */
+        EXTI_ClearITPendingBit(EXTI_Line5);
+    }
+
+    /* Clear APDS9960 pending bit last */
+    apds_clear_exti();
+}
+```
+
+### Option B: Override the weak callback
+
+If you only need to add logic after the default handling, override `apds_exti_callback()`.
+The default ISR will handle APDS9960 first, then call your callback:
+
+```c
+#include "int_config.h"
+
+void apds_exti_callback(void) {
+    /* Called after default handler has processed APDS9960 */
+    if (EXTI_GetITStatus(EXTI_Line5) != RESET) {
+        /* ... handle EXTI5 ... */
+        EXTI_ClearITPendingBit(EXTI_Line5);
+    }
+}
+```
+
+### EXTI API functions
+
+| Function | Purpose |
+|----------|---------|
+| `apds_handle_exti()` | Check `APDS_INT_LINE`, set `g_apds_int_flag`. Does NOT clear pending bit. |
+| `apds_clear_exti()` | Clear pending bit for `APDS_INT_LINE`. |
+| `apds_exti_callback()` | Weak callback, called from default `EXTI7_0_IRQHandler`. |
+
 ## 7. Pin Connections (same regardless of integration method)
 
 | CH32V003 | APDS9960 | Function |
@@ -297,6 +352,7 @@ code — verify the actual budget via `pio run` (output "RAM:" / "Flash:").
 
 | Symptom | Cause | Solution |
 |---------|-------|----------|
+| `multiple definition of 'EXTI7_0_IRQHandler'` | Your project defines `EXTI7_0_IRQHandler` and so does `int_config.c` | Override the `__weak` handler from the library — define your own `EXTI7_0_IRQHandler` in your project; it will take precedence. Use `apds_handle_exti()` and `apds_clear_exti()` inside it to maintain APDS9960 interrupt support (see section 7). |
 | `apds_init()` returns `false` | Incorrect I2C wiring, or PC1/PC2 occupied by other peripherals | Check pins, use `APDS9960_DEBUG` to print ID |
 | Gestures not detected | Signal too weak / incorrect calibration | Increase `APDS_GAIN` / `APDS_GGAIN`, check lighting (avoid direct sunlight) |
 | Gestures "duplicated" | Old version of `apds9960.c` with artificial `apds_readGesture()` cutoff by iteration count | Ensure the latest driver version from this repository is copied |

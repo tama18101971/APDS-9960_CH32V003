@@ -230,6 +230,62 @@ int main(void) {
 Полный рабочий пример (оба режима, с примером ISR) — см. `examples/basic/main.c` в этом
 репозитории.
 
+## 7. Пользовательский обработчик прерываний (несколько EXTI-линий)
+
+На CH32V003 все EXTI-линии 0-7 делят один вектор (`EXTI7_0_IRQHandler`).
+Библиотека предоставляет два варианта обработки дополнительных EXTI-линий:
+
+### Вариант А: Полная замена обработчика
+
+Обработчик `EXTI7_0_IRQHandler` в библиотеке объявлен `__weak`. Определите свой
+для обработки всех EXTI-линий. Используйте `apds_handle_exti()` для проверки
+APDS9960 и `apds_clear_exti()` для сброса pending bit:
+
+```c
+#include "int_config.h"
+
+void EXTI7_0_IRQHandler(void) __attribute__((interrupt("WCH-Interrupt-fast")));
+void EXTI7_0_IRQHandler(void) {
+    /* Проверяем APDS9960 — ставит g_apds_int_flag, pending bit ещё активен */
+    apds_handle_exti();
+
+    /* Проверяем свои EXTI-линии пока pending bits ещё на месте */
+    if (EXTI_GetITStatus(EXTI_Line5) != RESET) {
+        /* ... обработка EXTI5 ... */
+        EXTI_ClearITPendingBit(EXTI_Line5);
+    }
+
+    /* Сбрасываем pending bit APDS9960 последним */
+    apds_clear_exti();
+}
+```
+
+### Вариант Б: Переопределение слабого callback
+
+Если нужно просто добавить логику после дефолтной обработки, переопределите
+`apds_exti_callback()`. Дефолтный ISR сначала обработает APDS9960, затем
+вызовет ваш callback:
+
+```c
+#include "int_config.h"
+
+void apds_exti_callback(void) {
+    /* Вызывается после дефолтной обработки APDS9960 */
+    if (EXTI_GetITStatus(EXTI_Line5) != RESET) {
+        /* ... обработка EXTI5 ... */
+        EXTI_ClearITPendingBit(EXTI_Line5);
+    }
+}
+```
+
+### API функции EXTI
+
+| Функция | Назначение |
+|---------|------------|
+| `apds_handle_exti()` | Проверяет `APDS_INT_LINE`, ставит `g_apds_int_flag`. НЕ сбрасывает pending bit. |
+| `apds_clear_exti()` | Сбрасывает pending bit `APDS_INT_LINE`. |
+| `apds_exti_callback()` | Слабый callback, вызывается из дефолтного `EXTI7_0_IRQHandler`. |
+
 ## 7. Подключение пинов (не меняется независимо от способа интеграции)
 
 | CH32V003 | APDS9960 | Назначение |
@@ -298,6 +354,7 @@ build_flags =
 
 | Симптом | Причина | Решение |
 |---------|---------|---------|
+| `multiple definition of 'EXTI7_0_IRQHandler'` | Ваш проект определяет `EXTI7_0_IRQHandler` и `int_config.c` тоже | Переопределите `__weak` обработчик из библиотеки — определите свой `EXTI7_0_IRQHandler` в проекте, он автоматически возьмёт приоритет. Используйте `apds_handle_exti()` и `apds_clear_exti()` внутри него для поддержки прерываний APDS9960 (см. раздел 7). |
 | `apds_init()` возвращает `false` | Неверная разводка I2C, либо PC1/PC2 заняты другой периферией | Проверить пины, `APDS9960_DEBUG` для вывода ID |
 | Жесты не распознаются | Слишком слабый сигнал / неверная калибровка | Увеличить `APDS_GAIN`/`APDS_GGAIN`, проверить освещение (не под прямым солнцем) |
 | Жесты "двоятся" | Старая версия `apds9960.c` с искусственным обрывом `apds_readGesture()` по числу итераций | Убедиться, что скопирована актуальная версия драйвера из этого репозитория |

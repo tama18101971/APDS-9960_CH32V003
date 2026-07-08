@@ -124,6 +124,67 @@ void apds_disableInterrupt(void);
 void apds_clearInterrupt(void);
 ```
 
+### API EXTI-прерываний (`int_config.h`)
+
+```c
+#include "int_config.h"
+
+// Инициализация EXTI3 + NVIC для прерывания APDS9960 на PC3
+void apds_exti_init(void);
+
+// Включение/выключение EXTI7_0 в NVIC
+void apds_exti_enable(void);
+void apds_exti_disable(void);
+
+// Проверка APDS_INT_LINE и установка g_apds_int_flag (НЕ сбрасывает pending bit)
+void apds_handle_exti(void);
+
+// Сброс pending bit EXTI_Line3
+void apds_clear_exti(void);
+
+// Слабый callback — вызывается из дефолтного EXTI7_0_IRQHandler, переопределите для обработки своих EXTI
+void apds_exti_callback(void);
+```
+
+### Пользовательский обработчик прерываний
+
+На CH32V003 все EXTI-линии 0-7 делят один вектор прерывания (`EXTI7_0_IRQHandler`).
+Обработчик в библиотеке объявлен `__weak`, поэтому вы можете переопределить его
+для обработки дополнительных EXTI-линий с сохранением поддержки прерываний APDS9960:
+
+```c
+#include "int_config.h"
+
+void EXTI7_0_IRQHandler(void) __attribute__((interrupt("WCH-Interrupt-fast")));
+void EXTI7_0_IRQHandler(void) {
+    // Проверяем прерывание APDS9960 (ставит g_apds_int_flag, pending bit ещё НЕ сброшен)
+    apds_handle_exti();
+
+    // Проверяем свои EXTI-линии — pending bits ещё на месте
+    if (EXTI_GetITStatus(EXTI_Line5) != RESET) {
+        // ... обработка EXTI5 ...
+        EXTI_ClearITPendingBit(EXTI_Line5);
+    }
+
+    // Сбрасываем pending bit APDS9960 последним
+    apds_clear_exti();
+}
+```
+
+Или, если нужно просто добавить логику после дефолтной обработки, переопределите слабый callback:
+
+```c
+#include "int_config.h"
+
+void apds_exti_callback(void) {
+    // Вызывается после дефолтной обработки APDS9960 в EXTI7_0_IRQHandler
+    if (EXTI_GetITStatus(EXTI_Line5) != RESET) {
+        // ... обработка EXTI5 ...
+        EXTI_ClearITPendingBit(EXTI_Line5);
+    }
+}
+```
+
 ### Типы жестов
 
 ```c
