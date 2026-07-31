@@ -48,14 +48,14 @@ static bool rdBlock(uint8_t reg, uint8_t *buf, uint8_t len) {
  * для учета пакета. Если все 4 значения меньше этого порога,
  * пакет считается шумом и отбрасывается.
  */
-#define THRESH_OUT              10
+#define THRESH_OUT              APDS_FIFO_SIGNAL_MIN
 
 /*
  * SENSITIVITY_1 = 5 — Порог накопленной дельты для определения направления.
  * Когда |g_ud_acc| или |g_lr_acc| превышает это значение,
  * жест считается определенным.
  */
-#define SENSITIVITY_1           5
+#define SENSITIVITY_1           APDS_GESTURE_SENSITIVITY
 
 /*
  * FIFO_BATCH_MAX = 32 — Максимальная глубина аппаратного FIFO жестов
@@ -77,7 +77,7 @@ static bool rdBlock(uint8_t reg, uint8_t *buf, uint8_t len) {
  * операции. Отказоустойчивость на уровне шины обеспечивает i2c.c
  * (bus recovery), но не автоматический retry на уровне регистра.
  */
-#define RETRY_LIMIT             6
+#define RETRY_LIMIT             APDS_RETRY_LIMIT
 
 /* Сохранённые откалиброванные пороги (F7) — объявлены до calibrate_proximity() */
 static uint8_t  g_cal_piht;
@@ -184,13 +184,13 @@ static bool calibrate_proximity(void) {
     }
 
     /* Дисперсия от медианы (со сдвигом /4 для избежания переполнения) */
-    uint16_t sum_sq = 0;
+    uint32_t sum_sq = 0;
     for (uint8_t i = 0; i < valid_cnt; i++) {
         int16_t d = (int16_t)buf[i] - (int16_t)median;
         int16_t d4 = d / 4;
         sum_sq += (uint16_t)(d4 * d4);
     }
-    uint16_t var = sum_sq / valid_cnt;
+    uint16_t var = (uint16_t)(sum_sq / valid_cnt);
     uint8_t sigma = isqrt(var) * 4;
 
     /* Вычисление порогов */
@@ -265,38 +265,38 @@ static bool calibrate_proximity(void) {
  * С каждым новым действительным пакетом вычисляется дельта
  * от предыдущего пакета и прибавляется к аккумулятору.
  */
-static volatile int16_t  g_ud_acc;
-static volatile int16_t  g_lr_acc;
+static int16_t  g_ud_acc;
+static int16_t  g_lr_acc;
 
 /*
  * g_prev_ud / g_prev_lr — Ratio предыдущего действительного пакета.
  * Используются для вычисления дельты между соседними пакетами.
  */
-static volatile int16_t  g_prev_ud;
-static volatile int16_t  g_prev_lr;
+static int16_t  g_prev_ud;
+static int16_t  g_prev_lr;
 
 /*
  * g_has_prev — флаг: был ли обработан хотя бы один действительный пакет.
  */
-static volatile uint8_t  g_has_prev;
+static uint8_t  g_has_prev;
 
 /*
  * g_packet_count — Количество обработанных действительных пакетов.
  * Используется для фильтрации шума: жест не определяется
  * при малом количестве пакетов.
  */
-static volatile uint8_t  g_packet_count;
+static uint8_t  g_packet_count;
 
-static volatile uint8_t  g_motion;
+static gesture_t g_motion;
 
 /* g_reinit_count — Счётчик последовательных переинициализаций.
  * Сбрасывается при успешном чтении GSTATUS.
  * Если превышает RETRY_LIMIT — датчик считается неисправным. */
-static volatile uint8_t  g_reinit_count;
+static uint8_t  g_reinit_count;
 
 /* g_last_error — Код последней ошибки для диагностики.
  * Устанавливается функциями драйвера при сбоях. */
-static volatile uint8_t  g_last_error;
+static uint8_t  g_last_error;
 
 /* Сброс всех переменных состояния жеста */
 static void gesture_reset(void) {
@@ -307,7 +307,6 @@ static void gesture_reset(void) {
     g_has_prev = 0;
     g_packet_count = 0;
     g_motion = GESTURE_NONE;
-    g_reinit_count = 0;
 }
 
 /* ============================================================================
@@ -325,12 +324,9 @@ static void gesture_reset(void) {
  *   1. Читаем FIFO_LEVEL — сколько пакетов готово
  *   2. Для каждого пакета читаем 4 байта из регистра GFIFO_U (0xFC)
  *      Адрес автоинкрементируется: 0xFC -> U, 0xFD -> D, 0xFE -> L, 0xFF -> R
- *   3. Фильтруем: пропускаем пакеты где любой канал > 250 (насыщение)
- *      или все каналы < 10 (шум)
- *   4. Запоминаем первый и последний действительные пакеты
- *   5. Вычисляем Ratio для каждого: (U-D)*100/(U+D)
- *   6. Delta = Ratio_последний - Ratio_первый
- *   7. Накапливаем: g_ud_delta += ud_delta
+ *   3. Отбрасываем насыщенные и шумовые пакеты
+ *   4. Вычисляем Ratio для каждого оставшегося пакета: (U-D)*100/(U+D)
+ *   5. Накапливаем разность Ratio текущего и предыдущего валидного пакета
  * ============================================================================ */
 
 /* Обработка одного батча пакетов FIFO.
@@ -340,19 +336,21 @@ static void gesture_reset(void) {
  * по одному пакету за транзакцию.
  * Каждый новый пакет: вычисляем дельту от предыдущего и прибавляем к аккумулятору.
  * Ratio = (U-D)*100/(U+D), диапазон -100..+100 */
-static void process_fifo_batch(void) {
+static bool process_fifo_batch(void) {
     uint8_t fifo_level = 0;
-    if (!rd(REG_GFLVL, &fifo_level) || fifo_level == 0) return;
+    if (!rd(REG_GFLVL, &fifo_level)) return false;
+    if (fifo_level == 0) return true;
     if (fifo_level > FIFO_BATCH_MAX) fifo_level = FIFO_BATCH_MAX; /* защита от некорректных данных */
 
     uint8_t buf[FIFO_BATCH_MAX * 4]; /* [U,D,L,R] x до 32 пакетов */
-    if (!rdBlock(REG_GFIFO_U, buf, (uint8_t)(fifo_level * 4))) return;
+    if (!rdBlock(REG_GFIFO_U, buf, (uint8_t)(fifo_level * 4))) return false;
 
     for (uint8_t i = 0; i < fifo_level; i++) {
         uint8_t u = buf[i * 4 + 0], d = buf[i * 4 + 1], l = buf[i * 4 + 2], r = buf[i * 4 + 3];
 
-        /* Фильтр: насыщение (> 250) или шум (все < 10) */
-        if (u > 250 || d > 250 || l > 250 || r > 250) continue;
+        /* Фильтр: насыщение или шум (пороги задаются в apds9960_config.h) */
+        if (u > APDS_FIFO_SATURATION_MAX || d > APDS_FIFO_SATURATION_MAX ||
+            l > APDS_FIFO_SATURATION_MAX || r > APDS_FIFO_SATURATION_MAX) continue;
         if (u < THRESH_OUT && d < THRESH_OUT && l < THRESH_OUT && r < THRESH_OUT) continue;
 
         /* Вычисляем Ratio для этого пакета */
@@ -367,6 +365,7 @@ static void process_fifo_batch(void) {
             g_prev_ud = ud_ratio;
             g_prev_lr = lr_ratio;
             g_has_prev = 1;
+            g_packet_count = 1;
             continue;
         }
 
@@ -377,8 +376,10 @@ static void process_fifo_batch(void) {
         /* Запоминаем как предыдущий для следующего пакета */
         g_prev_ud = ud_ratio;
         g_prev_lr = lr_ratio;
-        g_packet_count++;
+        if (g_packet_count != UINT8_MAX) g_packet_count++;
     }
+
+    return true;
 }
 
 /* ============================================================================
@@ -413,8 +414,8 @@ static bool decode_gesture(void) {
         return false;
     }
 
-    int16_t abs_ud = g_ud_acc < 0 ? -g_ud_acc : g_ud_acc;
-    int16_t abs_lr = g_lr_acc < 0 ? -g_lr_acc : g_lr_acc;
+    int16_t abs_ud = g_ud_acc < 0 ? (int16_t)-g_ud_acc : g_ud_acc;
+    int16_t abs_lr = g_lr_acc < 0 ? (int16_t)-g_lr_acc : g_lr_acc;
 
 #ifdef APDS9960_DEBUG
     printf("DEC: ud_acc=%d lr_acc=%d pkts=%d thr=%d\r\n",
@@ -510,12 +511,29 @@ static bool configure_registers(void) {
 /* Полная переинициализация датчика.
  * Используется при переполнении FIFO или ошибках I2C.
  * После аппаратной настройки восстанавливает откалиброванные пороги. */
-static void sensor_reinit(void) {
-    configure_registers();
+static bool sensor_reinit(void) {
+    if (!configure_registers()) return false;
     if (g_cal_valid) {
-        wr(REG_PIHT,   g_cal_piht);
-        wr(REG_GPENTH, g_cal_gpenth);
-        wr(REG_GEXTH,  g_cal_gexth);
+        if (!wr(REG_PIHT, g_cal_piht)) return false;
+        if (!wr(REG_GPENTH, g_cal_gpenth)) return false;
+        if (!wr(REG_GEXTH, g_cal_gexth)) return false;
+    }
+    return true;
+}
+
+/* Восстановление после переполнения FIFO. Счётчик сохраняется между
+ * последовательными GFOV и сбрасывается только после нормального GSTATUS. */
+static void recover_fifo_overflow(void) {
+    gesture_reset();
+    g_last_error = APDS_ERR_FIFO_OVERFLOW;
+
+    if (g_reinit_count < RETRY_LIMIT) {
+        g_reinit_count++;
+        if (!sensor_reinit()) g_last_error = APDS_ERR_I2C;
+    }
+
+    if (g_reinit_count >= RETRY_LIMIT) {
+        g_last_error = APDS_ERR_SENSOR_HANG;
     }
 }
 
@@ -539,8 +557,12 @@ static void sensor_reinit(void) {
  * Возвращает: true если датчик отвечает и настроен. */
 bool apds_init(void) {
     uint8_t id;
-    if (!rd(REG_ID, &id)) return false;
+    if (!rd(REG_ID, &id)) {
+        g_last_error = APDS_ERR_I2C;
+        return false;
+    }
     if (id != 0xAB && id != 0xA8 && id != 0x9C && id != 0x9E) {
+        g_last_error = APDS_ERR_INVALID_ID;
         return false;
     }
 
@@ -549,10 +571,15 @@ bool apds_init(void) {
             uint8_t en;
             if (rd(REG_ENABLE, &en) && (en & EN_PON)) {
                 gesture_reset();
+                g_reinit_count = 0;
 
 #if APDS_ENABLE_CALIBRATION
-                if (!calibrate_proximity()) return false;
+                if (!calibrate_proximity()) {
+                    g_last_error = APDS_ERR_I2C;
+                    return false;
+                }
 #endif
+                g_last_error = APDS_ERR_NONE;
                 return true;
             }
         }
@@ -566,9 +593,13 @@ bool apds_init(void) {
 /* Перевод датчика в режим сна.
  * Отключает PEN, GEN, WEN — остаётся только PON.
  * Потребление: ~1 мкА (питание только на логику).
- * Возвращает: true всегда. */
+ * Возвращает: true если запись ENABLE успешна. */
 bool apds_sleep(void) {
-    wr(REG_ENABLE, EN_PON);
+    if (!wr(REG_ENABLE, EN_PON)) {
+        g_last_error = APDS_ERR_I2C;
+        return false;
+    }
+    g_last_error = APDS_ERR_NONE;
     return true;
 }
 
@@ -578,7 +609,11 @@ bool apds_sleep(void) {
  * Потребление: <1 мкА.
  * Для пробуждения необходимо apds_wakeup(). */
 bool apds_shutdown(void) {
-    wr(REG_ENABLE, 0x00);
+    if (!wr(REG_ENABLE, 0x00)) {
+        g_last_error = APDS_ERR_I2C;
+        return false;
+    }
+    g_last_error = APDS_ERR_NONE;
     return true;
 }
 
@@ -588,16 +623,31 @@ bool apds_shutdown(void) {
  * Если датчик был в sleep (PON=1) — лишняя задержка 1 мс безвредна. */
 bool apds_wakeup(void) {
     /* Шаг 1: включаем PON (если уже включён — ничего не меняется) */
-    if (!wr(REG_ENABLE, EN_PON)) return false;
+    if (!wr(REG_ENABLE, EN_PON)) {
+        g_last_error = APDS_ERR_I2C;
+        return false;
+    }
 
     /* Шаг 2:等待 генератор (1 мс достаточно для startup) */
     Delay_Ms(1);
 
     /* Шаг 3: включаем proximity + gesture + wait */
-    if (!wr(REG_ENABLE, EN_PON | EN_PEN | EN_GEN | EN_WEN)) return false;
+    if (!wr(REG_ENABLE, EN_PON | EN_PEN | EN_GEN | EN_WEN)) {
+        g_last_error = APDS_ERR_I2C;
+        return false;
+    }
 
     uint8_t en;
-    return rd(REG_ENABLE, &en) && (en & EN_PON) != 0;
+    if (!rd(REG_ENABLE, &en)) {
+        g_last_error = APDS_ERR_I2C;
+        return false;
+    }
+    if ((en & EN_PON) == 0) {
+        g_last_error = APDS_ERR_SENSOR_HANG;
+        return false;
+    }
+    g_last_error = APDS_ERR_NONE;
+    return true;
 }
 
 bool apds_available(void) {
@@ -608,16 +658,12 @@ bool apds_available(void) {
     }
 
     if (gs & GST_GFOV) {
-        gesture_reset();
-        g_last_error = APDS_ERR_FIFO_OVERFLOW;
-        if (g_reinit_count < RETRY_LIMIT) {
-            g_reinit_count++;
-            sensor_reinit();
-        }
+        recover_fifo_overflow();
         return false;
     }
 
     g_reinit_count = 0;
+    g_last_error = APDS_ERR_NONE;
     return (gs & GST_GVALID) != 0;
 }
 
@@ -644,6 +690,7 @@ bool apds_available(void) {
  * Возвращает: gesture_t — тип жеста или GESTURE_NONE. */
 gesture_t apds_readGesture(void) {
     gesture_reset();
+    g_last_error = APDS_ERR_NONE;
 
     uint32_t start_tick = SysTick->CNT;
     uint32_t timeout_ticks = (SystemCoreClock / 1000UL) * APDS_GESTURE_TIMEOUT_MS;
@@ -661,11 +708,14 @@ gesture_t apds_readGesture(void) {
         }
 
         if (gs & GST_GFOV) {
-            gesture_reset();
+            recover_fifo_overflow();
             return GESTURE_NONE;
         }
 
-        process_fifo_batch();
+        if (!process_fifo_batch()) {
+            g_last_error = APDS_ERR_I2C;
+            break;
+        }
 
         Delay_Ms(1);
     }
@@ -675,11 +725,21 @@ gesture_t apds_readGesture(void) {
 }
 
 bool apds_readProximity(uint8_t *value) {
-    return rd(REG_PDATA, value);
+    if (!rd(REG_PDATA, value)) {
+        g_last_error = APDS_ERR_I2C;
+        return false;
+    }
+    g_last_error = APDS_ERR_NONE;
+    return true;
 }
 
 bool apds_readStatus(uint8_t *value) {
-    return rd(REG_STATUS, value);
+    if (!rd(REG_STATUS, value)) {
+        g_last_error = APDS_ERR_I2C;
+        return false;
+    }
+    g_last_error = APDS_ERR_NONE;
+    return true;
 }
 
 uint8_t apds_getLastError(void) {
@@ -692,9 +752,15 @@ uint8_t apds_getReinitCount(void) {
 
 bool apds_recalibrate(void) {
 #if APDS_ENABLE_CALIBRATION
-    return calibrate_proximity();
+    if (!calibrate_proximity()) {
+        g_last_error = APDS_ERR_I2C;
+        return false;
+    }
+    g_last_error = APDS_ERR_NONE;
+    return true;
 #else
     (void)0;
+    g_last_error = APDS_ERR_NONE;
     return true;
 #endif
 }

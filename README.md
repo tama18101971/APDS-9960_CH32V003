@@ -12,7 +12,7 @@ Compact gesture recognition driver for the APDS9960 proximity/light/color sensor
 - Minimal Flash footprint (~2.0 KB driver only, ~9.7 KB full demo project)
 - No dynamic memory allocation (`malloc`/`free`)
 - No floating-point math — integer-only arithmetic
-- Configurable parameters via `#define`
+- Project-wide configurable parameters via PlatformIO `build_flags`
 - Auto-calibration of proximity thresholds
 - Auto-recovery on FIFO overflow
 - Interrupt-driven mode (APDS9960 INT → EXTI3 on PC3)
@@ -46,7 +46,8 @@ Sensor I2C address: `0x39`
 
 ```
 src/
-  apds9960.h         — Public API and configurable parameters
+  apds9960.h         — Public API
+  apds9960_config.h  — Shared driver parameters and range checks
   apds9960.c         — Driver implementation
   apds9960_regs.h    — Register map and bit definitions
   int_config.h / int_config.c — EXTI interrupt setup (PC3)
@@ -69,7 +70,7 @@ pio run -t upload  # flash via WCH-Link
 ## Using This Driver in Other Projects
 
 See [`INTEGRATION.md`](INTEGRATION.md) for step-by-step instructions on
-reusing this driver (`apds9960.*`, `apds9960_regs.h`, `int_config.*`)
+reusing this driver (`apds9960.*`, `apds9960_config.h`, `apds9960_regs.h`, `int_config.*`)
 in other CH32V003/PlatformIO projects — quick copy, shared local library
 folder, or a dedicated git-based PlatformIO library. I2C driver is
 included as an external dependency (`I2C-CH32V003`) via `lib_deps`.
@@ -147,8 +148,9 @@ void apds_exti_callback(void);
 ### Custom EXTI Handler
 
 On CH32V003, all EXTI lines 0-7 share a single interrupt vector (`EXTI7_0_IRQHandler`).
-The library's `EXTI7_0_IRQHandler` is declared `__weak`, so you can override it
-to handle additional EXTI lines while still using the APDS9960 interrupt support:
+By default the library provides a **strong** handler so it overrides the looping
+NoneOS-SDK fallback handler. To own the shared EXTI0…7 vector, add
+`-DAPDS_PROVIDE_EXTI_ISR=0` to `build_flags` and define the handler yourself:
 
 ```c
 #include "int_config.h"
@@ -169,7 +171,7 @@ void EXTI7_0_IRQHandler(void) {
 }
 ```
 
-Or, if you only need to add logic after the default handling, override the weak callback instead:
+If you only need to add logic after the default handling, override the weak callback instead:
 
 ```c
 #include "int_config.h"
@@ -202,6 +204,7 @@ typedef enum {
 #define APDS_ERR_I2C            1   // I2C error (NACK, timeout)
 #define APDS_ERR_FIFO_OVERFLOW  2   // FIFO overflow
 #define APDS_ERR_SENSOR_HANG    3   // Sensor not responding
+#define APDS_ERR_INVALID_ID     4   // Device at 0x39 is not an APDS9960
 ```
 
 ## Usage Example
@@ -402,19 +405,27 @@ The driver performs automatic calibration of proximity thresholds during `apds_i
 
 ## Configuration
 
-Override defaults by defining before including `apds9960.h`:
+Defaults live in `src/apds9960_config.h`. Override them for the complete build
+through PlatformIO `build_flags`:
 
-```c
-#define APDS_GAIN               3   // Proximity gain: 0=1x, 1=2x, 2=4x, 3=8x
-#define APDS_LED_CURRENT        0   // LED current: 0=100mA, 1=50mA, 2=25mA, 3=12.5mA
-#define APDS_GGAIN              3   // Gesture gain: 0=1x, 1=2x, 2=4x, 3=8x
-#define APDS_GLDRIVE            0   // Gesture LED: 0=100mA, 1=50mA, 2=25mA, 3=12.5mA
-#define APDS_PROX_THRESHOLD     50  // Proximity enter threshold (0-255)
-#define APDS_GESTURE_EXIT_TH    30  // Proximity exit threshold (0-255)
-#define APDS_GWTIME             1   // Gesture wait: 0=0ms, 1=2.8ms, ..., 7=39.2ms
-#define APDS_GESTURE_TIMEOUT_MS 300 // Gesture timeout (ms)
-#define APDS_INT_MODE           1   // 0=polling, 1=interrupt (PC3)
+```ini
+build_flags =
+    -Isrc
+    -DAPDS_GAIN=3
+    -DAPDS_LED_CURRENT=0
+    -DAPDS_GGAIN=3
+    -DAPDS_GLDRIVE=0
+    -DAPDS_PROX_THRESHOLD=50
+    -DAPDS_GESTURE_EXIT_TH=30
+    -DAPDS_GWTIME=1
+    -DAPDS_GESTURE_TIMEOUT_MS=300
+    -DAPDS_INT_MODE=1
 ```
+
+Defining these values in `main.c` before `#include "apds9960.h"` does **not**
+configure separately compiled `apds9960.c`. `apds9960_config.h` validates all
+supported values during compilation. It also exposes `APDS_FIFO_SIGNAL_MIN`,
+`APDS_FIFO_SATURATION_MAX`, `APDS_GESTURE_SENSITIVITY`, and `APDS_RETRY_LIMIT`.
 
 ### Tuning Tips
 
@@ -422,7 +433,7 @@ Override defaults by defining before including `apds9960.h`:
 |---------|----------|
 | Gestures not detected | Increase `APDS_GAIN` and `APDS_GGAIN` to 3 (8x) |
 | False positives | Increase proximity threshold or gesture sensitivity |
-| Slow gestures not working | Decrease `SENSITIVITY_1` in `apds9960.c` (default: 5) |
+| Slow gestures not working | Decrease `APDS_GESTURE_SENSITIVITY` through `build_flags` (default: 5) |
 | Multiple gestures per swipe | Should not happen anymore — `apds_readGesture()` blocks on a real SysTick deadline until GVALID clears, not a fixed iteration count. If it still happens, check I2C signal integrity at 400 kHz. |
 | Calibration fails | Check sensor orientation, ensure no direct sunlight |
 

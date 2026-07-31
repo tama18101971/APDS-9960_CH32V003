@@ -72,12 +72,17 @@ void apds_exti_callback(void) {}
 /* ============================================================================
  * ISR: EXTI7_0_IRQHandler
  *
- * Все EXTI 0-7 делят один вектор на CH32V003.
+ * Все EXTI 0-7 делят один вектор на CH32V003. Обработчик намеренно strong:
+ * NoneOS-SDK также предоставляет weak fallback, который зациклен. Если и этот
+ * обработчик объявить weak, линкер может выбрать fallback SDK, и первое EXTI
+ * приведёт к вечному зависанию МК.
  * ============================================================================ */
-void __attribute__((weak)) EXTI7_0_IRQHandler(void) __attribute__((interrupt("WCH-Interrupt-fast")));
+#if APDS_PROVIDE_EXTI_ISR
+void EXTI7_0_IRQHandler(void) __attribute__((interrupt("WCH-Interrupt-fast")));
 
 void EXTI7_0_IRQHandler(void) {
     apds_handle_exti();
     apds_clear_exti();
     apds_exti_callback();
 }
+#endif

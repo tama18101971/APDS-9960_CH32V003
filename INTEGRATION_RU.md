@@ -3,7 +3,7 @@
 🇬🇧 [English](INTEGRATION.md) | 🇷🇺 Русский
 
 Этот документ описывает, как использовать драйвер жестов APDS9960 (файлы
-`apds9960.*`, `apds9960_regs.h`, `int_config.*`) в **других** PlatformIO-проектах
+`apds9960.*`, `apds9960_config.h`, `apds9960_regs.h`, `int_config.*`) в **других** PlatformIO-проектах
 на CH32V003, без копирования `main.c` (он — только демо-пример этого репозитория).
 
 Драйвер I2C подключается как внешняя библиотека `I2C-CH32V003` через `lib_deps`.
@@ -13,6 +13,7 @@
 | Файл | Обязателен? | Назначение |
 |------|-------------|------------|
 | `apds9960_regs.h` | ✅ Всегда | Карта регистров APDS9960 |
+| `apds9960_config.h` | ✅ Всегда | Общая compile-time конфигурация драйвера |
 | `apds9960.h` / `apds9960.c` | ✅ Всегда | Сам драйвер жестов |
 | `int_config.h` / `int_config.c` | ⚙️ Только если `APDS_INT_MODE=1` | EXTI3 (PC3) для interrupt-режима |
 
@@ -63,6 +64,7 @@ lib_deps =
        APDS9960/
          apds9960.h
          apds9960.c
+         apds9960_config.h
          apds9960_regs.h
          int_config.h      (опционально)
          int_config.c      (опционально)
@@ -136,6 +138,7 @@ APDS9960_CH32V003/            (корень git-репозитория библ�
   src/
     apds9960.h
     apds9960.c
+    apds9960_config.h
     apds9960_regs.h
     int_config.h
     int_config.c
@@ -237,9 +240,11 @@ int main(void) {
 
 ### Вариант А: Полная замена обработчика
 
-Обработчик `EXTI7_0_IRQHandler` в библиотеке объявлен `__weak`. Определите свой
-для обработки всех EXTI-линий. Используйте `apds_handle_exti()` для проверки
-APDS9960 и `apds_clear_exti()` для сброса pending bit:
+По умолчанию библиотека определяет **strong** `EXTI7_0_IRQHandler`, поскольку
+weak fallback NoneOS-SDK зациклен. Если приложение должно владеть всеми EXTI
+линиями, задайте `-DAPDS_PROVIDE_EXTI_ISR=0` в `build_flags`, затем определите
+свой обработчик. Используйте `apds_handle_exti()` для проверки APDS9960 и
+`apds_clear_exti()` для сброса pending bit:
 
 ```c
 #include "int_config.h"
@@ -299,8 +304,11 @@ I2C-адрес датчика: `0x39`.
 
 ## 8. Настройка под конкретный проект
 
-Все параметры переопределяются через `#define` **до** `#include "apds9960.h"`,
-либо через `build_flags` в `platformio.ini` (например `-DAPDS_INT_MODE=0`):
+Параметры драйвера задавайте для **всей сборки** через `build_flags` в
+`platformio.ini` (например, `-DAPDS_INT_MODE=0`). `#define` в `main.c` перед
+`#include "apds9960.h"` влияет лишь на `main.c`, но не на отдельно
+скомпилированный `apds9960.c`, поэтому не поддерживается. Дефолты и проверки
+диапазонов находятся в `apds9960_config.h`.
 
 Параметры `int_config.h` (пин прерывания) также переопределяются через
 `build_flags`:
@@ -314,23 +322,23 @@ build_flags =
     -DAPDS_INT_PIN_SOURCE=GPIO_PinSource3
 ```
 
-```c
-#define APDS_GAIN               3     /* усиление proximity: 0=1x..3=8x */
-#define APDS_LED_CURRENT         0     /* ток LED: 0=100mA..3=12.5mA */
-#define APDS_GGAIN               3     /* усиление gesture: 0=1x..3=8x */
-#define APDS_GLDRIVE             0     /* ток gesture LED: 0=100mA..3=12.5mA */
-#define APDS_PROX_THRESHOLD      50    /* порог входа в gesture mode (до калибровки) */
-#define APDS_GESTURE_EXIT_TH     30    /* порог выхода (до калибровки) */
-#define APDS_GESTURE_TIMEOUT_MS  300   /* максимальное время одного жеста, мс */
-#define APDS_GWTIME              1     /* пауза между выборками жеста */
-#define APDS_ENABLE_CALIBRATION  1     /* авто-калибровка порогов при apds_init() */
-#define APDS_INT_MODE            1     /* 0=polling, 1=interrupt (PC3/EXTI3) */
-/* #define APDS9960_DEBUG */          /* включить printf-диагностику (~2.4 КБ Flash) */
-
-#include "apds9960.h"
+```ini
+build_flags =
+    -DAPDS_GAIN=3
+    -DAPDS_LED_CURRENT=0
+    -DAPDS_GGAIN=3
+    -DAPDS_GLDRIVE=0
+    -DAPDS_PROX_THRESHOLD=50
+    -DAPDS_GESTURE_EXIT_TH=30
+    -DAPDS_GESTURE_TIMEOUT_MS=300
+    -DAPDS_GWTIME=1
+    -DAPDS_ENABLE_CALIBRATION=1
+    -DAPDS_INT_MODE=1
+    -DAPDS_GESTURE_SENSITIVITY=5
+    ; -DAPDS9960_DEBUG
 ```
 
-Полный список и описание — в комментариях `apds9960.h`.
+Полный список и допустимые диапазоны — в `apds9960_config.h`.
 
 ## 9. Бюджет ресурсов (учитывайте в новом проекте)
 
@@ -354,7 +362,7 @@ build_flags =
 
 | Симптом | Причина | Решение |
 |---------|---------|---------|
-| `multiple definition of 'EXTI7_0_IRQHandler'` | Ваш проект определяет `EXTI7_0_IRQHandler` и `int_config.c` тоже | Переопределите `__weak` обработчик из библиотеки — определите свой `EXTI7_0_IRQHandler` в проекте, он автоматически возьмёт приоритет. Используйте `apds_handle_exti()` и `apds_clear_exti()` внутри него для поддержки прерываний APDS9960 (см. раздел 7). |
+| `multiple definition of 'EXTI7_0_IRQHandler'` | Ваш проект и `int_config.c` оба определяют strong ISR | Добавьте `-DAPDS_PROVIDE_EXTI_ISR=0` и в своём ISR вызовите `apds_handle_exti()` / `apds_clear_exti()` (см. раздел 7). |
 | `apds_init()` возвращает `false` | Неверная разводка I2C, либо PC1/PC2 заняты другой периферией | Проверить пины, `APDS9960_DEBUG` для вывода ID |
 | Жесты не распознаются | Слишком слабый сигнал / неверная калибровка | Увеличить `APDS_GAIN`/`APDS_GGAIN`, проверить освещение (не под прямым солнцем) |
 | Жесты "двоятся" | Старая версия `apds9960.c` с искусственным обрывом `apds_readGesture()` по числу итераций | Убедиться, что скопирована актуальная версия драйвера из этого репозитория |

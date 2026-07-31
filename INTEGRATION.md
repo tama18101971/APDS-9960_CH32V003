@@ -3,7 +3,7 @@
 🇬🇧 English | [🇷🇺 Русский](INTEGRATION_RU.md)
 
 This document describes how to use the APDS9960 gesture driver (`apds9960.*`,
-`apds9960_regs.h`, `int_config.*`) in **other** PlatformIO projects on CH32V003,
+`apds9960_config.h`, `apds9960_regs.h`, `int_config.*`) in **other** PlatformIO projects on CH32V003,
 without copying `main.c` (it is only a demo example for this repository).
 
 The I2C driver is included as an external dependency (`I2C-CH32V003`) via `lib_deps`.
@@ -13,6 +13,7 @@ The I2C driver is included as an external dependency (`I2C-CH32V003`) via `lib_d
 | File | Required? | Purpose |
 |------|-----------|---------|
 | `apds9960_regs.h` | Always | APDS9960 register map |
+| `apds9960_config.h` | Always | Shared compile-time driver configuration |
 | `apds9960.h` / `apds9960.c` | Always | Gesture driver itself |
 | `int_config.h` / `int_config.c` | Only if `APDS_INT_MODE=1` | EXTI3 (PC3) for interrupt mode |
 
@@ -63,6 +64,7 @@ The simplest option, no separate git repository needed.
        APDS9960/
          apds9960.h
          apds9960.c
+         apds9960_config.h
          apds9960_regs.h
          int_config.h      (optional)
          int_config.c      (optional)
@@ -136,6 +138,7 @@ APDS-9960_CH32V003/            (git repository root)
   src/
     apds9960.h
     apds9960.c
+    apds9960_config.h
     apds9960_regs.h
     int_config.h
     int_config.c
@@ -237,9 +240,11 @@ The library provides two options for handling additional EXTI lines:
 
 ### Option A: Override the entire handler
 
-The library's `EXTI7_0_IRQHandler` is declared `__weak`. Define your own to handle
-all EXTI lines. Use `apds_handle_exti()` to check APDS9960 and `apds_clear_exti()`
-to clear its pending bit:
+The library defines a **strong** `EXTI7_0_IRQHandler` by default because the
+NoneOS-SDK weak fallback loops forever. If your application must own all EXTI
+lines, add `-DAPDS_PROVIDE_EXTI_ISR=0` to `build_flags`, then define your own
+handler. Use `apds_handle_exti()` to check APDS9960 and `apds_clear_exti()` to
+clear its pending bit:
 
 ```c
 #include "int_config.h"
@@ -298,8 +303,11 @@ Sensor I2C address: `0x39`.
 
 ## 8. Project-Specific Configuration
 
-All parameters are overridden via `#define` **before** `#include "apds9960.h"`,
-or via `build_flags` in `platformio.ini` (e.g. `-DAPDS_INT_MODE=0`):
+Configure driver parameters for the **entire build** via `build_flags` in
+`platformio.ini` (e.g. `-DAPDS_INT_MODE=0`). Defining a value in `main.c` before
+`#include "apds9960.h"` affects only that translation unit, not separately
+compiled `apds9960.c`, and is therefore unsupported. Defaults and range checks
+are in `apds9960_config.h`.
 
 Interrupt pin parameters from `int_config.h` are also overridden via `build_flags`:
 
@@ -312,23 +320,23 @@ build_flags =
     -DAPDS_INT_PIN_SOURCE=GPIO_PinSource3
 ```
 
-```c
-#define APDS_GAIN               3     /* proximity gain: 0=1x..3=8x */
-#define APDS_LED_CURRENT         0     /* LED current: 0=100mA..3=12.5mA */
-#define APDS_GGAIN               3     /* gesture gain: 0=1x..3=8x */
-#define APDS_GLDRIVE             0     /* gesture LED current: 0=100mA..3=12.5mA */
-#define APDS_PROX_THRESHOLD      50    /* gesture mode entry threshold (before calibration) */
-#define APDS_GESTURE_EXIT_TH     30    /* exit threshold (before calibration) */
-#define APDS_GESTURE_TIMEOUT_MS  300   /* max gesture duration, ms */
-#define APDS_GWTIME              1     /* gesture sample wait time */
-#define APDS_ENABLE_CALIBRATION  1     /* auto-calibrate thresholds in apds_init() */
-#define APDS_INT_MODE            1     /* 0=polling, 1=interrupt (PC3/EXTI3) */
-/* #define APDS9960_DEBUG */          /* enable printf diagnostics (~2.4 KB Flash) */
-
-#include "apds9960.h"
+```ini
+build_flags =
+    -DAPDS_GAIN=3
+    -DAPDS_LED_CURRENT=0
+    -DAPDS_GGAIN=3
+    -DAPDS_GLDRIVE=0
+    -DAPDS_PROX_THRESHOLD=50
+    -DAPDS_GESTURE_EXIT_TH=30
+    -DAPDS_GESTURE_TIMEOUT_MS=300
+    -DAPDS_GWTIME=1
+    -DAPDS_ENABLE_CALIBRATION=1
+    -DAPDS_INT_MODE=1
+    -DAPDS_GESTURE_SENSITIVITY=5
+    ; -DAPDS9960_DEBUG
 ```
 
-Full list and description — in `apds9960.h` comments.
+The complete list and accepted ranges are in `apds9960_config.h`.
 
 ## 9. Resource Budget (consider for new projects)
 
@@ -352,7 +360,7 @@ code — verify the actual budget via `pio run` (output "RAM:" / "Flash:").
 
 | Symptom | Cause | Solution |
 |---------|-------|----------|
-| `multiple definition of 'EXTI7_0_IRQHandler'` | Your project defines `EXTI7_0_IRQHandler` and so does `int_config.c` | Override the `__weak` handler from the library — define your own `EXTI7_0_IRQHandler` in your project; it will take precedence. Use `apds_handle_exti()` and `apds_clear_exti()` inside it to maintain APDS9960 interrupt support (see section 7). |
+| `multiple definition of 'EXTI7_0_IRQHandler'` | Your project and `int_config.c` both define a strong ISR | Add `-DAPDS_PROVIDE_EXTI_ISR=0`; call `apds_handle_exti()` / `apds_clear_exti()` from your ISR (see section 7). |
 | `apds_init()` returns `false` | Incorrect I2C wiring, or PC1/PC2 occupied by other peripherals | Check pins, use `APDS9960_DEBUG` to print ID |
 | Gestures not detected | Signal too weak / incorrect calibration | Increase `APDS_GAIN` / `APDS_GGAIN`, check lighting (avoid direct sunlight) |
 | Gestures "duplicated" | Old version of `apds9960.c` with artificial `apds_readGesture()` cutoff by iteration count | Ensure the latest driver version from this repository is copied |
