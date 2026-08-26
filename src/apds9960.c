@@ -18,25 +18,49 @@
  * ОБЕРТКИ НАД I2C (адрес датчика 0x39)
  * ============================================================================ */
 
+/* Сырой статус последней НЕудачной I2C-транзакции (коды i2c.h v7.0.1:
+ * I2C_OK=0, I2C_NACK=1, I2C_ERR_TIMEOUT=2, I2C_ERR_CLK=3,
+ * I2C_ERR_BERR=4, I2C_ERR_ARLO=5). Обновляется только при сбое,
+ * успех статус не сбрасывает. Доступен через apds_getLastI2CStatus(). */
+static uint8_t g_last_i2c_status;
+
 /* Чтение одного регистра датчика.
  * reg — адрес регистра (0x80-0xFF), out — указатель для значения.
- * Возвращает: true если I2C успешен. */
+ * Возвращает: true если I2C успешен. При сбое сохраняет код i2c.h
+ * в g_last_i2c_status. */
 static bool rd(uint8_t reg, uint8_t *out) {
-    return i2c_read_register(APDS9960_I2C_ADDR, reg, out) == I2C_OK;
+    uint8_t st = i2c_read_register(APDS9960_I2C_ADDR, reg, out);
+    if (st != I2C_OK) {
+        g_last_i2c_status = st;
+        return false;
+    }
+    return true;
 }
 
 /* Запись одного регистра датчика.
  * reg — адрес регистра, val — записываемое значение.
- * Возвращает: true если I2C успешен. */
+ * Возвращает: true если I2C успешен. При сбое сохраняет код i2c.h
+ * в g_last_i2c_status. */
 static bool wr(uint8_t reg, uint8_t val) {
-    return i2c_write_register(APDS9960_I2C_ADDR, reg, val) == I2C_OK;
+    uint8_t st = i2c_write_register(APDS9960_I2C_ADDR, reg, val);
+    if (st != I2C_OK) {
+        g_last_i2c_status = st;
+        return false;
+    }
+    return true;
 }
 
 /* Блочное чтение из регистра (автоинкремент адреса).
  * reg — начальный адрес регистра, buf — буфер, len — количество байт.
- * Возвращает: true если успешно. */
+ * Возвращает: true если успешно. При сбое сохраняет код i2c.h
+ * в g_last_i2c_status. */
 static bool rdBlock(uint8_t reg, uint8_t *buf, uint8_t len) {
-    return i2c_read_buffer(APDS9960_I2C_ADDR, reg, buf, len) == I2C_OK;
+    uint8_t st = i2c_read_buffer(APDS9960_I2C_ADDR, reg, buf, len);
+    if (st != I2C_OK) {
+        g_last_i2c_status = st;
+        return false;
+    }
+    return true;
 }
 
 /* ============================================================================
@@ -744,6 +768,10 @@ bool apds_readStatus(uint8_t *value) {
 
 uint8_t apds_getLastError(void) {
     return g_last_error;
+}
+
+uint8_t apds_getLastI2CStatus(void) {
+    return g_last_i2c_status;
 }
 
 uint8_t apds_getReinitCount(void) {

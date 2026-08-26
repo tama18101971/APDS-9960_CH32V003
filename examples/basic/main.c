@@ -41,10 +41,15 @@ int main(void) {
     USART_Printf_Init(115200);
     printf("APDS9960 gesture driver init...\r\n");
 
-    i2c_init(400000);
+    uint8_t i2c_st = i2c_init(400000);
+    if (i2c_st != I2C_OK) {
+        printf("ERROR: i2c_init failed (%d)\r\n", i2c_st);
+        while (1) {}
+    }
 
     if (!apds_init()) {
-        printf("ERROR: APDS9960 not responding!\r\n");
+        printf("ERROR: APDS9960 not responding! err=%d i2c=%d\r\n",
+               apds_getLastError(), apds_getLastI2CStatus());
         while (1) {}
     }
 
