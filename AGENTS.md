@@ -26,7 +26,7 @@ No test framework configured. Manual testing via UART output (PD5, 115200 baud).
 | File | Purpose |
 |------|---------|
 | `src/apds9960.h` | Public API + all configurable #defines |
-| `src/apds9960.c` | Driver implementation (~620 lines) |
+| `src/apds9960.c` | Driver implementation (~840 lines) |
 | `src/apds9960_regs.h` | APDS9960 register map |
 | `src/int_config.h` / `src/int_config.c` | EXTI interrupt setup (INT→PC3) |
 | `examples/basic/main.c` | Example usage (polling + interrupt modes) |
@@ -47,6 +47,8 @@ No test framework configured. Manual testing via UART output (PD5, 115200 baud).
 - **I2C retries:** `RETRY_LIMIT=6` in `apds9960.c` gates two things only: (1) how many times `apds_init()` retries the *entire* `configure_registers()` sequence, and (2) the ceiling on consecutive `sensor_reinit()` calls in `apds_available()`. It is NOT a per-call retry inside `rd()`/`wr()`/`rdBlock()` — a single failed I2C register access is not automatically retried at that level.
 - **FIFO reads are batched.** `process_fifo_batch()` reads all `GFLVL` packets in one `rdBlock()` transaction (up to 32×4=128 bytes) instead of one I2C transaction per packet — keeps up with the sensor's fill rate and reduces GFOV risk.
 - **I2C runs at 400 kHz** (Fast-mode, set in `examples/basic/main.c`). The `I2C-CH32V003` library supports both 100 kHz/400 kHz.
+- **I2C error diagnostics (I2C-CH32V003 v7.0.x):** wrappers `rd()`/`wr()`/`rdBlock()` store the raw status of the last FAILED transaction (`I2C_NACK`, `I2C_ERR_TIMEOUT`, `I2C_ERR_BERR`, `I2C_ERR_ARLO`) in static `g_last_i2c_status`, exposed via `apds_getLastI2CStatus()`. Written only on failures; success never resets it. Existing `APDS_ERR_*` codes are unchanged.
+- **I2C fault tolerance policy:** transient I2C faults during calibration *sampling* abort collection early and fall back to default thresholds instead of failing `apds_init()` (threshold writes remain strict). `apds_readGesture()` returns `GESTURE_NONE` immediately on an I2C fault mid-gesture rather than decoding partial data. Void interrupt-API functions (`apds_enableInterrupt/disableInterrupt/clearInterrupt`) record `APDS_ERR_I2C` on failure and do not touch `g_last_error` on success.
 
 ## Gotchas
 

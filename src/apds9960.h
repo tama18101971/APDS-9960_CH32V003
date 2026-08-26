@@ -89,6 +89,9 @@ bool apds_available(void);
  *   3. Накапливает разности Ratio соседних пакетов, пока GVALID=1
  *   4. Определяет направление по доминирующей оси
  *
+ * @note При сбое I2C частично накопленные данные НЕ декодируются:
+ * возвращается GESTURE_NONE, а apds_getLastError() == APDS_ERR_I2C.
+ *
  * Возвращает: gesture_t — тип жеста или GESTURE_NONE */
 gesture_t apds_readGesture(void);
 
@@ -125,13 +128,16 @@ uint8_t apds_getReinitCount(void);
 bool apds_recalibrate(void);
 
 /* Включение прерывания жеста (GIEN=1).
- * INT pin становится низким когда GVALID=1. */
+ * INT pin становится низким когда GVALID=1.
+ * При сбое I2C фиксирует apds_getLastError() = APDS_ERR_I2C. */
 void apds_enableInterrupt(void);
 
-/* Отключение прерывания жеста (GIEN=0). */
+/* Отключение прерывания жеста (GIEN=0).
+ * При сбое I2C фиксирует apds_getLastError() = APDS_ERR_I2C. */
 void apds_disableInterrupt(void);
 
-/* Сброс прерывания: чтение GSTATUS очищает GINT, INT pin → высокий. */
+/* Сброс прерывания: чтение GSTATUS очищает GINT, INT pin → высокий.
+ * При сбое I2C фиксирует apds_getLastError() = APDS_ERR_I2C. */
 void apds_clearInterrupt(void);
 
 #endif /* APDS9960_H */

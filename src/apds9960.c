@@ -144,6 +144,11 @@ static void sort_u8(uint8_t *arr, uint8_t n) {
  * сохраняет их для sensor_reinit().
  * Gesture FIFO дрainится перед каждым чтением PDATA для предотвращения GFOV.
  * Если калибровка невозможна — используются дефолты.
+ * @note Преходящая ошибка I2C во время сбора НЕ фатальна (датчик уже
+ * сконфигурирован): сбор прерывается досрочно, и нехватка валидных замеров
+ * переводит калибровку на дефолтные пороги вместо отказа apds_init().
+ * Записи порогов в конце остаются строгими — ошибка там означает,
+ * что конфигурация датчика неполна.
  * Возвращает: true (датчик остаётся в gesture mode). */
 static bool calibrate_proximity(void) {
     uint8_t buf[APDS_CAL_SAMPLES];
@@ -158,18 +163,20 @@ static bool calibrate_proximity(void) {
     {
         uint16_t pv_timeout = 100;
         uint8_t total = 0;
+        uint8_t aborted = 0;
         while (valid_cnt < APDS_CAL_SAMPLES && total < APDS_CAL_SAMPLES * 2) {
             /* Drain gesture FIFO — предотвращаем GFOV во время калибровки */
             uint8_t fifo_level;
-            if (!rd(REG_GFLVL, &fifo_level)) return false;
+            if (!rd(REG_GFLVL, &fifo_level)) { aborted = 1; break; }
             while (fifo_level > 0) {
                 uint8_t dummy[4];
-                if (!rdBlock(REG_GFIFO_U, dummy, 4)) return false;
+                if (!rdBlock(REG_GFIFO_U, dummy, 4)) { aborted = 1; break; }
                 fifo_level--;
             }
+            if (aborted) break;
 
             uint8_t status;
-            if (!rd(REG_STATUS, &status)) return false;
+            if (!rd(REG_STATUS, &status)) { aborted = 1; break; }
 
             if (!(status & ST_PVALID)) {
                 if (--pv_timeout == 0) break;
@@ -178,7 +185,7 @@ static bool calibrate_proximity(void) {
             }
 
             uint8_t data;
-            if (!rd(REG_PDATA, &data)) return false;
+            if (!rd(REG_PDATA, &data)) { aborted = 1; break; }
             total++;
             if (data > APDS_CAL_FILTER_MAX) continue;  /* насыщение — пропускаем */
 
@@ -186,6 +193,11 @@ static bool calibrate_proximity(void) {
             pv_timeout = 100;
             Delay_Ms(10);
         }
+
+#ifdef APDS9960_DEBUG
+        if (aborted) printf("CAL: I2C fault during sampling (valid=%d)\r\n", valid_cnt);
+#endif
+        (void)aborted;
     }
 
     /* Если валидных замеров меньше половины — среда загрязнена, используем дефолты */
@@ -703,6 +715,11 @@ bool apds_available(void) {
  *      e. Небольшая пауза перед следующим опросом GSTATUS
  *   3. Декодируем финальное направление
  *
+ * @note При сбое I2C в середине жеста возвращается GESTURE_NONE — частично
+ * накопленные данные не декодируются, т.к. направление по обрывку данных
+ * недостоверно. Диагностика: apds_getLastError() == APDS_ERR_I2C и
+ * apds_getLastI2CStatus().
+ *
  * @note Дедлайн считается по SysTick->CNT (аппаратный таймер, считает ВНИЗ на
  * CH32V003), а не по счётчику итераций — иначе цикл может завершиться заметно
  * раньше APDS_GESTURE_TIMEOUT_MS (например, если I2C-транзакции внутри цикла
@@ -711,7 +728,7 @@ bool apds_available(void) {
  * и его "двоению" (вторая половина того же взмаха руки трактовалась как
  * отдельный жест).
  *
- * Возвращает: gesture_t — тип жеста или GESTURE_NONE. */
+ * Возвращает: gesture_t — тип жеста или GESTURE_NONE (в т.ч. при сбое I2C). */
 gesture_t apds_readGesture(void) {
     gesture_reset();
     g_last_error = APDS_ERR_NONE;
@@ -723,7 +740,7 @@ gesture_t apds_readGesture(void) {
         uint8_t gs;
         if (!rd(REG_GSTATUS, &gs)) {
             g_last_error = APDS_ERR_I2C;
-            break;
+            return GESTURE_NONE;
         }
 
         if (!(gs & GST_GVALID)) {
@@ -738,7 +755,7 @@ gesture_t apds_readGesture(void) {
 
         if (!process_fifo_batch()) {
             g_last_error = APDS_ERR_I2C;
-            break;
+            return GESTURE_NONE;
         }
 
         Delay_Ms(1);
@@ -795,20 +812,30 @@ bool apds_recalibrate(void) {
 
 /* ============================================================================
  * ПРЕРЫВАНИЯ
+ *
+ * Функции не имеют возврата (void-API), но при сбое транзакции фиксируют
+ * g_last_error = APDS_ERR_I2C (сырой код доступен через
+ * apds_getLastI2CStatus()). При успехе g_last_error НЕ перезаписывается.
  * ============================================================================ */
 
 void apds_enableInterrupt(void) {
     /* GMODE=1 | GIEN=1: gesture interrupt при GVALID=1 */
-    wr(REG_GCONF4, 0x03);
+    if (!wr(REG_GCONF4, 0x03)) {
+        g_last_error = APDS_ERR_I2C;
+    }
 }
 
 void apds_disableInterrupt(void) {
     /* GMODE=1, GIEN=0: interrupt отключен */
-    wr(REG_GCONF4, 0x01);
+    if (!wr(REG_GCONF4, 0x01)) {
+        g_last_error = APDS_ERR_I2C;
+    }
 }
 
 void apds_clearInterrupt(void) {
     /* Чтение GSTATUS сбрасывает GINT → INT pin → HIGH */
     uint8_t dummy;
-    rd(REG_GSTATUS, &dummy);
+    if (!rd(REG_GSTATUS, &dummy)) {
+        g_last_error = APDS_ERR_I2C;
+    }
 }

@@ -47,7 +47,7 @@ For Method C, also add the library itself (see section 5.2).
   **PC3 (INT)**. If these pins are occupied by other peripherals in the target
   project, you need to either free them or override the interrupt pin parameters
   (`APDS_INT_PORT`, `APDS_INT_PIN`, `APDS_INT_LINE`, `APDS_INT_PORT_SOURCE`,
-  `APDS_INT_PIN_SOURCE`) via `build_flags` (see section 8).
+  `APDS_INT_PIN_SOURCE`) via `build_flags` (see section 9).
 - I2C1 bus is free (or already used only by devices compatible by address —
   APDS9960 sits on `0x39`).
 
@@ -198,10 +198,15 @@ int main(void) {
     Delay_Init();
     USART_Printf_Init(115200);
 
-    i2c_init(400000);              /* Fast-mode I2C, sensor and I2C-CH32V003 both support it */
+    uint8_t i2c_st = i2c_init(400000);   /* Fast-mode I2C, sensor and I2C-CH32V003 both support it */
+    if (i2c_st != I2C_OK) {              /* rejected before any sensor access */
+        printf("i2c_init failed (%d)\r\n", i2c_st);
+        while (1) {}
+    }
 
     if (!apds_init()) {
-        printf("APDS9960 not responding!\r\n");
+        printf("APDS9960 not responding! err=%d i2c=%d\r\n",
+               apds_getLastError(), apds_getLastI2CStatus());
         while (1) {}
     }
 
@@ -290,7 +295,7 @@ void apds_exti_callback(void) {
 | `apds_clear_exti()` | Clear pending bit for `APDS_INT_LINE`. |
 | `apds_exti_callback()` | Weak callback, called from default `EXTI7_0_IRQHandler`. |
 
-## 7. Pin Connections (same regardless of integration method)
+## 8. Pin Connections (same regardless of integration method)
 
 | CH32V003 | APDS9960 | Function |
 |----------|----------|----------|
@@ -301,7 +306,7 @@ void apds_exti_callback(void) {
 
 Sensor I2C address: `0x39`.
 
-## 8. Project-Specific Configuration
+## 9. Project-Specific Configuration
 
 Configure driver parameters for the **entire build** via `build_flags` in
 `platformio.ini` (e.g. `-DAPDS_INT_MODE=0`). Defining a value in `main.c` before
@@ -338,25 +343,25 @@ build_flags =
 
 The complete list and accepted ranges are in `apds9960_config.h`.
 
-## 9. Resource Budget (consider for new projects)
+## 10. Resource Budget (consider for new projects)
 
 On the CH32V003 chip (RAM 2 KB, Flash 16 KB), the driver itself uses approximately:
 
-- **RAM:** ~20 bytes static + up to ~150 bytes stack at peak (batch FIFO read)
-- **Flash:** ~2.0 KB (`apds9960.c` + `int_config.c` only, without I2C library)
+- **RAM:** ~21 bytes static + up to ~150 bytes stack at peak (batch FIFO read)
+- **Flash:** ~3.3 KB (`apds9960.o` + `int_config.o` `.text`, without I2C library)
 
 If the target project already uses a significant portion of Flash/RAM with other
 code — verify the actual budget via `pio run` (output "RAM:" / "Flash:").
 
-## 10. Compatibility Checklist Before Porting
+## 11. Compatibility Checklist Before Porting
 
 - [ ] Target project uses `platform = ch32v`, `framework = noneos-sdk`
 - [ ] PC1/PC2 (and PC3, if interrupt mode) are free
 - [ ] I2C1 is not occupied by another device at address `0x39`
-- [ ] Enough Flash/RAM available (see section 9)
+- [ ] Enough Flash/RAM available (see section 10)
 - [ ] `lib_deps` with `I2C-CH32V003` added to `platformio.ini`
 
-## 11. Common Porting Issues
+## 12. Common Porting Issues
 
 | Symptom | Cause | Solution |
 |---------|-------|----------|
@@ -368,7 +373,7 @@ code — verify the actual budget via `pio run` (output "RAM:" / "Flash:").
 | Build can't find `i2c.h` | `lib_deps` with `I2C-CH32V003` not added to `platformio.ini` | Add `https://github.com/tama18101971/I2C-CH32V003.git` to `lib_deps` |
 | `main()` conflict when connecting via `lib_deps` on the entire repository | `main.c` accidentally ended up in the library | Do not copy/include `main.c` in the library repository (see sections 1 and 5.1) |
 
-## 12. Back-Syncing Fixes
+## 13. Back-Syncing Fixes
 
 If you find a bug or improve the algorithm after porting to another project —
 back-port the fix to this repository (source of truth), then update copies/

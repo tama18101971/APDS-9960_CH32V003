@@ -8,8 +8,8 @@ Compact gesture recognition driver for the APDS9960 proximity/light/color sensor
 
 ## Features
 
-- Minimal RAM usage (~20 bytes static driver + ~150 bytes transient stack for FIFO batch read)
-- Minimal Flash footprint (~2.0 KB driver only, ~9.7 KB full demo project)
+- Minimal RAM usage (~21 bytes static driver + ~150 bytes transient stack for FIFO batch read)
+- Minimal Flash footprint (~3.3 KB driver only, ~11.4 KB full demo project)
 - No dynamic memory allocation (`malloc`/`free`)
 - No floating-point math — integer-only arithmetic
 - Project-wide configurable parameters via PlatformIO `build_flags`
@@ -18,7 +18,7 @@ Compact gesture recognition driver for the APDS9960 proximity/light/color sensor
 - Interrupt-driven mode (APDS9960 INT → EXTI3 on PC3)
 - Real SysTick-deadline gesture read (no artificial cooldown needed)
 - Clone-compatible ID check (supports original + Chinese clones)
-- Diagnostic API (error codes, reinit count)
+- Diagnostic API (error codes, reinit count, raw I2C bus status)
 - Platform-agnostic C code (no HAL, no Arduino)
 
 ## Hardware
@@ -107,6 +107,9 @@ bool apds_readStatus(uint8_t *value);
 // Get last error code (APDS_ERR_*)
 uint8_t apds_getLastError(void);
 
+// Get raw status of the last FAILED I2C transaction (I2C-CH32V003 v7.0.x codes)
+uint8_t apds_getLastI2CStatus(void);
+
 // Get reinit count (0 = normal, >0 = problems)
 uint8_t apds_getReinitCount(void);
 
@@ -122,6 +125,35 @@ void apds_disableInterrupt(void);
 // Clear interrupt: read GSTATUS → INT pin goes high
 void apds_clearInterrupt(void);
 ```
+
+### I2C Error Diagnostics
+
+When `apds_getLastError()` returns `APDS_ERR_I2C`, `apds_getLastI2CStatus()`
+reports the raw bus-level code from the
+[I2C-CH32V003 v7.0.x](https://github.com/tama18101971/I2C-CH32V003) driver:
+
+| Value | Symbol | Meaning |
+|-------|--------|---------|
+| 0 | `I2C_OK` | No failure recorded yet |
+| 1 | `I2C_NACK` | No ACK from sensor (wiring / wrong address) |
+| 2 | `I2C_ERR_TIMEOUT` | Bus timeout (clock stretch / stuck bus) |
+| 3 | `I2C_ERR_CLK` | Invalid clock configuration |
+| 4 | `I2C_ERR_BERR` | Bus error (START/STOP fault, auto-recovered by the I2C driver) |
+| 5 | `I2C_ERR_ARLO` | Arbitration lost |
+
+Behavior notes:
+
+- The raw status is written **only on failures** and is never reset by a
+  subsequent successful transaction.
+- `apds_readGesture()` returns `GESTURE_NONE` immediately when an I2C fault
+  occurs mid-gesture — partially accumulated data is not decoded. Check
+  `apds_getLastError()` afterwards.
+- Interrupt API (`apds_enableInterrupt()` / `apds_disableInterrupt()` /
+  `apds_clearInterrupt()`) records `APDS_ERR_I2C` on failure; on success the
+  previous error code is left untouched.
+- Transient I2C faults during calibration sampling do not fail `apds_init()`:
+  sampling stops early and default thresholds are used if too few valid
+  samples remain. Threshold *writes* remain strict.
 
 ### EXTI Interrupt API (`int_config.h`)
 
@@ -201,7 +233,7 @@ typedef enum {
 
 ```c
 #define APDS_ERR_NONE           0   // No error
-#define APDS_ERR_I2C            1   // I2C error (NACK, timeout)
+#define APDS_ERR_I2C            1   // I2C error — see apds_getLastI2CStatus()
 #define APDS_ERR_FIFO_OVERFLOW  2   // FIFO overflow
 #define APDS_ERR_SENSOR_HANG    3   // Sensor not responding
 #define APDS_ERR_INVALID_ID     4   // Device at 0x39 is not an APDS9960
@@ -223,10 +255,15 @@ int main(void) {
     Delay_Init();
     USART_Printf_Init(115200);
 
-    i2c_init(400000);
+    uint8_t i2c_st = i2c_init(400000);
+    if (i2c_st != I2C_OK) {
+        printf("ERROR: i2c_init failed (%d)\r\n", i2c_st);
+        while (1) {}
+    }
 
     if (!apds_init()) {
-        printf("Sensor not found!\r\n");
+        printf("Sensor not found! err=%d i2c=%d\r\n",
+               apds_getLastError(), apds_getLastI2CStatus());
         while (1) {}
     }
 
@@ -274,10 +311,15 @@ int main(void) {
     Delay_Init();
     USART_Printf_Init(115200);
 
-    i2c_init(400000);
+    uint8_t i2c_st = i2c_init(400000);
+    if (i2c_st != I2C_OK) {
+        printf("ERROR: i2c_init failed (%d)\r\n", i2c_st);
+        while (1) {}
+    }
 
     if (!apds_init()) {
-        printf("Sensor not found!\r\n");
+        printf("Sensor not found! err=%d i2c=%d\r\n",
+               apds_getLastError(), apds_getLastI2CStatus());
         while (1) {}
     }
 
@@ -384,6 +426,10 @@ The driver performs automatic calibration of proximity thresholds during `apds_i
 4. Sets GPENTH (entry) and GEXTH (exit) thresholds
 5. Stores thresholds for use by `sensor_reinit()`
 
+If an I2C fault interrupts the sampling phase, collection stops early and
+default thresholds are used when fewer than half of the samples remain valid —
+`apds_init()` still succeeds (the sensor is already configured at that point).
+
 ### Calibration Parameters
 
 ```c
@@ -471,12 +517,13 @@ Gesture: LEFT
 
 | Resource | Driver only | Full demo project | Limit |
 |----------|-------------|-------------------|-------|
-| RAM | ~20 bytes static | ~496 bytes | 2048 bytes |
-| Flash | ~2.0 KB | ~9.7 KB | 16384 bytes |
+| RAM | ~21 bytes static | ~504 bytes | 2048 bytes |
+| Flash | ~3.3 KB | ~11.4 KB | 16384 bytes |
 
-Driver-only numbers exclude I2C library (`I2C-CH32V003`), `main.c`, startup
-code, and framework libraries. Full project includes all of the above plus
-`printf`-based debug output.
+Driver-only numbers are `.text` sizes of `apds9960.o` + `int_config.o`
+(measured with toolchain `size`) and exclude the I2C library (`I2C-CH32V003`),
+`main.c`, startup code, and framework libraries. Full project includes all of
+the above plus `printf`-based debug output.
 
 ## Limitations
 
