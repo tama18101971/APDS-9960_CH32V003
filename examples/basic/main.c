@@ -35,6 +35,26 @@ static void print_gesture(gesture_t g) {
     }
 }
 
+/* Дренаж FIFO: глубина аппаратного FIFO датчика — 32 пакета, поэтому число
+ * проходов ограничено. Без ограничения залипший GVALID даёт вечный цикл. */
+static void drain_fifo(void) {
+    uint8_t guard = 8;
+    while (guard-- && apds_available()) {
+        apds_readGesture();
+    }
+}
+
+/* Диагностика отказа датчика и попытка восстановления. */
+static void handle_sensor_failure(void) {
+    printf("SENSOR HANG (i2c=%d), re-init...\r\n", apds_getLastI2CStatus());
+    if (apds_init()) {
+        printf("Sensor recovered.\r\n");
+        drain_fifo();
+    } else {
+        printf("Re-init failed (err=%d)\r\n", apds_getLastError());
+    }
+}
+
 int main(void) {
     SystemCoreClockUpdate();
     Delay_Init();
@@ -50,6 +70,20 @@ int main(void) {
     if (!apds_init()) {
         printf("ERROR: APDS9960 not responding! err=%d i2c=%d\r\n",
                apds_getLastError(), apds_getLastI2CStatus());
+
+        /* Автосканирование шины для диагностики: сенсор на 0x39? */
+        printf("Scanning I2C bus...\r\n");
+        uint8_t found = 0;
+        for (uint8_t a = 1; a < 0x7F; a++) {
+            if (i2c_probe_address(a, NULL, NULL) == I2C_OK) {
+                printf("  device found at 0x%02X\r\n", a);
+                found++;
+            }
+        }
+        if (found == 0) {
+            printf("  no devices on the bus — check wiring/power/pull-ups\r\n");
+        }
+
         while (1) {}
     }
 
@@ -66,9 +100,7 @@ int main(void) {
     Delay_Ms(200);
 
     /* Сброс шумовых данных из FIFO */
-    while (apds_available()) {
-        apds_readGesture();
-    }
+    drain_fifo();
 
 #if APDS_INT_MODE == 1
     /* ========================================================================
@@ -90,12 +122,18 @@ int main(void) {
         }
         g_apds_int_flag = 0;
 
-        apds_clearInterrupt();
+        /* Чтение GSTATUS в apds_clearInterrupt() здесь избыточно: следующий
+         * apds_available() читает GSTATUS сам, а GINT в сенсоре сбрасывается
+         * опустошением FIFO внутри apds_readGesture(), а не чтением GSTATUS
+         * (см. apds9960.h). Прежняя пара вызовов давала лишнюю I2C-
+         * транзакцию и гонку двух последовательных чтений GSTATUS. */
 
         if (apds_available()) {
             gesture_t g = apds_readGesture();
             print_gesture(g);
-            while (apds_available()) apds_readGesture();
+            drain_fifo();
+        } else if (apds_getLastError() == APDS_ERR_SENSOR_HANG) {
+            handle_sensor_failure();
         }
     }
 
@@ -109,8 +147,10 @@ int main(void) {
             print_gesture(g);
 
             if (g != GESTURE_NONE) {
-                while (apds_available()) apds_readGesture();
+                drain_fifo();
             }
+        } else if (apds_getLastError() == APDS_ERR_SENSOR_HANG) {
+            handle_sensor_failure();
         }
     }
 #endif

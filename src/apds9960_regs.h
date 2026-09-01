@@ -5,7 +5,9 @@
 
 #define APDS9960_I2C_ADDR       0x39
 
-/* Core registers */
+/* Core registers. Ниже — полный адресный блок для справки; регистры,
+ * не используемые драйвером (ALS/цветовые пороги и данные), пригодятся
+ * приложениям, работающим с сенсором напрямую поверх этой библиотеки. */
 #define REG_ENABLE              0x80
 #define REG_ATIME               0x81
 #define REG_WTIME               0x83
@@ -23,7 +25,7 @@
 #define REG_ID                  0x92
 #define REG_STATUS              0x93
 
-/* Data registers */
+/* Data registers (драйвер использует только PDATA) */
 #define REG_CDATAL              0x94
 #define REG_RDATAL              0x96
 #define REG_GDATAL              0x98
@@ -48,10 +50,22 @@
 #define REG_GCONF3              0xAA
 #define REG_GCONF4              0xAB
 
-/* Gesture FIFO */
+/* Special function registers (команды; записываемое значение не важно).
+ * Сбрасывают соответствующие прерывания; GINT отдельно не сбрасывается —
+ * он снимается полным опустошением FIFO (datasheet APDS-9960). */
+#define REG_IFORCE              0xE4
+#define REG_PICLEAR             0xE5
+#define REG_CICLEAR             0xE6
+#define REG_AICLEAR             0xE7
+
+/* Gesture FIFO (чтение идёт по кругу 0xFC->0xFF->0xFC, каждая четверка
+ * байт извлекает один пакет из FIFO) */
 #define REG_GFLVL               0xAE
 #define REG_GSTATUS             0xAF
 #define REG_GFIFO_U             0xFC
+#define REG_GFIFO_D             0xFD
+#define REG_GFIFO_L             0xFE
+#define REG_GFIFO_R             0xFF
 
 /* ENABLE register bits (0x80) */
 #define EN_PON                  0x01
@@ -62,11 +76,15 @@
 #define EN_PIEN                 0x20
 #define EN_GEN                  0x40
 
-/* STATUS register bits (0x93) */
+/* STATUS register bits (0x93). По datasheet: AVALID=bit0, PVALID=bit1,
+ * GINT=bit2, AINT=bit4, PINT=bit5, PGSAT=bit6, CPSAT=bit7; бит 3 не
+ * определён (см. заметку ниже про PGSAT). */
 #define ST_AVALID               0x01
 #define ST_PVALID               0x02
 #define ST_GINT                 0x04
-#define ST_PGSAT                0x08
+#define ST_AINT                 0x10
+#define ST_PINT                 0x20
+#define ST_PGSAT                0x40
 #define ST_CPSAT                0x80
 
 /* GSTATUS register bits (0xAF) */
@@ -104,9 +122,14 @@
 #define CFG2_LED_BOOST_SHIFT    4
 #define CFG2_LED_BOOST_MASK     0x30
 
-/* Known device IDs */
+/* Известные ID APDS9960: 0xAB — даташитный; 0x9C — альтернативный
+ * (встречается в дубликатах датчика, ср. SparkFun/Adafruit).
+ * 0xA8 и 0x9E — фактически встречающиеся значения клонов, приняты
+ * в apds_init() для совместимости с ними. */
 #define APDS9960_ID_1           0xAB
 #define APDS9960_ID_2           0x9C
+#define APDS9960_ID_3           0xA8
+#define APDS9960_ID_4           0x9E
 
 /* LED Boost values */
 #define LED_BOOST_100           0

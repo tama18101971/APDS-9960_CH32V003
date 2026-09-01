@@ -64,6 +64,59 @@ static bool rdBlock(uint8_t reg, uint8_t *buf, uint8_t len) {
 }
 
 /* ============================================================================
+ * ТАЙМБЕЙС ЦИКЛА apds_readGesture()
+ *
+ * ВАЖНО: SysTick в NoneOS-SDK НЕ свободнобегущий. Delay_Ms()/Delay_Us()
+ * (Debug/ch32v00x/debug.c) каждый раз пишут CMP, ОБНУЛЯЮТ CNT, запускают
+ * счёт и по завершении ОСТАНАВЛИВАЮТ его (CTLR bit0 -> 0). Между вызовами
+ * Delay_* счётчик стоит на месте. Поэтому читать SysTick->CNT как «текущее
+ * время» при активном использовании Delay_* бессмысленно — ранее именно
+ * так работал (точнее, не работал) дедлайн apds_readGesture().
+ *
+ * APDS_OWN_SYSTICK=1: драйвер на время цикла запускает SysTick сам
+ * (CNT=0, CMP=max, счёт вверх от нуля, без прерывания) и внутри цикла
+ * Delay_* НЕ вызывает — пауза между опросами GSTATUS считается по CNT.
+ * Тактирование HCLK/8 (STCLK=0 после сброса) — та же посылка, что в
+ * Delay_Init(): p_us = SystemCoreClock / 8000000.
+ *
+ * APDS_OWN_SYSTICK=0: SysTick не трогаем, цикл ограничен бюджетом
+ * итераций, каждая из которых занимает не менее 1 мс (Delay_Ms(1) в
+ * теле) плюс время I2C-транзакций — это нижняя оценка, защищающая
+ * от вечного цикла при залипшем GVALID.
+ * ============================================================================ */
+
+#if APDS_OWN_SYSTICK
+/* Тиков SysTick на 1 мс; вычисляется один раз в timebase_start(). */
+static uint16_t g_ticks_per_ms;
+
+/* Запустить свободнобегущий SysTick от нуля. */
+static void timebase_start(void) {
+    g_ticks_per_ms = (uint16_t)(SystemCoreClock / 8UL / 1000UL); /* HCLK/8 */
+    SysTick->SR   = 0;
+    SysTick->CMP  = 0xFFFFFFFFu;
+    SysTick->CNT  = 0;
+    SysTick->CTLR |= 1u;              /* STE=1: счёт вверх от нуля */
+}
+
+/* Подождать перехода к следующему опросу GSTATUS.
+ * Требует запущенного timebase_start(); SysTick не трогает. */
+static void poll_delay(void) {
+    uint32_t until = SysTick->CNT + g_ticks_per_ms;
+    while ((int32_t)(until - SysTick->CNT) > 0) {}
+}
+
+/* true, если дедлайн (мс от timebase_start()) истёк. */
+static bool timebase_expired(uint16_t deadline_ms) {
+    return SysTick->CNT >= (uint32_t)g_ticks_per_ms * deadline_ms;
+}
+#else
+/* Пауза 1 мс штатным средством SDK (SysTick он перенастроит сам). */
+static void poll_delay(void) {
+    Delay_Ms(1);
+}
+#endif
+
+/* ============================================================================
  * КОНСТАНТЫ ФИЛЬТРАЦИИ И АЛГОРИТМА
  * ============================================================================ */
 
@@ -103,8 +156,10 @@ static bool rdBlock(uint8_t reg, uint8_t *buf, uint8_t len) {
  */
 #define RETRY_LIMIT             APDS_RETRY_LIMIT
 
-/* Сохранённые откалиброванные пороги (F7) — объявлены до calibrate_proximity() */
-static uint8_t  g_cal_piht;
+/* Сохранённые откалиброванные пороги (F7) — объявлены до calibrate_proximity().
+ * PIHT/PILT/PERS не пишем: драйвер не включает proximity-прерывания (PIEN),
+ * поэтому эти регистры не влияли бы ни на что — их настройка была бы
+ * мёртвыми I2C-транзакциями при каждом sensor_reinit(). */
 static uint8_t  g_cal_gpenth;
 static uint8_t  g_cal_gexth;
 static uint8_t  g_cal_valid;
@@ -210,8 +265,7 @@ static bool calibrate_proximity(void) {
         return true;
     }
 
-    /* Сортируем и берём медиану */
-    sort_u8(buf, valid_cnt);
+    /* Сортируем и берём медиану */    sort_u8(buf, valid_cnt);
     uint8_t median;
     if (valid_cnt & 1) {
         median = buf[valid_cnt / 2];
@@ -259,7 +313,6 @@ static bool calibrate_proximity(void) {
             exit_val = APDS_GESTURE_EXIT_TH;
             g_cal_valid = 0;
         } else {
-            g_cal_piht   = prox_th;
             g_cal_gpenth = prox_th;
             g_cal_gexth  = exit_val;
             g_cal_valid  = 1;
@@ -271,7 +324,6 @@ static bool calibrate_proximity(void) {
             exit_val = APDS_GESTURE_EXIT_TH;
             g_cal_valid = 0;
         } else {
-            g_cal_piht   = prox_th;
             g_cal_gpenth = prox_th;
             g_cal_gexth  = exit_val;
             g_cal_valid  = 1;
@@ -279,7 +331,6 @@ static bool calibrate_proximity(void) {
     }
 
     /* Запись порогов (датчик уже в gesture mode — не переключаем) */
-    if (!wr(REG_PIHT, prox_th)) return false;
     if (!wr(REG_GPENTH, prox_th)) return false;
     if (!wr(REG_GEXTH, exit_val)) return false;
 
@@ -294,27 +345,41 @@ static bool calibrate_proximity(void) {
 
 /* ============================================================================
  * СОСТОЯНИЕ ЖЕСТА (статические переменные)
+ *
+ * Направление определяется по разности УСРЕДНЁННЫХ краёв жеста:
+ * delta = avg(последние EDGE_SAMPLES пакетов) - avg(первые EDGE_SAMPLES).
+ * Это математически эквивалентно прежней сумме приращений
+ * (сумма дельт телескопируется в ratio[last] - ratio[first]), но крайние
+ * пакеты усредняются, поэтому одиночный шумный кадр на границе свайпа
+ * не определяет результат целиком.
  * ============================================================================ */
 
-/*
- * g_ud_acc / g_lr_acc — Накопленная сумма изменений Ratio.
- * С каждым новым действительным пакетом вычисляется дельта
- * от предыдущего пакета и прибавляется к аккумулятору.
- */
-static int16_t  g_ud_acc;
-static int16_t  g_lr_acc;
+/* Число крайних пакетов, по которому берётся среднее. Должно быть >= 2
+ * и вдвое меньше минимального числа пакетов, иначе окна краёв
+ * перекрываются и delta вырождается в ноль (см. EDGE_MIN_PACKETS). */
+#define EDGE_SAMPLES            2
 
-/*
- * g_prev_ud / g_prev_lr — Ratio предыдущего действительного пакета.
- * Используются для вычисления дельты между соседними пакетами.
- */
-static int16_t  g_prev_ud;
-static int16_t  g_prev_lr;
+/* Дефолт нижней границы для алгоритма краёв: при APDS_FIFO_MIN_PACKETS < 4
+ * первый и последний пакеты совпадают, delta = 0, жест не распознается
+ * никогда. Окно выхода — 4..32, как в конфиге, поэтому ниже 4 просто
+ * поднимаем до 4. */
+#if APDS_FIFO_MIN_PACKETS < (2 * EDGE_SAMPLES)
+#define EDGE_MIN_PACKETS        (2 * EDGE_SAMPLES)
+#else
+#define EDGE_MIN_PACKETS        APDS_FIFO_MIN_PACKETS
+#endif
 
-/*
- * g_has_prev — флаг: был ли обработан хотя бы один действительный пакет.
- */
-static uint8_t  g_has_prev;
+/* Сумма ratio первых EDGE_SAMPLES валидных пакетов (ось U/D и L/R). */
+static int16_t  g_ud_first_sum;
+static int16_t  g_lr_first_sum;
+
+/* Сколько пакетов уже ушло в first_sum (не более EDGE_SAMPLES). */
+static uint8_t  g_first_cnt;
+
+/* Кольцевой буфер последних EDGE_SAMPLES валидных ratio. */
+static int16_t  g_ud_ring[EDGE_SAMPLES];
+static int16_t  g_lr_ring[EDGE_SAMPLES];
+static uint8_t  g_ring_idx;
 
 /*
  * g_packet_count — Количество обработанных действительных пакетов.
@@ -336,11 +401,10 @@ static uint8_t  g_last_error;
 
 /* Сброс всех переменных состояния жеста */
 static void gesture_reset(void) {
-    g_ud_acc = 0;
-    g_lr_acc = 0;
-    g_prev_ud = 0;
-    g_prev_lr = 0;
-    g_has_prev = 0;
+    g_ud_first_sum = 0;
+    g_lr_first_sum = 0;
+    g_first_cnt = 0;
+    g_ring_idx = 0;
     g_packet_count = 0;
     g_motion = GESTURE_NONE;
 }
@@ -366,53 +430,60 @@ static void gesture_reset(void) {
  * ============================================================================ */
 
 /* Обработка одного батча пакетов FIFO.
- * Все доступные пакеты читаются ОДНОЙ I2C-транзакцией (а не по одной на пакет) —
- * это кратно снижает накладные расходы шины и риск переполнения FIFO (GFOV),
- * так как датчик может заполнить все 32 пакета быстрее, чем их можно вычитать
- * по одному пакету за транзакцию.
- * Каждый новый пакет: вычисляем дельту от предыдущего и прибавляем к аккумулятору.
- * Ratio = (U-D)*100/(U+D), диапазон -100..+100 */
+ * Пакеты читаются ПОРЦИЯМИ по FIFO_CHUNK_PACKETS в одной I2C-транзакции —
+ * это кратно снижает накладные расходы шины и риск переполнения FIFO (GFOV)
+ * по сравнению с чтением по одному пакету за транзакцию, но не держит
+ * 128-байтный буфер на стеке (стек по линкер-скрипту — 256 байт, кадр
+ * apds_readGesture с прежним буфером на весь FIFO составлял 208 байт).
+ * FIFO читается по кругу 0xFC..0xFF с возвратом к 0xFC: каждая новая
+ * транзакция с адреса 0xFC извлекает следующие непрочитанные пакеты.
+ * Ratio = (U-D)*100/(U+D), диапазон -100..+100.
+ * Для каждого валидного пакета: первые EDGE_SAMPLES идут в суммы
+ * g_*_first_sum, каждый — в кольцевой буфер g_*_ring (последние). */
+#define FIFO_CHUNK_PACKETS      8
+
 static bool process_fifo_batch(void) {
     uint8_t fifo_level = 0;
     if (!rd(REG_GFLVL, &fifo_level)) return false;
     if (fifo_level == 0) return true;
     if (fifo_level > FIFO_BATCH_MAX) fifo_level = FIFO_BATCH_MAX; /* защита от некорректных данных */
 
-    uint8_t buf[FIFO_BATCH_MAX * 4]; /* [U,D,L,R] x до 32 пакетов */
-    if (!rdBlock(REG_GFIFO_U, buf, (uint8_t)(fifo_level * 4))) return false;
+    uint8_t buf[FIFO_CHUNK_PACKETS * 4]; /* [U,D,L,R] x до 8 пакетов = 32 байта */
 
-    for (uint8_t i = 0; i < fifo_level; i++) {
-        uint8_t u = buf[i * 4 + 0], d = buf[i * 4 + 1], l = buf[i * 4 + 2], r = buf[i * 4 + 3];
+    while (fifo_level) {
+        uint8_t n = (fifo_level > FIFO_CHUNK_PACKETS) ? FIFO_CHUNK_PACKETS : fifo_level;
+        if (!rdBlock(REG_GFIFO_U, buf, (uint8_t)(n * 4))) return false;
+        fifo_level -= n;
 
-        /* Фильтр: насыщение или шум (пороги задаются в apds9960_config.h) */
-        if (u > APDS_FIFO_SATURATION_MAX || d > APDS_FIFO_SATURATION_MAX ||
-            l > APDS_FIFO_SATURATION_MAX || r > APDS_FIFO_SATURATION_MAX) continue;
-        if (u < THRESH_OUT && d < THRESH_OUT && l < THRESH_OUT && r < THRESH_OUT) continue;
+        for (uint8_t i = 0; i < n; i++) {
+            uint8_t u = buf[i * 4 + 0], d = buf[i * 4 + 1], l = buf[i * 4 + 2], r = buf[i * 4 + 3];
 
-        /* Вычисляем Ratio для этого пакета */
-        int16_t ud_sum = (int16_t)u + d;
-        int16_t lr_sum = (int16_t)l + r;
-        int16_t ud_ratio = 0, lr_ratio = 0;
-        if (ud_sum > 0) ud_ratio = ((int16_t)u - d) * 100 / ud_sum;
-        if (lr_sum > 0) lr_ratio = ((int16_t)l - r) * 100 / lr_sum;
+            /* Фильтр: насыщение или шум (пороги задаются в apds9960_config.h) */
+            if (u > APDS_FIFO_SATURATION_MAX || d > APDS_FIFO_SATURATION_MAX ||
+                l > APDS_FIFO_SATURATION_MAX || r > APDS_FIFO_SATURATION_MAX) continue;
+            if (u < THRESH_OUT && d < THRESH_OUT && l < THRESH_OUT && r < THRESH_OUT) continue;
 
-        /* Первый пакет — просто запоминаем, накапливать нечего */
-        if (!g_has_prev) {
-            g_prev_ud = ud_ratio;
-            g_prev_lr = lr_ratio;
-            g_has_prev = 1;
-            g_packet_count = 1;
-            continue;
+            /* Вычисляем Ratio для этого пакета */
+            int16_t ud_sum = (int16_t)u + d;
+            int16_t lr_sum = (int16_t)l + r;
+            int16_t ud_ratio = 0, lr_ratio = 0;
+            if (ud_sum > 0) ud_ratio = ((int16_t)u - d) * 100 / ud_sum;
+            if (lr_sum > 0) lr_ratio = ((int16_t)l - r) * 100 / lr_sum;
+
+            /* Первые EDGE_SAMPLES пакетов — копим для среднего "начала" */
+            if (g_first_cnt < EDGE_SAMPLES) {
+                g_ud_first_sum += ud_ratio;
+                g_lr_first_sum += lr_ratio;
+                g_first_cnt++;
+            }
+
+            /* Последние EDGE_SAMPLES пакетов — кольцевой буфер */
+            g_ud_ring[g_ring_idx] = ud_ratio;
+            g_lr_ring[g_ring_idx] = lr_ratio;
+            g_ring_idx = (uint8_t)((g_ring_idx + 1) % EDGE_SAMPLES);
+
+            if (g_packet_count != UINT8_MAX) g_packet_count++;
         }
-
-        /* Накапливаем дельту: текущий - предыдущий */
-        g_ud_acc += ud_ratio - g_prev_ud;
-        g_lr_acc += lr_ratio - g_prev_lr;
-
-        /* Запоминаем как предыдущий для следующего пакета */
-        g_prev_ud = ud_ratio;
-        g_prev_lr = lr_ratio;
-        if (g_packet_count != UINT8_MAX) g_packet_count++;
     }
 
     return true;
@@ -421,41 +492,44 @@ static bool process_fifo_batch(void) {
 /* ============================================================================
  * ДЕКОДИРОВАНИЕ НАПРАВЛЕНИЯ
  *
- * Матрица определения направления по g_ud_count и g_lr_count:
- *
- *   g_lr_count:  -1 (лево)    0 (нет)      +1 (право)
- *   g_ud_count:
- *   -1 (вверх)   UP или LEFT  UP           UP или RIGHT
- *    0 (нет)     LEFT         --           RIGHT
- *   +1 (вниз)   DOWN или LEFT DOWN         DOWN или RIGHT
- *
- * Для диагональных движений: сравниваем |g_ud_delta| и |g_lr_delta|.
+ * delta = avg(последние EDGE_SAMPLES валидных пакетов)
+ *       - avg(первые EDGE_SAMPLES валидных пакетов)
+ * по каждой оси; побеждает ось с большей |delta|, знак даёт направление.
+ * Для диагональных движений: сравниваем |delta_ud| и |delta_lr|.
  * Если |UD| > |LR| -> вертикальное, иначе -> горизонтальное.
  * ============================================================================ */
 
-/* Декодирование: определяет направление по накопленным изменениям.
+/* Среднее последних EDGE_SAMPLES валидных ratio (кольцевой буфер полон). */
+static int16_t edge_avg(const int16_t *ring) {
+    return (int16_t)(((int32_t)ring[0] + ring[1]) / EDGE_SAMPLES);
+}
+
+/* Декодирование: определяет направление по разности усреднённых краёв.
  * Возвращает: true если жест определен. */
 static bool decode_gesture(void) {
-    if (!g_has_prev) {
+    if (g_first_cnt == 0) {
 #ifdef APDS9960_DEBUG
         printf("DEC: no data\r\n");
 #endif
         return false;
     }
 
-    if (g_packet_count < APDS_FIFO_MIN_PACKETS) {
+    if (g_packet_count < EDGE_MIN_PACKETS) {
 #ifdef APDS9960_DEBUG
         printf("DEC: too few packets (%d)\r\n", g_packet_count);
 #endif
         return false;
     }
 
-    int16_t abs_ud = g_ud_acc < 0 ? (int16_t)-g_ud_acc : g_ud_acc;
-    int16_t abs_lr = g_lr_acc < 0 ? (int16_t)-g_lr_acc : g_lr_acc;
+    int16_t ud_delta = (int16_t)(edge_avg(g_ud_ring) - g_ud_first_sum / EDGE_SAMPLES);
+    int16_t lr_delta = (int16_t)(edge_avg(g_lr_ring) - g_lr_first_sum / EDGE_SAMPLES);
+
+    int16_t abs_ud = ud_delta < 0 ? (int16_t)-ud_delta : ud_delta;
+    int16_t abs_lr = lr_delta < 0 ? (int16_t)-lr_delta : lr_delta;
 
 #ifdef APDS9960_DEBUG
-    printf("DEC: ud_acc=%d lr_acc=%d pkts=%d thr=%d\r\n",
-           g_ud_acc, g_lr_acc, g_packet_count, SENSITIVITY_1);
+    printf("DEC: ud=%d lr=%d pkts=%d thr=%d\r\n",
+           ud_delta, lr_delta, g_packet_count, SENSITIVITY_1);
 #endif
 
     if (abs_ud < SENSITIVITY_1 && abs_lr < SENSITIVITY_1) {
@@ -466,9 +540,9 @@ static bool decode_gesture(void) {
     }
 
     if (abs_ud > abs_lr) {
-        g_motion = (g_ud_acc > 0) ? GESTURE_UP : GESTURE_DOWN;
+        g_motion = (ud_delta > 0) ? GESTURE_UP : GESTURE_DOWN;
     } else {
-        g_motion = (g_lr_acc > 0) ? GESTURE_LEFT : GESTURE_RIGHT;
+        g_motion = (lr_delta > 0) ? GESTURE_LEFT : GESTURE_RIGHT;
     }
 #ifdef APDS9960_DEBUG
     printf("DEC: motion=%d\r\n", g_motion);
@@ -496,8 +570,6 @@ static bool configure_registers(void) {
     if (!wr(REG_PPULSE, 0x87)) return false;   /* 16 мкс x 8 импульсов */
     if (!wr(REG_POFFSET_UR, 0x00)) return false;
     if (!wr(REG_POFFSET_DL, 0x00)) return false;
-    if (!wr(REG_PILT, 0x00)) return false;
-    if (!wr(REG_PIHT, (uint8_t)(APDS_PROX_THRESHOLD > 255 ? 255 : APDS_PROX_THRESHOLD))) return false;
 
     /* --- CONTROL (0x8F) --- */
     uint8_t ctrl = ((uint8_t)APDS_LED_CURRENT << CTRL_LED_SHIFT) |
@@ -506,9 +578,11 @@ static bool configure_registers(void) {
 
     /* --- Конфигурация --- */
     if (!wr(REG_CONFIG1, 0x60)) return false;
-    if (!wr(REG_CONFIG2, 0x31)) return false;
+    /* CONFIG2: LED_BOOST (биты 5:4) + обязательный бит 0 = 1 (datasheet).
+     * 0x31 == (300% << 4) | 1 — историческое значение сохранено
+     * в APDS_LED_BOOST по умолчанию. */
+    if (!wr(REG_CONFIG2, (uint8_t)((APDS_LED_BOOST << CFG2_LED_BOOST_SHIFT) | 0x01))) return false;
     if (!wr(REG_CONFIG3, 0x00)) return false;
-    if (!wr(REG_PERS, 0x11)) return false;
 
     /* --- Жестовый режим --- */
     if (!wr(REG_GPENTH, APDS_PROX_THRESHOLD)) return false;
@@ -532,9 +606,9 @@ static bool configure_registers(void) {
     if (!wr(REG_GCONF3, 0x00)) return false;
 
     /* GCONF4: GMODE=1 (gesture mode), GIEN по APDS_INT_MODE */
-    uint8_t gconf4 = 0x01;  /* GMODE=1 */
+    uint8_t gconf4 = GC4_GMODE;
 #if APDS_INT_MODE == 1
-    gconf4 |= GC4_GIEN;    /* Gesture Interrupt Enable */
+    gconf4 |= GC4_GIEN;   /* Gesture Interrupt Enable */
 #endif
     if (!wr(REG_GCONF4, gconf4)) return false;
 
@@ -550,7 +624,6 @@ static bool configure_registers(void) {
 static bool sensor_reinit(void) {
     if (!configure_registers()) return false;
     if (g_cal_valid) {
-        if (!wr(REG_PIHT, g_cal_piht)) return false;
         if (!wr(REG_GPENTH, g_cal_gpenth)) return false;
         if (!wr(REG_GEXTH, g_cal_gexth)) return false;
     }
@@ -558,14 +631,22 @@ static bool sensor_reinit(void) {
 }
 
 /* Восстановление после переполнения FIFO. Счётчик сохраняется между
- * последовательными GFOV и сбрасывается только после нормального GSTATUS. */
+ * последовательными GFOV и сбрасывается только после нормального GSTATUS.
+ * Провал sensor_reinit() немедленно отражается как APDS_ERR_SENSOR_HANG
+ * и не маскируется под APDS_ERR_FIFO_OVERFLOW: иначе по публичному API
+ * невозможно отличить «GFOV без проблем шины» от «GFOV + провалившееся
+ * восстановление» (сырой статус шины при этом относится к внутренностям
+ * reinit, а не к операции, которую видел вызывающий). */
 static void recover_fifo_overflow(void) {
     gesture_reset();
     g_last_error = APDS_ERR_FIFO_OVERFLOW;
 
     if (g_reinit_count < RETRY_LIMIT) {
         g_reinit_count++;
-        if (!sensor_reinit()) g_last_error = APDS_ERR_I2C;
+        if (!sensor_reinit()) {
+            g_last_error = APDS_ERR_SENSOR_HANG;
+            return;
+        }
     }
 
     if (g_reinit_count >= RETRY_LIMIT) {
@@ -597,7 +678,8 @@ bool apds_init(void) {
         g_last_error = APDS_ERR_I2C;
         return false;
     }
-    if (id != 0xAB && id != 0xA8 && id != 0x9C && id != 0x9E) {
+    if (id != APDS9960_ID_1 && id != APDS9960_ID_2 &&
+        id != APDS9960_ID_3 && id != APDS9960_ID_4) {
         g_last_error = APDS_ERR_INVALID_ID;
         return false;
     }
@@ -682,6 +764,13 @@ bool apds_wakeup(void) {
         g_last_error = APDS_ERR_SENSOR_HANG;
         return false;
     }
+
+    /* Состояние жеста не должно переживать цикл сна: без сброса
+     * аккумуляторы прошлого (прерванного сном) жеста и счётчик переинициализаций
+     * искажают первое чтение после пробуждения. */
+    gesture_reset();
+    g_reinit_count = 0;
+
     g_last_error = APDS_ERR_NONE;
     return true;
 }
@@ -733,10 +822,20 @@ gesture_t apds_readGesture(void) {
     gesture_reset();
     g_last_error = APDS_ERR_NONE;
 
-    uint32_t start_tick = SysTick->CNT;
-    uint32_t timeout_ticks = (SystemCoreClock / 1000UL) * APDS_GESTURE_TIMEOUT_MS;
+#if APDS_OWN_SYSTICK
+    timebase_start();
+#else
+    uint16_t budget = (uint16_t)APDS_GESTURE_TIMEOUT_MS;
+#endif
 
-    while ((int32_t)(start_tick - SysTick->CNT) < (int32_t)timeout_ticks) {
+    for (;;) {
+#if APDS_OWN_SYSTICK
+        if (timebase_expired((uint16_t)APDS_GESTURE_TIMEOUT_MS)) break;
+#else
+        if (budget == 0) break;
+        budget--;
+#endif
+
         uint8_t gs;
         if (!rd(REG_GSTATUS, &gs)) {
             g_last_error = APDS_ERR_I2C;
@@ -758,7 +857,7 @@ gesture_t apds_readGesture(void) {
             return GESTURE_NONE;
         }
 
-        Delay_Ms(1);
+        poll_delay();
     }
 
     decode_gesture();
@@ -804,9 +903,11 @@ bool apds_recalibrate(void) {
     g_last_error = APDS_ERR_NONE;
     return true;
 #else
-    (void)0;
-    g_last_error = APDS_ERR_NONE;
-    return true;
+    /* Калибровка скомпилирована наружу: честно отказываем, а не
+     * изображаем успех — вызывающий иначе не узнает, что ничего
+     * не произошло. */
+    g_last_error = APDS_ERR_UNSUPPORTED;
+    return false;
 #endif
 }
 
@@ -820,20 +921,23 @@ bool apds_recalibrate(void) {
 
 void apds_enableInterrupt(void) {
     /* GMODE=1 | GIEN=1: gesture interrupt при GVALID=1 */
-    if (!wr(REG_GCONF4, 0x03)) {
+    if (!wr(REG_GCONF4, GC4_GMODE | GC4_GIEN)) {
         g_last_error = APDS_ERR_I2C;
     }
 }
 
 void apds_disableInterrupt(void) {
     /* GMODE=1, GIEN=0: interrupt отключен */
-    if (!wr(REG_GCONF4, 0x01)) {
+    if (!wr(REG_GCONF4, GC4_GMODE)) {
         g_last_error = APDS_ERR_I2C;
     }
 }
 
 void apds_clearInterrupt(void) {
-    /* Чтение GSTATUS сбрасывает GINT → INT pin → HIGH */
+    /* Чтение GSTATUS проверяет GVALID/GFOV, но не сбрасывает GINT:
+     * GINT снимается полным опустошением FIFO (datasheet APDS-9960).
+     * Функция сохранена в API для совместимости; в типовой схеме
+     * (EXTI по фронту + дренаж FIFO в apds_readGesture) вызов опционален. */
     uint8_t dummy;
     if (!rd(REG_GSTATUS, &dummy)) {
         g_last_error = APDS_ERR_I2C;

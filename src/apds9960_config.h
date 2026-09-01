@@ -23,6 +23,15 @@
 #define APDS_LED_CURRENT                0
 #endif
 
+/* Дополнение тока LED CONFIG2.LED_BOOST: 0=100%, 1=150%, 2=200%, 3=300%.
+ * Фактический ток = LED_CURRENT * BOOST. Дефолт 3 (300%) сохраняет
+ * историческое поведение, но является главной причиной насыщения PDATA
+ * (~247) при близкой руке — см. AGENTS.md Gotchas. Снижение до 1-2
+ * убирает насыщение ценью дистанции распознавания. */
+#ifndef APDS_LED_BOOST
+#define APDS_LED_BOOST                  3
+#endif
+
 /* Минимум валидных FIFO-пакетов для распознавания. */
 #ifndef APDS_FIFO_MIN_PACKETS
 #define APDS_FIFO_MIN_PACKETS           4
@@ -36,9 +45,19 @@
 #define APDS_GESTURE_EXIT_TH            30
 #endif
 
-/* Максимальное время блокирующего чтения одного жеста. */
+/* Максимальное время блокирующего чтения одного жеста (мс). */
 #ifndef APDS_GESTURE_TIMEOUT_MS
 #define APDS_GESTURE_TIMEOUT_MS         300
+#endif
+
+/* 1 (по умолчанию): на время apds_readGesture() драйвер конфигурирует SysTick
+ * как свободнобегущий счётчик (HCLK/8) и обеспечивает настоящий дедлайн в мс.
+ * 0: драйвер не трогает SysTick вовсе — для приложений, использующих его
+ * иначе (свой SysTick_Handler и т.п.). Цикл ограничивается бюджетом итераций:
+ * каждая итерация содержит Delay_Ms(1), поэтому таймаут не менее заданного,
+ * при заполненном FIFO — пропорционально дольше. */
+#ifndef APDS_OWN_SYSTICK
+#define APDS_OWN_SYSTICK                1
 #endif
 
 /* Усиление и ток LED gesture engine: 0=максимум, 3=минимум для drive. */
@@ -107,6 +126,9 @@
 #if (APDS_LED_CURRENT < 0) || (APDS_LED_CURRENT > 3)
 #error "APDS_LED_CURRENT must be in range 0..3"
 #endif
+#if (APDS_LED_BOOST < 0) || (APDS_LED_BOOST > 3)
+#error "APDS_LED_BOOST must be in range 0..3"
+#endif
 #if (APDS_GGAIN < 0) || (APDS_GGAIN > 3)
 #error "APDS_GGAIN must be in range 0..3"
 #endif
@@ -125,8 +147,11 @@
 #if (APDS_GESTURE_EXIT_TH < 0) || (APDS_GESTURE_EXIT_TH > APDS_PROX_THRESHOLD)
 #error "APDS_GESTURE_EXIT_TH must be in range 0..APDS_PROX_THRESHOLD"
 #endif
-#if (APDS_GESTURE_TIMEOUT_MS < 1)
-#error "APDS_GESTURE_TIMEOUT_MS must be greater than zero"
+#if (APDS_GESTURE_TIMEOUT_MS < 1) || (APDS_GESTURE_TIMEOUT_MS > 1000)
+#error "APDS_GESTURE_TIMEOUT_MS must be in range 1..1000"
+#endif
+#if (APDS_OWN_SYSTICK != 0) && (APDS_OWN_SYSTICK != 1)
+#error "APDS_OWN_SYSTICK must be 0 or 1"
 #endif
 #if (APDS_FIFO_SIGNAL_MIN < 0) || (APDS_FIFO_SIGNAL_MIN > 255)
 #error "APDS_FIFO_SIGNAL_MIN must be in range 0..255"

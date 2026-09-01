@@ -42,6 +42,7 @@ typedef enum {
 #define APDS_ERR_FIFO_OVERFLOW  2   /* Переполнение FIFO */
 #define APDS_ERR_SENSOR_HANG    3   /* Датчик не отвечает */
 #define APDS_ERR_INVALID_ID     4   /* Устройство по адресу 0x39 не APDS9960 */
+#define APDS_ERR_UNSUPPORTED    5   /* Функция выключена на этапе компиляции (APDS_ENABLE_CALIBRATION=0) */
 
 /* ============================================================================
  * ПУБЛИЧНЫЙ API
@@ -123,7 +124,8 @@ uint8_t apds_getReinitCount(void);
 
 /* Переинициализация датчика с повторной калибровкой порогов proximity.
  * Полезно при изменении условий освещения или положения датчика.
- * Доступна только если APDS_ENABLE_CALIBRATION = 1.
+ * Доступна только если APDS_ENABLE_CALIBRATION = 1; при 0 возвращает
+ * false с apds_getLastError() == APDS_ERR_UNSUPPORTED.
  * Возвращает: true если калибровка успешна. */
 bool apds_recalibrate(void);
 
@@ -136,7 +138,12 @@ void apds_enableInterrupt(void);
  * При сбое I2C фиксирует apds_getLastError() = APDS_ERR_I2C. */
 void apds_disableInterrupt(void);
 
-/* Сброс прерывания: чтение GSTATUS очищает GINT, INT pin → высокий.
+/* Сброс прерывания: чтение GSTATUS проверяет флаги GVALID/GFOV, но НЕ
+ * сбрасывает GINT в сенсоре. GINT снимается только полным опустошением
+ * FIFO (это делает apds_readGesture()); регистров прямого сброса
+ * gesture-прерывания у APDS9960 нет (IFORCE/PICLEAR/AICLEAR относятся
+ * к proximity/ALS-прерываниям). В типовой схеме (EXTI по фронту)
+ * вызов опционален: apds_available() читает GSTATUS сам.
  * При сбое I2C фиксирует apds_getLastError() = APDS_ERR_I2C. */
 void apds_clearInterrupt(void);
 

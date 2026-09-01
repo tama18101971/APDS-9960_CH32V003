@@ -1,16 +1,33 @@
 {
   "name": "APDS-9960_CH32V003",
-  "version": "1.2.3",
+  "version": "1.3.0",
   "description": "Gesture driver for APDS9960 on CH32V003 (NoneOS-SDK)",
   "frameworks": "noneos-sdk",
   "platforms": "ch32v",
+  "keywords": "apds9960, gesture, proximity, ch32v003, risc-v, wch, i2c",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tama18101971/APDS-9960_CH32V003"
+  },
   "dependencies": [
     {
       "name": "I2C-CH32V003",
-      "version": "https://github.com/tama18101971/I2C-CH32V003.git"
+      "version": "https://github.com/tama18101971/I2C-CH32V003.git#v7.0.1"
     }
   ],
   "build": {
     "srcDir": "src"
+  },
+  "export": {
+    "exclude": [
+      "examples",
+      ".pio",
+      ".serena",
+      ".vscode",
+      ".github",
+      "test",
+      "AGENTS.md"
+    ]
   }
 }

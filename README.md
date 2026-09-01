@@ -8,7 +8,7 @@ Compact gesture recognition driver for the APDS9960 proximity/light/color sensor
 
 ## Features
 
-- Minimal RAM usage (~21 bytes static driver + ~150 bytes transient stack for FIFO batch read)
+- Minimal RAM usage (~32 bytes static driver, peak stack ~148 bytes inside `apds_readGesture()`)
 - Minimal Flash footprint (~3.3 KB driver only, ~11.4 KB full demo project)
 - No dynamic memory allocation (`malloc`/`free`)
 - No floating-point math — integer-only arithmetic
@@ -16,7 +16,7 @@ Compact gesture recognition driver for the APDS9960 proximity/light/color sensor
 - Auto-calibration of proximity thresholds
 - Auto-recovery on FIFO overflow
 - Interrupt-driven mode (APDS9960 INT → EXTI3 on PC3)
-- Real SysTick-deadline gesture read (no artificial cooldown needed)
+- Real gesture timeout (free-running SysTick owned by the driver, or iteration budget with `APDS_OWN_SYSTICK=0`)
 - Clone-compatible ID check (supports original + Chinese clones)
 - Diagnostic API (error codes, reinit count, raw I2C bus status)
 - Platform-agnostic C code (no HAL, no Arduino)
@@ -235,8 +235,9 @@ typedef enum {
 #define APDS_ERR_NONE           0   // No error
 #define APDS_ERR_I2C            1   // I2C error — see apds_getLastI2CStatus()
 #define APDS_ERR_FIFO_OVERFLOW  2   // FIFO overflow
-#define APDS_ERR_SENSOR_HANG    3   // Sensor not responding
+#define APDS_ERR_SENSOR_HANG    3   // Sensor not responding (also set when sensor_reinit() inside overflow recovery fails)
 #define APDS_ERR_INVALID_ID     4   // Device at 0x39 is not an APDS9960
+#define APDS_ERR_UNSUPPORTED    5   // Feature compiled out (e.g. apds_recalibrate() with APDS_ENABLE_CALIBRATION=0)
 ```
 
 ## Usage Example
@@ -276,7 +277,9 @@ int main(void) {
         while (g_apds_int_flag == 0) { __WFI(); }
         g_apds_int_flag = 0;
 
-        apds_clearInterrupt();
+        // Note: apds_clearInterrupt() is optional here — apds_available()
+        // reads GSTATUS itself, and GINT in the sensor is cleared by
+        // draining the FIFO inside apds_readGesture().
 
         if (apds_available()) {
             gesture_t g = apds_readGesture();
@@ -288,11 +291,10 @@ int main(void) {
                 default: break;
             }
 
-            // No artificial cooldown needed: apds_readGesture() already blocks
-            // on a real SysTick deadline until GVALID actually clears, so the
-            // tail of a single physical swipe is never decoded as a second
-            // gesture. This drain is a safety net and is usually a no-op.
-            while (apds_available()) apds_readGesture();
+            // Drain the FIFO tail. Bounded: the hardware FIFO is 32 packets
+            // deep, so at most 8 passes are needed.
+            uint8_t drain = 8;
+            while (drain-- && apds_available()) apds_readGesture();
         }
     }
 }
@@ -335,7 +337,8 @@ int main(void) {
             }
 
             if (g != GESTURE_NONE) {
-                while (apds_available()) apds_readGesture();
+                uint8_t drain = 8;
+                while (drain-- && apds_available()) apds_readGesture();
             }
         }
     }
@@ -360,16 +363,16 @@ APDS9960 photodiodes (U, D, L, R)
 Hardware FIFO (4 bytes per packet: [U, D, L, R])
         |
         v
-Driver reads FIFO via I2C
+Driver reads FIFO via I2C (chunks of up to 8 packets per transaction)
         |
         v
 Ratio calculation: (U-D)*100/(U+D), (L-R)*100/(L+R)
         |
         v
-Accumulate changes between consecutive packets
+Averaged edges: avg(last N packets) - avg(first N packets), N=2
         |
         v
-Determine direction from accumulated deltas
+Determine direction from the edge deltas
 ```
 
 ### Ratio Calculation
@@ -386,26 +389,31 @@ LR_ratio = (L - R) * 100 / (L + R)    range: -100 to +100
 - **Positive LR_ratio**: object closer to Left photodiode
 - **Negative LR_ratio**: object closer to Right photodiode
 
-### Accumulation
+### Edge Difference
 
-Between consecutive valid packets, the change in ratio is accumulated:
+The gesture direction is the difference between the **averaged edges** of the
+valid-packet ratio sequence:
 
 ```
-ud_acc += UD_ratio[current] - UD_ratio[previous]
-lr_acc += LR_ratio[current] - LR_ratio[previous]
+ud_delta = avg(UD_ratio of last N packets) - avg(UD_ratio of first N packets)
+lr_delta = avg(LR_ratio of last N packets) - avg(LR_ratio of first N packets)
 ```
 
-This accumulation approach works for both fast and slow gestures — even small per-packet changes add up over time.
+with N = 2. Mathematically this is equivalent to the previous "sum of ratio
+deltas" (that sum telescopes to `last - first`), but the averaged edges are
+robust against a single noisy frame at the swipe boundary deciding the whole
+gesture. This works for both fast and slow gestures: a swipe produces a
+monotonic ratio shift between its start and end.
 
 ### Direction Decision
 
 After all FIFO data is processed (GVALID goes low):
 
 1. Check minimum packet count (>= 4) to filter noise
-2. Compare absolute accumulated values: `|ud_acc|` vs `|lr_acc|`
+2. Compare absolute edge deltas: `|ud_delta|` vs `|lr_delta|`
 3. The dominant axis determines the gesture:
-   - `|ud_acc| > |lr_acc|` → vertical gesture (UP or DOWN)
-   - `|lr_acc| > |ud_acc|` → horizontal gesture (LEFT or RIGHT)
+   - `|ud_delta| > |lr_delta|` → vertical gesture (UP or DOWN)
+   - `|lr_delta| > |ud_delta|` → horizontal gesture (LEFT or RIGHT)
 4. Sign determines direction within the axis
 
 ### Filtering
@@ -447,7 +455,11 @@ default thresholds are used when fewer than half of the samples remain valid —
 |----------|---------|--------------|----------------|
 | GPENTH | Entry threshold | median/4 | median + 3*sigma |
 | GEXTH | Exit threshold | GPENTH * 0.6 | GPENTH * 0.6 |
-| PIHT | Interrupt threshold | Same as GPENTH | Same as GPENTH |
+
+`PIHT`/`PILT`/`PERS` are not written: the driver never enables proximity
+interrupts (`PIEN`), so those registers would have no effect. `APDS_LED_BOOST`
+(CONFIG2, default 300%) scales the actual LED current and is the primary
+reason for PDATA saturation at close range.
 
 ## Configuration
 
@@ -459,6 +471,7 @@ build_flags =
     -Isrc
     -DAPDS_GAIN=3
     -DAPDS_LED_CURRENT=0
+    -DAPDS_LED_BOOST=3
     -DAPDS_GGAIN=3
     -DAPDS_GLDRIVE=0
     -DAPDS_PROX_THRESHOLD=50
@@ -466,12 +479,26 @@ build_flags =
     -DAPDS_GWTIME=1
     -DAPDS_GESTURE_TIMEOUT_MS=300
     -DAPDS_INT_MODE=1
+    -DAPDS_OWN_SYSTICK=1
 ```
 
 Defining these values in `main.c` before `#include "apds9960.h"` does **not**
 configure separately compiled `apds9960.c`. `apds9960_config.h` validates all
 supported values during compilation. It also exposes `APDS_FIFO_SIGNAL_MIN`,
 `APDS_FIFO_SATURATION_MAX`, `APDS_GESTURE_SENSITIVITY`, and `APDS_RETRY_LIMIT`.
+
+`APDS_GESTURE_TIMEOUT_MS` bounds one `apds_readGesture()` call (1..1000 ms).
+With the default `APDS_OWN_SYSTICK=1` the driver reconfigures SysTick as a
+free-running counter for the duration of the call — do not use this option
+if the application keeps its own SysTick timebase (set it to `0` then; the
+loop is bounded by an iteration budget instead, each iteration ≥ 1 ms).
+
+Gesture direction is decoded as the difference of **averaged edges**:
+`delta = avg(last N valid packets) − avg(first N valid packets)` per axis
+(N = 2). This is mathematically equivalent to the previous telescoped ratio
+sum, but a single noisy frame at a swipe boundary no longer decides the whole
+gesture. The metric change means `APDS_GESTURE_SENSITIVITY` values tuned for
+older versions may need re-tuning (typical working range 5..40).
 
 ### Tuning Tips
 
@@ -480,7 +507,7 @@ supported values during compilation. It also exposes `APDS_FIFO_SIGNAL_MIN`,
 | Gestures not detected | Increase `APDS_GAIN` and `APDS_GGAIN` to 3 (8x) |
 | False positives | Increase proximity threshold or gesture sensitivity |
 | Slow gestures not working | Decrease `APDS_GESTURE_SENSITIVITY` through `build_flags` (default: 5) |
-| Multiple gestures per swipe | Should not happen anymore — `apds_readGesture()` blocks on a real SysTick deadline until GVALID clears, not a fixed iteration count. If it still happens, check I2C signal integrity at 400 kHz. |
+| Multiple gestures per swipe | `apds_readGesture()` waits until GVALID actually clears, bounded by `APDS_GESTURE_TIMEOUT_MS`. If it still happens, check I2C signal integrity at 400 kHz. |
 | Calibration fails | Check sensor orientation, ensure no direct sunlight |
 
 ### Power States
@@ -517,19 +544,23 @@ Gesture: LEFT
 
 | Resource | Driver only | Full demo project | Limit |
 |----------|-------------|-------------------|-------|
-| RAM | ~21 bytes static | ~504 bytes | 2048 bytes |
-| Flash | ~3.3 KB | ~11.4 KB | 16384 bytes |
+| RAM | ~32 bytes static | ~512 bytes | 2048 bytes |
+| Flash | ~2.4 KB | ~11.9 KB | 16384 bytes |
 
 Driver-only numbers are `.text` sizes of `apds9960.o` + `int_config.o`
 (measured with toolchain `size`) and exclude the I2C library (`I2C-CH32V003`),
 `main.c`, startup code, and framework libraries. Full project includes all of
-the above plus `printf`-based debug output.
+the above plus `printf`-based debug output. Peak stack depth inside
+`apds_readGesture()` (driver + I2C call chain) is ~148 bytes against the
+256-byte stack reservation of the stock linker script.
 
 ## Limitations
 
 - `apds_readGesture()` blocks for the duration of the gesture (up to `APDS_GESTURE_TIMEOUT_MS`, default 300 ms)
 - No RGB, ALS, or proximity-only API (gesture mode only)
 - Calibration works best in gesture mode (proximity-only saturates)
+- `GINT` is cleared by fully draining the FIFO, not by reading `GSTATUS`; there is no dedicated gesture-interrupt clear command
+- With `APDS_OWN_SYSTICK=1` (default) SysTick is reconfigured by the driver during `apds_readGesture()`; applications needing their own SysTick timebase must set it to `0`
 
 ## License
 

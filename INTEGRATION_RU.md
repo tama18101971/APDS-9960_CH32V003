@@ -18,7 +18,7 @@
 | `int_config.h` / `int_config.c` | ⚙️ Только если `APDS_INT_MODE=1` | EXTI3 (PC3) для interrupt-режима |
 
 Драйвер I2C (`i2c.h` / `i2c.c`) — **внешняя зависимость**
-[`I2C-CH32V003`](https://github.com/tama18101971/I2C-CH32V003.git).
+[`I2C-CH32V003`](https://github.com/tama18101971/I2C-CH32V003.git#v7.0.1).
 Подключается через `lib_deps` в `platformio.ini`, копировать в проект не нужно.
 
 Если новый проект работает только в polling-режиме (`APDS_INT_MODE=0`),
@@ -38,7 +38,7 @@ platform = ch32v
 board = ch32v003f4p6_evt_r0   ; или другая ваша плата на CH32V003
 framework = noneos-sdk
 lib_deps =
-    https://github.com/tama18101971/I2C-CH32V003.git
+    https://github.com/tama18101971/I2C-CH32V003.git#v7.0.1
 ```
 
 Для Способа C добавьте также саму библиотеку (см. раздел 5.2).
@@ -77,7 +77,7 @@ lib_deps =
 
    ```ini
    lib_deps =
-       https://github.com/tama18101971/I2C-CH32V003.git
+       https://github.com/tama18101971/I2C-CH32V003.git#v7.0.1
    ```
 
 4. В своём `src/main.c` подключайте как обычно:
@@ -372,7 +372,7 @@ build_flags =
 | Жесты не распознаются | Слишком слабый сигнал / неверная калибровка | Увеличить `APDS_GAIN`/`APDS_GGAIN`, проверить освещение (не под прямым солнцем) |
 | Жесты "двоятся" | Старая версия `apds9960.c` с искусственным обрывом `apds_readGesture()` по числу итераций | Убедиться, что скопирована актуальная версия драйвера из этого репозитория |
 | Сборка не находит `ch32v00x.h`/`debug.h` | Не тот `framework`/`platform` в `platformio.ini` целевого проекта | См. раздел 2 |
-| Сборка не находит `i2c.h` | Не добавлена `lib_deps` с `I2C-CH32V003` в `platformio.ini` | Добавить `https://github.com/tama18101971/I2C-CH32V003.git` в `lib_deps` |
+| Сборка не находит `i2c.h` | Не добавлена `lib_deps` с `I2C-CH32V003` в `platformio.ini` | Добавить `https://github.com/tama18101971/I2C-CH32V003.git#v7.0.1` в `lib_deps` |
 | Конфликт `main()` при подключении через `lib_deps` на весь репозиторий | В библиотеку случайно попал `main.c` | Не копировать/не включать `main.c` в библиотечный репозиторий (см. раздел 1 и 5.1) |
 
 ## 13. Обратная синхронизация исправлений

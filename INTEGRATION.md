@@ -18,7 +18,7 @@ The I2C driver is included as an external dependency (`I2C-CH32V003`) via `lib_d
 | `int_config.h` / `int_config.c` | Only if `APDS_INT_MODE=1` | EXTI3 (PC3) for interrupt mode |
 
 The I2C driver (`i2c.h` / `i2c.c`) is an **external dependency**
-[`I2C-CH32V003`](https://github.com/tama18101971/I2C-CH32V003.git).
+[`I2C-CH32V003`](https://github.com/tama18101971/I2C-CH32V003.git#v7.0.1).
 Connected via `lib_deps` in `platformio.ini`, no need to copy it into your project.
 
 If the new project only works in polling mode (`APDS_INT_MODE=0`),
@@ -38,7 +38,7 @@ platform = ch32v
 board = ch32v003f4p6_evt_r0   ; or another CH32V003 board
 framework = noneos-sdk
 lib_deps =
-    https://github.com/tama18101971/I2C-CH32V003.git
+    https://github.com/tama18101971/I2C-CH32V003.git#v7.0.1
 ```
 
 For Method C, also add the library itself (see section 5.2).
@@ -77,7 +77,7 @@ The simplest option, no separate git repository needed.
 
    ```ini
    lib_deps =
-       https://github.com/tama18101971/I2C-CH32V003.git
+       https://github.com/tama18101971/I2C-CH32V003.git#v7.0.1
    ```
 
 4. In your `src/main.c`, include as usual:
@@ -370,7 +370,7 @@ code — verify the actual budget via `pio run` (output "RAM:" / "Flash:").
 | Gestures not detected | Signal too weak / incorrect calibration | Increase `APDS_GAIN` / `APDS_GGAIN`, check lighting (avoid direct sunlight) |
 | Gestures "duplicated" | Old version of `apds9960.c` with artificial `apds_readGesture()` cutoff by iteration count | Ensure the latest driver version from this repository is copied |
 | Build can't find `ch32v00x.h` / `debug.h` | Wrong `framework` / `platform` in target project's `platformio.ini` | See section 2 |
-| Build can't find `i2c.h` | `lib_deps` with `I2C-CH32V003` not added to `platformio.ini` | Add `https://github.com/tama18101971/I2C-CH32V003.git` to `lib_deps` |
+| Build can't find `i2c.h` | `lib_deps` with `I2C-CH32V003` not added to `platformio.ini` | Add `https://github.com/tama18101971/I2C-CH32V003.git#v7.0.1` to `lib_deps` |
 | `main()` conflict when connecting via `lib_deps` on the entire repository | `main.c` accidentally ended up in the library | Do not copy/include `main.c` in the library repository (see sections 1 and 5.1) |
 
 ## 13. Back-Syncing Fixes
