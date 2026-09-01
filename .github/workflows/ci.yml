@@ -39,10 +39,19 @@ jobs:
           python -m pip install --upgrade pip
           pip install --upgrade platformio
 
+      # The 'ch32v' platform is not in the official PIO registry —
+      # install it from the Community-PIO-CH32V GitHub repository
+      # (same approach as the I2C-CH32V003 CI).
+      - name: Install ch32v platform
+        run: pio pkg install --platform https://github.com/Community-PIO-CH32V/platform-ch32v.git
+
       - name: Cache PlatformIO packages
         uses: actions/cache@v4
         with:
-          path: ~/.platformio
+          path: |
+            ~/.platformio/.cache
+            ~/.platformio/packages
+            ~/.platformio/platforms
           key: ${{ runner.os }}-platformio-${{ hashFiles('**/platformio.ini') }}
           restore-keys: |
             ${{ runner.os }}-platformio-
@@ -82,10 +91,19 @@ jobs:
           python -m pip install --upgrade pip
           pip install --upgrade platformio
 
+      # The 'ch32v' platform is not in the official PIO registry —
+      # install it from the Community-PIO-CH32V GitHub repository
+      # (same approach as the I2C-CH32V003 CI).
+      - name: Install ch32v platform
+        run: pio pkg install --platform https://github.com/Community-PIO-CH32V/platform-ch32v.git
+
       - name: Cache PlatformIO packages
         uses: actions/cache@v4
         with:
-          path: ~/.platformio
+          path: |
+            ~/.platformio/.cache
+            ~/.platformio/packages
+            ~/.platformio/platforms
           key: ${{ runner.os }}-platformio-${{ hashFiles('**/platformio.ini') }}
           restore-keys: |
             ${{ runner.os }}-platformio-
