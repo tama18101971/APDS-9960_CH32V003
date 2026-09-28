@@ -1,0 +1,42 @@
+# Shared clangd configuration. Check this in, keep it machine-independent.
+#
+# This file is read by clangd itself and by Serena's C++ backend (Serena's
+# `cpp` language server IS clangd), so a correct setup here fixes IntelliSense
+# and Serena's symbol tools at the same time.
+#
+# Do NOT put absolute paths, PlatformIO package locations or toolchain paths
+# here: every developer has a different home directory and OS. Anything
+# machine-specific belongs in the clangd *user* config, which is never
+# versioned:
+#   Windows: %LocalAppData%\clangd\config.yaml
+#   macOS:   ~/Library/Preferences/clangd/config.yaml
+#   Linux:   $XDG_CONFIG_HOME/clangd/config.yaml
+
+CompileFlags:
+  # PlatformIO drives riscv-wch-elf-gcc; telling clangd the driver name makes
+  # it parse GCC-style arguments and infer a RISC-V target instead of falling
+  # back to the host (x86_64-windows) triple.
+  Compiler: riscv-wch-elf-gcc
+  Add:
+    # Pin the target explicitly so parsing does not depend on driver-name
+    # inference. The real ABI/tuning flags are GCC-only and are removed below.
+    - --target=riscv32-unknown-elf
+  Remove:
+    # WCH RISC-V specific flags that the clang driver rejects outright
+    # (they abort the whole translation unit, so navigation silently breaks).
+    - -march=*
+    - -mabi=*
+    - -msmall-data-limit=*
+    - -msave-restore
+
+Diagnostics:
+  # Include-optimizer diagnostics are noise here: the driver headers are pulled
+  # in behind feature macros (APDS_INT_MODE, APDS_ENABLE_CALIBRATION, ...), so
+  # a header that looks unused to clangd is often required by the build flags.
+  UnusedIncludes: None
+  MissingIncludes: None
+
+Index:
+  # Index lives in <workspace>/.cache/clangd (git-ignored). Background
+  # indexing is what makes find-all-references work across translation units.
+  Background: Build

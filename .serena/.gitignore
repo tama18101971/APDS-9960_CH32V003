@@ -1,2 +1,6 @@
 /cache
 /project.local.yml
+
+# Transformed compilation database, written by Serena when it normalises
+# relative paths in the project's compile_commands.json. Machine-local.
+/compile_commands.json
