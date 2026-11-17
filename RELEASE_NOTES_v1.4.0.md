@@ -27,8 +27,7 @@ compatible APDS_DELAY_MS hook. Replace old WFI/live-discard examples.
 ## Hardware evidence
 
 Two working clone specimens were exercised. The0xA8 test produced5 LEFT,5 RIGHT,
-5 UP,5 DOWN in order; some close-range raw samples clipped. Another0x9E module failed
-communication tests and is not a supported-hardware certification result. Original
+5 UP,5 DOWN in order; some close-range raw samples clipped. One tested 0x9E module had communication failures, while another module with the same ID worked. The cause is unknown, so no ID-specific change was made based on one failed specimen. Original
 0xAB/alternative 0x9C and long soak were not physically qualified. See hardware report.
 
 ## Кратко по-русски
@@ -38,4 +37,4 @@ communication tests and is not a supported-hardware certification result. Origin
 Прошивка demo занимает7952Б Flash/380Б RAM. Перед обновлением перепроверьте монтаж,
 чувствительность, обработку новых ошибок и подключите файлы UART-логгера.
 Проверка отдельных экземпляров не является гарантией всех клонов или длительной
-надёжности. Сведения о неисправном модуле не скрыты новой веткой по ID.
+надёжности. Один проверенный модуль0x9E давал сбои связи, другой модуль с тем же ID работал. Причина неизвестна, поэтому по одному неисправному экземпляру поведение для ID не меняли.
