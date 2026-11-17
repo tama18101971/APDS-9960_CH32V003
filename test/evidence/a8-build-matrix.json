@@ -1,0 +1,50 @@
+[
+  {
+    "name": "polling",
+    "exit": 0,
+    "size": [
+      "RAM:   [==        ]  18.0% (used 368 bytes from 2048 bytes)",
+      "Flash: [=====     ]  45.5% (used 7452 bytes from 16384 bytes)"
+    ]
+  },
+  {
+    "name": "no-calibration",
+    "exit": 0,
+    "size": [
+      "RAM:   [==        ]  18.4% (used 376 bytes from 2048 bytes)",
+      "Flash: [====      ]  44.2% (used 7240 bytes from 16384 bytes)"
+    ]
+  },
+  {
+    "name": "debug",
+    "exit": 0,
+    "size": [
+      "RAM:   [==        ]  18.6% (used 380 bytes from 2048 bytes)",
+      "Flash: [=====     ]  51.1% (used 8376 bytes from 16384 bytes)"
+    ]
+  },
+  {
+    "name": "external-isr",
+    "exit": 0,
+    "size": [
+      "RAM:   [==        ]  18.6% (used 380 bytes from 2048 bytes)",
+      "Flash: [=====     ]  48.0% (used 7872 bytes from 16384 bytes)"
+    ]
+  },
+  {
+    "name": "external-clock",
+    "exit": 0,
+    "size": [
+      "RAM:   [==        ]  18.4% (used 376 bytes from 2048 bytes)",
+      "Flash: [=====     ]  47.8% (used 7836 bytes from 16384 bytes)"
+    ]
+  },
+  {
+    "name": "generic",
+    "exit": 0,
+    "size": [
+      "RAM:   [==        ]  18.6% (used 380 bytes from 2048 bytes)",
+      "Flash: [=====     ]  48.3% (used 7916 bytes from 16384 bytes)"
+    ]
+  }
+]

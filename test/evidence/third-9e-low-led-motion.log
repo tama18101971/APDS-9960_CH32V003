@@ -1,0 +1,7623 @@
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=5
+
+Re-init failed (err=1)
+
+BUS reg=AF status=5
+
+SENSOR HANG (i2c=5), re-init...
+
+BUS reg=92 status=5
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=5
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1)
+
+BUS reg=AF status=6
+
+SENSOR HANG (i2c=6), re-init...
+
+BUS reg=92 status=6
+
+Re-init failed (err=1

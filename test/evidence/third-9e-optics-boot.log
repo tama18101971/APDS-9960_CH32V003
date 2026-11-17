@@ -1,0 +1,44 @@
+APDS9960 gesture driver init...
+
+CHIP ID=0x9E
+
+CAL: median=192 valid=32 sigma=0 gpenth=48 gexth=28
+
+Mode: INTERRUPT (INT=PC3)
+
+APDS9960 ready.
+
+SENSOR HANG (i2c=5), re-init...
+
+CAL: I2C fault during sampling (valid=5)
+
+CAL: FAIL (saturated, valid=5) using defaults gpenth=50 gexth=30
+
+Sensor recovered.
+
+SENSOR HANG (i2c=5), re-init...
+
+CAL: I2C fault during sampling (valid=5)
+
+CAL: FAIL (saturated, valid=5) using defaults gpenth=50 gexth=30
+
+Sensor recovered.
+
+SENSOR HANG (i2c=5), re-init...
+
+CAL: I2C fault during sampling (valid=5)
+
+CAL: FAIL (saturated, valid=5) using defaults gpenth=50 gexth=30
+
+Sensor recovered.
+
+SENSOR HANG (i2c=5), re-init...
+
+CAL: I2C fault during sampling (valid=5)
+
+CAL: FAIL (saturated, valid=5) using defaults gpenth=50 gexth=30
+
+Sensor recovered.
+
+SENSOR HANG (i2c=5), re-init...
+

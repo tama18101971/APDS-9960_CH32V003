@@ -1,0 +1,368 @@
+APDS9960 gesture driver init...
+
+CHIP ID=0x9E
+
+BUS reg=93 status=5
+
+CAL: I2C fault during sampling (valid=5)
+
+CAL: FAIL (saturated, valid=5) using defaults gpenth=50 gexth=30
+
+Mode: INTERRUPT (INT=PC3)
+
+APDS9960 ready.
+
+BUS reg=AF status=5
+
+BUS reg=AF status=5
+
+SENSOR HANG (i2c=5), re-init...
+
+BUS reg=AE status=5
+
+CAL: I2C fault during sampling (valid=5)
+
+CAL: FAIL (saturated, valid=5) using defaults gpenth=50 gexth=30
+
+Sensor recovered.
+
+BUS reg=AF status=5
+
+SENSOR HANG (i2c=5), re-init...
+
+BUS reg=AE status=5
+
+CAL: I2C fault during sampling (valid=5)
+
+CAL: FAIL (saturated, valid=5) using defaults gpenth=50 gexth=30
+
+Sensor recovered.
+
+BUS reg=AF status=5
+
+SENSOR HANG (i2c=5), re-init...
+
+BUS reg=AE status=5
+
+CAL: I2C fault during sampling (valid=5)
+
+CAL: FAIL (saturated, valid=5) using defaults gpenth=50 gexth=30
+
+Sensor recovered.
+
+BUS reg=AF status=5
+
+SENSOR HANG (i2c=5), re-init...
+
+BUS reg=AE status=5
+
+CAL: I2C fault during sampling (valid=5)
+
+CAL: FAIL (saturated, valid=5) using defaults gpenth=50 gexth=30
+
+Sensor recovered.
+
+BUS reg=AF status=5
+
+SENSOR HANG (i2c=5), re-init...
+
+BUS reg=AE status=5
+
+CAL: I2C fault during sampling (valid=5)
+
+CAL: FAIL (saturated, valid=5) using defaults gpenth=50 gexth=30
+
+Sensor recovered.
+
+BUS reg=AF status=5
+
+SENSOR HANG (i2c=5), re-init...
+
+BUS reg=AE status=5
+
+CAL: I2C fault during sampling (valid=5)
+
+CAL: FAIL (saturated, valid=5) using defaults gpenth=50 gexth=30
+
+Sensor recovered.
+
+BUS reg=AF status=5
+
+SENSOR HANG (i2c=5), re-init...
+
+BUS reg=AE status=5
+
+CAL: I2C fault during sampling (valid=5)
+
+CAL: FAIL (saturated, valid=5) using defaults gpenth=50 gexth=30
+
+Sensor recovered.
+
+BUS reg=AF status=5
+
+SENSOR HANG (i2c=5), re-init...
+
+BUS reg=AE status=5
+
+CAL: I2C fault during sampling (valid=5)
+
+CAL: FAIL (saturated, valid=5) using defaults gpenth=50 gexth=30
+
+Sensor recovered.
+
+BUS reg=AF status=5
+
+SENSOR HANG (i2c=5), re-init...
+
+BUS reg=AE status=5
+
+CAL: I2C fault during sampling (valid=5)
+
+CAL: FAIL (saturated, valid=5) using defaults gpenth=50 gexth=30
+
+Sensor recovered.
+
+BUS reg=AF status=5
+
+SENSOR HANG (i2c=5), re-init...
+
+BUS reg=AE status=5
+
+CAL: I2C fault during sampling (valid=5)
+
+CAL: FAIL (saturated, valid=5) using defaults gpenth=50 gexth=30
+
+Sensor recovered.
+
+BUS reg=AF status=5
+
+SENSOR HANG (i2c=5), re-init...
+
+BUS reg=AE status=5
+
+CAL: I2C fault during sampling (valid=5)
+
+CAL: FAIL (saturated, valid=5) using defaults gpenth=50 gexth=30
+
+Sensor recovered.
+
+BUS reg=AF status=5
+
+SENSOR HANG (i2c=5), re-init...
+
+BUS reg=93 status=5
+
+CAL: I2C fault during sampling (valid=5)
+
+CAL: FAIL (saturated, valid=5) using defaults gpenth=50 gexth=30
+
+Sensor recovered.
+
+BUS reg=AF status=5
+
+SENSOR HANG (i2c=5), re-init...
+
+BUS reg=AE status=5
+
+CAL: I2C fault during sampling (valid=5)
+
+CAL: FAIL (saturated, valid=5) using defaults gpenth=50 gexth=30
+
+Sensor recovered.
+
+BUS reg=AF status=5
+
+SENSOR HANG (i2c=5), re-init...
+
+BUS reg=AE status=5
+
+CAL: I2C fault during sampling (valid=5)
+
+CAL: FAIL (saturated, valid=5) using defaults gpenth=50 gexth=30
+
+Sensor recovered.
+
+BUS reg=AF status=5
+
+SENSOR HANG (i2c=5), re-init...
+
+BUS reg=AE status=5
+
+CAL: I2C fault during sampling (valid=5)
+
+CAL: FAIL (saturated, valid=5) using defaults gpenth=50 gexth=30
+
+Sensor recovered.
+
+BUS reg=AF status=5
+
+SENSOR HANG (i2c=5), re-init...
+
+BUS reg=AE status=5
+
+CAL: I2C fault during sampling (valid=5)
+
+CAL: FAIL (saturated, valid=5) using defaults gpenth=50 gexth=30
+
+Sensor recovered.
+
+BUS reg=AF status=5
+
+SENSOR HANG (i2c=5), re-init...
+
+BUS reg=AE status=5
+
+CAL: I2C fault during sampling (valid=5)
+
+CAL: FAIL (saturated, valid=5) using defaults gpenth=50 gexth=30
+
+Sensor recovered.
+
+BUS reg=AF status=5
+
+SENSOR HANG (i2c=5), re-init...
+
+BUS reg=AE status=5
+
+CAL: I2C fault during sampling (valid=5)
+
+CAL: FAIL (saturated, valid=5) using defaults gpenth=50 gexth=30
+
+Sensor recovered.
+
+BUS reg=AF status=5
+
+SENSOR HANG (i2c=5), re-init...
+
+BUS reg=AE status=5
+
+CAL: I2C fault during sampling (valid=5)
+
+CAL: FAIL (saturated, valid=5) using defaults gpenth=50 gexth=30
+
+Sensor recovered.
+
+BUS reg=AF status=5
+
+SENSOR HANG (i2c=5), re-init...
+
+BUS reg=AE status=5
+
+CAL: I2C fault during sampling (valid=5)
+
+CAL: FAIL (saturated, valid=5) using defaults gpenth=50 gexth=30
+
+Sensor recovered.
+
+BUS reg=AF status=5
+
+SENSOR HANG (i2c=5), re-init...
+
+BUS reg=93 status=5
+
+CAL: I2C fault during sampling (valid=5)
+
+CAL: FAIL (saturated, valid=5) using defaults gpenth=50 gexth=30
+
+Sensor recovered.
+
+BUS reg=AF status=5
+
+SENSOR HANG (i2c=5), re-init...
+
+BUS reg=AE status=5
+
+CAL: I2C fault during sampling (valid=5)
+
+CAL: FAIL (saturated, valid=5) using defaults gpenth=50 gexth=30
+
+Sensor recovered.
+
+BUS reg=AF status=5
+
+SENSOR HANG (i2c=5), re-init...
+
+BUS reg=AE status=5
+
+CAL: I2C fault during sampling (valid=5)
+
+CAL: FAIL (saturated, valid=5) using defaults gpenth=50 gexth=30
+
+Sensor recovered.
+
+BUS reg=AF status=5
+
+SENSOR HANG (i2c=5), re-init...
+
+BUS reg=93 status=5
+
+CAL: I2C fault during sampling (valid=5)
+
+CAL: FAIL (saturated, valid=5) using defaults gpenth=50 gexth=30
+
+Sensor recovered.
+
+BUS reg=AF status=5
+
+SENSOR HANG (i2c=5), re-init...
+
+BUS reg=AE status=5
+
+CAL: I2C fault during sampling (valid=5)
+
+CAL: FAIL (saturated, valid=5) using defaults gpenth=50 gexth=30
+
+Sensor recovered.
+
+BUS reg=AF status=5
+
+SENSOR HANG (i2c=5), re-init...
+
+BUS reg=AE status=5
+
+CAL: I2C fault during sampling (valid=5)
+
+CAL: FAIL (saturated, valid=5) using defaults gpenth=50 gexth=30
+
+Sensor recovered.
+
+BUS reg=AF status=5
+
+SENSOR HANG (i2c=5), re-init...
+
+BUS reg=AE status=5
+
+CAL: I2C fault during sampling (valid=5)
+
+CAL: FAIL (saturated, valid=5) using defaults gpenth=50 gexth=30
+
+Sensor recovered.
+
+BUS reg=AF status=5
+
+SENSOR HANG (i2c=5), re-init...
+
+BUS reg=AE status=5
+
+CAL: I2C fault during sampling (valid=5)
+
+CAL: FAIL (saturated, valid=5) using defaults gpenth=50 gexth=30
+
+Sensor recovered.
+
+BUS reg=AF status=5
+
+SENSOR HANG (i2c=5), re-init...
+
+BUS reg=AE status=5
+
+CAL: I2C fault during sampling (valid=5)
+
+CAL: FAIL (saturated, valid=5) using defaults gpenth=50 gexth=30
+
+Sensor recovered.
+
+BUS reg=AF status=5
+
+SENSOR HANG (i2c=5), re-init...
+

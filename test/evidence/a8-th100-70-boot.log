@@ -1,0 +1,5 @@
+APDS9960 gesture driver init...
+CHIP ID=0xA8
+CAL: median=23 valid=32 sigma=0 gpenth=100 gexth=70
+Mode: INTERRUPT (INT=PC3)
+APDS9960 ready.

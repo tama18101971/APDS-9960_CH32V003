@@ -18,6 +18,10 @@
  * НАСТРОЙКА ПИНА INT (APDS9960 → CH32V003)
  * ============================================================================ */
 
+#ifndef APDS_INT_GPIO_CLOCK
+#define APDS_INT_GPIO_CLOCK RCC_APB2Periph_GPIOC
+#endif
+
 #ifndef APDS_INT_PORT
 #define APDS_INT_PORT           GPIOC
 #endif

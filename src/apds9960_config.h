@@ -13,6 +13,22 @@
 #ifndef APDS9960_CONFIG_H
 #define APDS9960_CONFIG_H
 
+/* Measured 0xA8 board: 2x gesture gain / 25mA before LED boost.
+ * Set to 0 to use the generic APDS_GGAIN/APDS_GLDRIVE settings. */
+#ifndef APDS_CLONE_A8_PROFILE
+#define APDS_CLONE_A8_PROFILE 1
+#endif
+#if APDS_CLONE_A8_PROFILE != 0 && APDS_CLONE_A8_PROFILE != 1
+#error "APDS_CLONE_A8_PROFILE must be 0 or 1"
+#endif
+
+#ifndef APDS_CLONE_9E_PROFILE
+#define APDS_CLONE_9E_PROFILE 1
+#endif
+#if APDS_CLONE_9E_PROFILE != 0 && APDS_CLONE_9E_PROFILE != 1
+#error "APDS_CLONE_9E_PROFILE must be 0 or 1"
+#endif
+
 /* Усиление proximity-канала CONTROL.PGAIN: 0=1x, 1=2x, 2=4x, 3=8x. */
 #ifndef APDS_GAIN
 #define APDS_GAIN                       3
@@ -26,8 +42,8 @@
 /* Дополнение тока LED CONFIG2.LED_BOOST: 0=100%, 1=150%, 2=200%, 3=300%.
  * Фактический ток = LED_CURRENT * BOOST. Дефолт 3 (300%) сохраняет
  * историческое поведение, но является главной причиной насыщения PDATA
- * (~247) при близкой руке — см. AGENTS.md Gotchas. Снижение до 1-2
- * убирает насыщение ценью дистанции распознавания. */
+ * при близкой руке. Снижайте boost/gain/drive по результатам измерений;
+ * отсутствие насыщения при любых условиях не гарантируется. */
 #ifndef APDS_LED_BOOST
 #define APDS_LED_BOOST                  3
 #endif
@@ -52,10 +68,14 @@
 
 /* 1 (по умолчанию): на время apds_readGesture() драйвер конфигурирует SysTick
  * как свободнобегущий счётчик (HCLK/8) и обеспечивает настоящий дедлайн в мс.
- * 0: драйвер не трогает SysTick вовсе — для приложений, использующих его
- * иначе (свой SysTick_Handler и т.п.). Цикл ограничивается бюджетом итераций:
+ * 0: собственный deadline SysTick не используется — для приложений, использующих его
+ * иначе: также задайте APDS_DELAY_MS своим delay hook. Цикл ограничивается бюджетом итераций:
  * каждая итерация содержит Delay_Ms(1), поэтому таймаут не менее заданного,
  * при заполненном FIFO — пропорционально дольше. */
+#ifndef APDS_DELAY_MS
+#define APDS_DELAY_MS Delay_Ms
+#endif
+
 #ifndef APDS_OWN_SYSTICK
 #define APDS_OWN_SYSTICK                1
 #endif

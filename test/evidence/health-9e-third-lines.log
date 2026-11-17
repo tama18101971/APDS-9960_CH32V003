@@ -1,0 +1,14 @@
+APDS9960 gesture driver init...
+
+HEALTH speed=400000 init=6
+
+HEALTH LINES SDA=0 SCL=1
+
+HEALTH speed=100000 init=6
+
+HEALTH LINES SDA=0 SCL=1
+
+HEALTH SHUTDOWN=0
+
+HEALTH DONE
+

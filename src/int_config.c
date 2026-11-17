@@ -10,7 +10,7 @@ volatile uint8_t g_apds_int_flag = 0;
 
 void apds_exti_init(void) {
     /* Включаем AFIO clock (обязательно для EXTI маппинга) */
-    RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO | APDS_INT_GPIO_CLOCK, ENABLE);
 
     /* PC3 — вход с подтяжкой к VCC (INT open-drain active-low) */
     GPIO_InitTypeDef gpio = {0};

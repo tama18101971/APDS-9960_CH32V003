@@ -15,9 +15,22 @@
 #include <debug.h>
 #include "i2c.h"
 #include "apds9960.h"
+#include "apds9960_log.h"
+#ifndef APDS_EXAMPLE_I2C_HZ
+#define APDS_EXAMPLE_I2C_HZ 400000u
+#endif
 
 #if APDS_INT_MODE == 1
 #include "int_config.h"
+#endif
+
+#if APDS_INT_MODE == 1 && APDS_PROVIDE_EXTI_ISR == 0
+/* Example ownership of the shared vector; applications handle other lines here. */
+void EXTI7_0_IRQHandler(void) __attribute__((interrupt("WCH-Interrupt-fast")));
+void EXTI7_0_IRQHandler(void) {
+    apds_handle_exti();
+    apds_clear_exti();
+}
 #endif
 
 /* Обработчики прерываний (обязательны для CH32V003) */
@@ -27,10 +40,10 @@ void HardFault_Handler(void) __attribute__((interrupt("WCH-Interrupt-fast")));
 /* Вывод имени распознанного жеста в UART (общий код для polling/interrupt режимов) */
 static void print_gesture(gesture_t g) {
     switch (g) {
-        case GESTURE_LEFT:  printf("LEFT\r\n");  break;
-        case GESTURE_RIGHT: printf("RIGHT\r\n"); break;
-        case GESTURE_UP:    printf("UP\r\n");    break;
-        case GESTURE_DOWN:  printf("DOWN\r\n");  break;
+        case GESTURE_LEFT:  apds_log("LEFT\r\n");  break;
+        case GESTURE_RIGHT: apds_log("RIGHT\r\n"); break;
+        case GESTURE_UP:    apds_log("UP\r\n");    break;
+        case GESTURE_DOWN:  apds_log("DOWN\r\n");  break;
         default: break;
     }
 }
@@ -46,12 +59,13 @@ static void drain_fifo(void) {
 
 /* Диагностика отказа датчика и попытка восстановления. */
 static void handle_sensor_failure(void) {
-    printf("SENSOR HANG (i2c=%d), re-init...\r\n", apds_getLastI2CStatus());
+    apds_log("SENSOR HANG (i2c=%d), re-init...\r\n", apds_getLastI2CStatus());
+    if (apds_getLastI2CStatus() == I2C_ERR_RECOVERY) (void)i2c_init(APDS_EXAMPLE_I2C_HZ);
     if (apds_init()) {
-        printf("Sensor recovered.\r\n");
+        apds_log("Sensor recovered.\r\n");
         drain_fifo();
     } else {
-        printf("Re-init failed (err=%d)\r\n", apds_getLastError());
+        apds_log("Re-init failed (err=%d)\r\n", apds_getLastError());
     }
 }
 
@@ -59,43 +73,67 @@ int main(void) {
     SystemCoreClockUpdate();
     Delay_Init();
     USART_Printf_Init(115200);
-    printf("APDS9960 gesture driver init...\r\n");
+    apds_log("APDS9960 gesture driver init...\r\n");
+#ifdef APDS_HEALTH_TEST
+    extern void apds_health_check(void);
+    apds_health_check();
+#endif
 
-    uint8_t i2c_st = i2c_init(400000);
+    uint8_t i2c_st = i2c_init(APDS_EXAMPLE_I2C_HZ);
     if (i2c_st != I2C_OK) {
-        printf("ERROR: i2c_init failed (%d)\r\n", i2c_st);
+        apds_log("ERROR: i2c_init failed (%d)\r\n", i2c_st);
         while (1) {}
     }
 
+    uint8_t chip_id = 0;
+    i2c_read_register(0x39, 0x92, &chip_id);
+    apds_log("CHIP ID=0x%02X\r\n", chip_id);
     if (!apds_init()) {
-        printf("ERROR: APDS9960 not responding! err=%d i2c=%d\r\n",
+        apds_log("ERROR: APDS9960 not responding! err=%d i2c=%d\r\n",
                apds_getLastError(), apds_getLastI2CStatus());
 
         /* Автосканирование шины для диагностики: сенсор на 0x39? */
-        printf("Scanning I2C bus...\r\n");
+        apds_log("Scanning I2C bus...\r\n");
         uint8_t found = 0;
         for (uint8_t a = 1; a < 0x7F; a++) {
             if (i2c_probe_address(a, NULL, NULL) == I2C_OK) {
-                printf("  device found at 0x%02X\r\n", a);
+                apds_log("  device found at 0x%02X\r\n", a);
                 found++;
             }
         }
         if (found == 0) {
-            printf("  no devices on the bus — check wiring/power/pull-ups\r\n");
+            apds_log("  no devices on the bus — check wiring/power/pull-ups\r\n");
         }
 
         while (1) {}
     }
 
 #if APDS_INT_MODE == 1
-    printf("Mode: INTERRUPT (INT=PC3)\r\n");
+    apds_log("Mode: INTERRUPT (INT=PC3)\r\n");
     apds_exti_init();
     apds_enableInterrupt();
 #else
-    printf("Mode: POLLING\r\n");
+    apds_log("Mode: POLLING\r\n");
 #endif
 
-    printf("APDS9960 ready.\r\n");
+#ifdef APDS_HW_TEST
+    uint8_t gc2=0, gs=0, level=0, en=0;
+    i2c_read_register(0x39, 0xA3, &gc2);
+    i2c_read_register(0x39, 0x80, &en);
+    apds_log("HW CONFIG id=%02X gc2=%02X en=%02X\r\n", chip_id, gc2, en);
+    Delay_Ms(500);
+    i2c_read_register(0x39, 0xAF, &gs);
+    i2c_read_register(0x39, 0xAE, &level);
+    apds_log("HW BEFORE gs=%02X level=%u\r\n", gs, level);
+    (void)apds_available();
+    uint8_t recovery_error=apds_getLastError();
+    i2c_read_register(0x39, 0xAF, &gs);
+    i2c_read_register(0x39, 0xAE, &level);
+    apds_log("HW RECOVERY err=%u gs=%02X level=%u\r\n", recovery_error, gs, level);
+    bool sleep_ok=apds_sleep(), wake_ok=apds_wakeup();
+    apds_log("HW SLEEP=%u WAKE=%u\r\n", sleep_ok, wake_ok);
+#endif
+    apds_log("APDS9960 ready.\r\n");
 
     Delay_Ms(200);
 
@@ -103,22 +141,13 @@ int main(void) {
     drain_fifo();
 
 #if APDS_INT_MODE == 1
-    /* ========================================================================
-     * INTERRUPT MODE
-     *
-     * Main loop засыпает (__WFI) пока ISR не установит g_apds_int_flag.
-     * Прерывание срабатывает при GVALID=1 (falling edge на INT pin).
-     * После пробуждения: читаем жест через существующий API.
-     *
-     * Искусственный кулдаун после жеста не требуется: apds_readGesture()
-     * теперь ждёт настоящего завершения жеста (GVALID=0) по дедлайну
-     * SysTick вместо фиксированного числа итераций, поэтому "хвост"
-     * одного физического взмаха руки больше не декодируется как отдельный
-     * второй жест. Оставляем лишь безусловный дренаж FIFO — обычно no-op.
-     * ======================================================================== */
+    /* Bounded flag/INT-level polling avoids the check-then-WFI race.
+     * This example trades CPU sleep for guaranteed periodic recovery attempts.
+     * Completed gestures are delivered once; the next gesture is not discarded. */
     while (1) {
-        while (g_apds_int_flag == 0) {
-            __WFI();
+        for (uint8_t wait = 0; wait < 20 && g_apds_int_flag == 0 &&
+             GPIO_ReadInputDataBit(APDS_INT_PORT, APDS_INT_PIN) == Bit_SET; ++wait) {
+            Delay_Ms(1);
         }
         g_apds_int_flag = 0;
 
@@ -131,8 +160,9 @@ int main(void) {
         if (apds_available()) {
             gesture_t g = apds_readGesture();
             print_gesture(g);
-            drain_fifo();
-        } else if (apds_getLastError() == APDS_ERR_SENSOR_HANG) {
+            /* Completed gestures have already drained their own FIFO. */
+        } else if (apds_getLastError() == APDS_ERR_SENSOR_HANG ||
+                   apds_getLastError() == APDS_ERR_I2C) {
             handle_sensor_failure();
         }
     }
@@ -146,10 +176,8 @@ int main(void) {
             gesture_t g = apds_readGesture();
             print_gesture(g);
 
-            if (g != GESTURE_NONE) {
-                drain_fifo();
-            }
-        } else if (apds_getLastError() == APDS_ERR_SENSOR_HANG) {
+        } else if (apds_getLastError() == APDS_ERR_SENSOR_HANG ||
+                   apds_getLastError() == APDS_ERR_I2C) {
             handle_sensor_failure();
         }
     }

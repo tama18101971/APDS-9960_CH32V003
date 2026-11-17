@@ -24,7 +24,14 @@ jobs:
             flags: "-DAPDS9960_DEBUG"
           - name: external-exti-isr
             flags: "-DAPDS_INT_MODE=1 -DAPDS_PROVIDE_EXTI_ISR=0"
+          - name: external-systick
+            flags: "-DAPDS_OWN_SYSTICK=0"
+          - name: generic-profiles
+            flags: "-DAPDS_CLONE_A8_PROFILE=0 -DAPDS_CLONE_9E_PROFILE=0"
     name: build (${{ matrix.name }})
+    env:
+      PLATFORMIO_BUILD_FLAGS: "-Isrc ${{ matrix.flags }}"
+      PLATFORMIO_BUILD_SRC_FLAGS: "-Wextra -Werror"
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -59,10 +66,11 @@ jobs:
       # PLATFORMIO_BUILD_SRC_FLAGS applies only to src/ and examples/, so
       # -Werror does not fail on NoneOS-SDK or third-party library warnings.
       - name: Build
-        env:
-          PLATFORMIO_BUILD_FLAGS: ${{ matrix.flags }}
-          PLATFORMIO_BUILD_SRC_FLAGS: "-Wextra -Werror"
         run: pio run
+
+      - name: Host regression against pinned I2C API
+        if: matrix.name == 'default'
+        run: python test/host/run.py
 
       - name: Report size
         run: |

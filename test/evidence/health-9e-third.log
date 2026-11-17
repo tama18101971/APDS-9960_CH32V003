@@ -1,0 +1,84 @@
+APDS9960 gesture driver init...
+
+HEALTH speed=400000 init=0
+
+HEALTH disable=0
+
+HEALTH ID good=100 bad=0 last=9E errors=0,0,0,0,0,0
+
+HEALTH WTIME match=32/32 write_errors=0 read_errors=0
+
+HEALTH APDS init=1 err=0 raw=0
+
+HEALTH reg=80 value=4D status=0
+
+HEALTH reg=8F value=0C status=0
+
+HEALTH reg=8D value=60 status=0
+
+HEALTH reg=90 value=31 status=0
+
+HEALTH reg=A2 value=40 status=0
+
+HEALTH reg=A3 value=19 status=0
+
+HEALTH reg=AB value=03 status=0
+
+HEALTH reg=A0 value=2E status=0
+
+HEALTH reg=A1 value=1B status=0
+
+HEALTH reg=93 value=22 status=0
+
+HEALTH reg=9C value=B3 status=0
+
+HEALTH reg=AF value=00 status=0
+
+HEALTH reg=AE value=00 status=0
+
+HEALTH FIFO gs=00 level=0 statuses=0,0
+
+HEALTH service err=0 raw=0
+
+HEALTH speed=100000 init=0
+
+HEALTH disable=0
+
+HEALTH ID good=100 bad=0 last=9E errors=0,0,0,0,0,0
+
+HEALTH WTIME match=32/32 write_errors=0 read_errors=0
+
+HEALTH APDS init=1 err=0 raw=0
+
+HEALTH reg=80 value=4D status=0
+
+HEALTH reg=8F value=0C status=0
+
+HEALTH reg=8D value=60 status=0
+
+HEALTH reg=90 value=31 status=0
+
+HEALTH reg=A2 value=40 status=0
+
+HEALTH reg=A3 value=19 status=0
+
+HEALTH reg=AB value=02 status=0
+
+HEALTH reg=A0 value=2E status=0
+
+HEALTH reg=A1 value=1B status=0
+
+HEALTH reg=93 value=22 status=0
+
+HEALTH reg=9C value=B6 status=0
+
+HEALTH reg=AF value=00 status=0
+
+HEALTH reg=AE value=00 status=0
+
+HEALTH FIFO gs=00 level=0 statuses=0,0
+
+HEALTH service err=0 raw=0
+
+HEALTH DONE
+

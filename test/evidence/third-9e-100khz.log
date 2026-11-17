@@ -1,0 +1,174 @@
+APDS9960 gesture driver init...
+
+CHIP ID=0x9E
+
+CAL: I2C fault during sampling (valid=8)
+
+CAL: FAIL (saturated, valid=8) using defaults gpenth=50 gexth=30
+
+Mode: INTERRUPT (INT=PC3)
+
+APDS9960 ready.
+
+SENSOR HANG (i2c=5), re-init...
+
+CAL: I2C fault during sampling (valid=10)
+
+CAL: FAIL (saturated, valid=10) using defaults gpenth=50 gexth=30
+
+Sensor recovered.
+
+SENSOR HANG (i2c=5), re-init...
+
+CAL: I2C fault during sampling (valid=10)
+
+CAL: FAIL (saturated, valid=10) using defaults gpenth=50 gexth=30
+
+Sensor recovered.
+
+SENSOR HANG (i2c=5), re-init...
+
+CAL: I2C fault during sampling (valid=10)
+
+CAL: FAIL (saturated, valid=10) using defaults gpenth=50 gexth=30
+
+Sensor recovered.
+
+SENSOR HANG (i2c=5), re-init...
+
+CAL: I2C fault during sampling (valid=10)
+
+CAL: FAIL (saturated, valid=10) using defaults gpenth=50 gexth=30
+
+Sensor recovered.
+
+SENSOR HANG (i2c=5), re-init...
+
+CAL: I2C fault during sampling (valid=12)
+
+CAL: FAIL (saturated, valid=12) using defaults gpenth=50 gexth=30
+
+Sensor recovered.
+
+SENSOR HANG (i2c=5), re-init...
+
+CAL: I2C fault during sampling (valid=10)
+
+CAL: FAIL (saturated, valid=10) using defaults gpenth=50 gexth=30
+
+Sensor recovered.
+
+SENSOR HANG (i2c=5), re-init...
+
+CAL: I2C fault during sampling (valid=10)
+
+CAL: FAIL (saturated, valid=10) using defaults gpenth=50 gexth=30
+
+Sensor recovered.
+
+SENSOR HANG (i2c=5), re-init...
+
+CAL: I2C fault during sampling (valid=10)
+
+CAL: FAIL (saturated, valid=10) using defaults gpenth=50 gexth=30
+
+Sensor recovered.
+
+SENSOR HANG (i2c=5), re-init...
+
+CAL: I2C fault during sampling (valid=10)
+
+CAL: FAIL (saturated, valid=10) using defaults gpenth=50 gexth=30
+
+Sensor recovered.
+
+SENSOR HANG (i2c=5), re-init...
+
+CAL: I2C fault during sampling (valid=14)
+
+CAL: FAIL (saturated, valid=14) using defaults gpenth=50 gexth=30
+
+Sensor recovered.
+
+SENSOR HANG (i2c=5), re-init...
+
+CAL: I2C fault during sampling (valid=12)
+
+CAL: FAIL (saturated, valid=12) using defaults gpenth=50 gexth=30
+
+Sensor recovered.
+
+SENSOR HANG (i2c=5), re-init...
+
+CAL: I2C fault during sampling (valid=10)
+
+CAL: FAIL (saturated, valid=10) using defaults gpenth=50 gexth=30
+
+Sensor recovered.
+
+SENSOR HANG (i2c=5), re-init...
+
+CAL: I2C fault during sampling (valid=12)
+
+CAL: FAIL (saturated, valid=12) using defaults gpenth=50 gexth=30
+
+Sensor recovered.
+
+SENSOR HANG (i2c=5), re-init...
+
+CAL: I2C fault during sampling (valid=10)
+
+CAL: FAIL (saturated, valid=10) using defaults gpenth=50 gexth=30
+
+Sensor recovered.
+
+SENSOR HANG (i2c=5), re-init...
+
+CAL: I2C fault during sampling (valid=10)
+
+CAL: FAIL (saturated, valid=10) using defaults gpenth=50 gexth=30
+
+Sensor recovered.
+
+SENSOR HANG (i2c=5), re-init...
+
+CAL: I2C fault during sampling (valid=10)
+
+CAL: FAIL (saturated, valid=10) using defaults gpenth=50 gexth=30
+
+Sensor recovered.
+
+SENSOR HANG (i2c=5), re-init...
+
+CAL: I2C fault during sampling (valid=10)
+
+CAL: FAIL (saturated, valid=10) using defaults gpenth=50 gexth=30
+
+Sensor recovered.
+
+SENSOR HANG (i2c=5), re-init...
+
+CAL: I2C fault during sampling (valid=10)
+
+CAL: FAIL (saturated, valid=10) using defaults gpenth=50 gexth=30
+
+Sensor recovered.
+
+SENSOR HANG (i2c=5), re-init...
+
+CAL: I2C fault during sampling (valid=14)
+
+CAL: FAIL (saturated, valid=14) using defaults gpenth=50 gexth=30
+
+Sensor recovered.
+
+SENSOR HANG (i2c=5), re-init...
+
+CAL: I2C fault during sampling (valid=10)
+
+CAL: FAIL (saturated, valid=10) using defaults gpenth=50 gexth=30
+
+Sensor recovered.
+
+SENSOR HANG (i2c=5), re-init...
+

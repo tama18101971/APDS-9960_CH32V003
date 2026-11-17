@@ -52,7 +52,7 @@
 
 /* Special function registers (команды; записываемое значение не важно).
  * Сбрасывают соответствующие прерывания; GINT отдельно не сбрасывается —
- * он снимается полным опустошением FIFO (datasheet APDS-9960). */
+ * он снимается опустошением FIFO или GCONF4.GFIFO_CLR. */
 #define REG_IFORCE              0xE4
 #define REG_PICLEAR             0xE5
 #define REG_CICLEAR             0xE6
@@ -92,6 +92,7 @@
 #define GST_GFOV                0x02
 
 /* GCONF4 register bits (0xAB) */
+#define GC4_GFIFO_CLR           0x04
 #define GC4_GMODE               0x01
 #define GC4_GIEN                0x02
 
@@ -108,14 +109,14 @@
 #define CTRL_AGAIN_MASK         0x03
 
 /* GCONF2 register (0xA3) layout:
- * [6:5] GGLDRIVE: gesture LED drive
- * [4:3] GGAIN: gesture gain
+ * [6:5] GGAIN: gesture gain
+ * [4:3] GLDRIVE: gesture LED drive
  * [2:0] GWTIME: gesture wait time */
 
-#define GCONF2_GLDRIVE_SHIFT    5
-#define GCONF2_GLDRIVE_MASK     0x60
-#define GCONF2_GGAIN_SHIFT      3
-#define GCONF2_GGAIN_MASK       0x18
+#define GCONF2_GLDRIVE_SHIFT    3
+#define GCONF2_GLDRIVE_MASK     0x18
+#define GCONF2_GGAIN_SHIFT      5
+#define GCONF2_GGAIN_MASK       0x60
 #define GCONF2_GWTIME_MASK      0x07
 
 /* CONFIG2 register (0x90) */

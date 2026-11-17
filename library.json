@@ -1,6 +1,6 @@
 {
   "name": "APDS-9960_CH32V003",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "Gesture driver for APDS9960 on CH32V003 (NoneOS-SDK)",
   "frameworks": "noneos-sdk",
   "platforms": "ch32v",
@@ -13,7 +13,7 @@
   "dependencies": [
     {
       "name": "I2C-CH32V003",
-      "version": "https://github.com/tama18101971/I2C-CH32V003.git#v7.0.1"
+      "version": "https://github.com/tama18101971/I2C-CH32V003.git#v7.2.1"
     }
   ],
   "build": {
@@ -27,7 +27,27 @@
       ".vscode",
       ".github",
       "test",
-      "AGENTS.md"
+      "AGENTS.md",
+      ".clangd",
+      ".cache",
+      "compile_commands.json",
+      "RELEASE_NOTES_v1.4.0.md",
+      "include",
+      "lib",
+      "platformio.ini",
+      ".gitignore",
+      ".kilo"
+    ],
+    "include": [
+      "src/*",
+      "library.json",
+      "LICENSE",
+      "README.md",
+      "README_RU.md",
+      "INTEGRATION.md",
+      "INTEGRATION_RU.md",
+      "CHANGELOG.md",
+      "HARDWARE_TEST_RU.md"
     ]
   }
 }

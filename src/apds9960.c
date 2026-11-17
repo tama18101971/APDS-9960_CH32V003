@@ -3,26 +3,31 @@
  *
  * Алгоритм основан на соотношениях U/D и L/R из FIFO-буфера датчика.
  * Не использует float/double, только целочисленную арифметику.
- * Потребление RAM: ~20 байт статика.
+ * Static footprint and stack: see HARDWARE_TEST_RU.md.
  */
 
 #include "apds9960.h"
+#include "apds9960_log.h"
 #include "apds9960_regs.h"
 #include "i2c.h"
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <debug.h>
+extern void APDS_DELAY_MS(uint32_t ms);
 
 /* ============================================================================
  * ОБЕРТКИ НАД I2C (адрес датчика 0x39)
  * ============================================================================ */
 
-/* Сырой статус последней НЕудачной I2C-транзакции (коды i2c.h v7.0.1:
+/* Сырой статус последней НЕудачной I2C-транзакции (коды i2c.h v7.2.1:
  * I2C_OK=0, I2C_NACK=1, I2C_ERR_TIMEOUT=2, I2C_ERR_CLK=3,
- * I2C_ERR_BERR=4, I2C_ERR_ARLO=5). Обновляется только при сбое,
+ * I2C_ERR_BERR=4, I2C_ERR_ARLO=5, I2C_ERR_RECOVERY=6). Обновляется только при сбое,
  * успех статус не сбрасывает. Доступен через apds_getLastI2CStatus(). */
 static uint8_t g_last_i2c_status;
+static uint8_t g_sensor_id;
+static uint8_t g_irq_enabled = APDS_INT_MODE;
+static uint8_t g_discard_pending;
 
 /* Чтение одного регистра датчика.
  * reg — адрес регистра (0x80-0xFF), out — указатель для значения.
@@ -32,6 +37,9 @@ static bool rd(uint8_t reg, uint8_t *out) {
     uint8_t st = i2c_read_register(APDS9960_I2C_ADDR, reg, out);
     if (st != I2C_OK) {
         g_last_i2c_status = st;
+#ifdef APDS_I2C_TRACE
+        apds_log("BUS reg=%02X status=%u\r\n", reg, st);
+#endif
         return false;
     }
     return true;
@@ -45,6 +53,9 @@ static bool wr(uint8_t reg, uint8_t val) {
     uint8_t st = i2c_write_register(APDS9960_I2C_ADDR, reg, val);
     if (st != I2C_OK) {
         g_last_i2c_status = st;
+#ifdef APDS_I2C_TRACE
+        apds_log("BUS reg=%02X status=%u\r\n", reg, st);
+#endif
         return false;
     }
     return true;
@@ -58,6 +69,9 @@ static bool rdBlock(uint8_t reg, uint8_t *buf, uint8_t len) {
     uint8_t st = i2c_read_buffer(APDS9960_I2C_ADDR, reg, buf, len);
     if (st != I2C_OK) {
         g_last_i2c_status = st;
+#ifdef APDS_I2C_TRACE
+        apds_log("BUS reg=%02X status=%u\r\n", reg, st);
+#endif
         return false;
     }
     return true;
@@ -66,7 +80,7 @@ static bool rdBlock(uint8_t reg, uint8_t *buf, uint8_t len) {
 /* ============================================================================
  * ТАЙМБЕЙС ЦИКЛА apds_readGesture()
  *
- * ВАЖНО: SysTick в NoneOS-SDK НЕ свободнобегущий. Delay_Ms()/Delay_Us()
+ * ВАЖНО: SysTick в NoneOS-SDK НЕ свободнобегущий. APDS_DELAY_MS()/Delay_Us()
  * (Debug/ch32v00x/debug.c) каждый раз пишут CMP, ОБНУЛЯЮТ CNT, запускают
  * счёт и по завершении ОСТАНАВЛИВАЮТ его (CTLR bit0 -> 0). Между вызовами
  * Delay_* счётчик стоит на месте. Поэтому читать SysTick->CNT как «текущее
@@ -79,8 +93,9 @@ static bool rdBlock(uint8_t reg, uint8_t *buf, uint8_t len) {
  * Тактирование HCLK/8 (STCLK=0 после сброса) — та же посылка, что в
  * Delay_Init(): p_us = SystemCoreClock / 8000000.
  *
- * APDS_OWN_SYSTICK=0: SysTick не трогаем, цикл ограничен бюджетом
- * итераций, каждая из которых занимает не менее 1 мс (Delay_Ms(1) в
+ * APDS_OWN_SYSTICK=0: только iteration budget; default delay меняет SysTick.
+ * Для shared SysTick задайте APDS_DELAY_MS. Цикл ограничен бюджетом
+ * итераций, каждая из которых занимает не менее 1 мс (APDS_DELAY_MS(1) в
  * теле) плюс время I2C-транзакций — это нижняя оценка, защищающая
  * от вечного цикла при залипшем GVALID.
  * ============================================================================ */
@@ -95,7 +110,7 @@ static void timebase_start(void) {
     SysTick->SR   = 0;
     SysTick->CMP  = 0xFFFFFFFFu;
     SysTick->CNT  = 0;
-    SysTick->CTLR |= 1u;              /* STE=1: счёт вверх от нуля */
+    SysTick->CTLR = 1u;              /* STE=1: счёт вверх от нуля */
 }
 
 /* Подождать перехода к следующему опросу GSTATUS.
@@ -112,7 +127,7 @@ static bool timebase_expired(uint16_t deadline_ms) {
 #else
 /* Пауза 1 мс штатным средством SDK (SysTick он перенастроит сам). */
 static void poll_delay(void) {
-    Delay_Ms(1);
+    APDS_DELAY_MS(1);
 }
 #endif
 
@@ -211,8 +226,8 @@ static bool calibrate_proximity(void) {
 
     /* Датчик уже в gesture mode (PON+PEN+GEN+WEN) после configure_registers().
      * Переключение в proximity-only НЕ требуется — PDATA в gesture mode
-     * отражает реальные условия работы (GLDRIVE + GGAIN, без LED_BOOST). */
-    Delay_Ms(100);  /* Стабилизация gesture mode (больше чем proximity-only) */
+     * sampling can fall back if fresh proximity data is unavailable. */
+    APDS_DELAY_MS(100);  /* Стабилизация gesture mode (больше чем proximity-only) */
 
     /* Сбор замеров PDATA с фильтрацией насыщения и drain FIFO */
     {
@@ -235,7 +250,7 @@ static bool calibrate_proximity(void) {
 
             if (!(status & ST_PVALID)) {
                 if (--pv_timeout == 0) break;
-                Delay_Ms(1);
+                APDS_DELAY_MS(1);
                 continue;
             }
 
@@ -246,26 +261,29 @@ static bool calibrate_proximity(void) {
 
             buf[valid_cnt++] = data;
             pv_timeout = 100;
-            Delay_Ms(10);
+            APDS_DELAY_MS(10);
         }
 
 #ifdef APDS9960_DEBUG
-        if (aborted) printf("CAL: I2C fault during sampling (valid=%d)\r\n", valid_cnt);
+        if (aborted) apds_log("CAL: I2C fault during sampling (valid=%d)\r\n", valid_cnt);
 #endif
         (void)aborted;
     }
 
     /* Если валидных замеров меньше половины — среда загрязнена, используем дефолты */
     if (valid_cnt < APDS_CAL_SAMPLES / 2) {
+        if (!wr(REG_GPENTH, APDS_PROX_THRESHOLD) ||
+            !wr(REG_GEXTH, APDS_GESTURE_EXIT_TH)) return false;
         g_cal_valid = 0;
 #ifdef APDS9960_DEBUG
-        printf("CAL: FAIL (saturated, valid=%d) using defaults gpenth=%d gexth=%d\r\n",
+        apds_log("CAL: FAIL (saturated, valid=%d) using defaults gpenth=%d gexth=%d\r\n",
                valid_cnt, APDS_PROX_THRESHOLD, APDS_GESTURE_EXIT_TH);
 #endif
         return true;
     }
 
-    /* Сортируем и берём медиану */    sort_u8(buf, valid_cnt);
+    /* Сортируем и берём медиану */
+    sort_u8(buf, valid_cnt);
     uint8_t median;
     if (valid_cnt & 1) {
         median = buf[valid_cnt / 2];
@@ -300,33 +318,31 @@ static bool calibrate_proximity(void) {
 
     if (entry > APDS_CAL_PROX_MAX) entry = APDS_CAL_PROX_MAX;
     if (entry < APDS_CAL_PROX_MIN) entry = APDS_CAL_PROX_MIN;
-    if (exit_th < 1) exit_th = 1;
+    exit_th = entry * 6 / 10;
+    if (entry != 0 && exit_th < 1) exit_th = 1;
 
     uint8_t prox_th = (uint8_t)entry;
     uint8_t exit_val = (uint8_t)exit_th;
 
+    uint8_t calibrated = 1;
     /* Sanity check + сохранение откалиброванных порогов */
     if (median > 100) {
         /* Gesture mode: порог должен быть ниже фона, но не > 100 */
         if (prox_th > 100) {
             prox_th = APDS_PROX_THRESHOLD;
             exit_val = APDS_GESTURE_EXIT_TH;
-            g_cal_valid = 0;
+            calibrated = 0;
         } else {
-            g_cal_gpenth = prox_th;
-            g_cal_gexth  = exit_val;
-            g_cal_valid  = 1;
+            calibrated = 1;
         }
     } else {
         /* Proximity mode: порог выше фона, не > 100 и не < дефолта */
         if (prox_th > 100 || prox_th < APDS_PROX_THRESHOLD) {
             prox_th = APDS_PROX_THRESHOLD;
             exit_val = APDS_GESTURE_EXIT_TH;
-            g_cal_valid = 0;
+            calibrated = 0;
         } else {
-            g_cal_gpenth = prox_th;
-            g_cal_gexth  = exit_val;
-            g_cal_valid  = 1;
+            calibrated = 1;
         }
     }
 
@@ -334,8 +350,12 @@ static bool calibrate_proximity(void) {
     if (!wr(REG_GPENTH, prox_th)) return false;
     if (!wr(REG_GEXTH, exit_val)) return false;
 
+    g_cal_gpenth = prox_th;
+    g_cal_gexth = exit_val;
+    g_cal_valid = calibrated;
+
 #ifdef APDS9960_DEBUG
-    printf("CAL: median=%d valid=%d sigma=%d gpenth=%d gexth=%d\r\n",
+    apds_log("CAL: median=%d valid=%d sigma=%d gpenth=%d gexth=%d\r\n",
            median, valid_cnt, sigma, prox_th, exit_val);
 #endif
 
@@ -348,10 +368,8 @@ static bool calibrate_proximity(void) {
  *
  * Направление определяется по разности УСРЕДНЁННЫХ краёв жеста:
  * delta = avg(последние EDGE_SAMPLES пакетов) - avg(первые EDGE_SAMPLES).
- * Это математически эквивалентно прежней сумме приращений
- * (сумма дельт телескопируется в ratio[last] - ratio[first]), но крайние
- * пакеты усредняются, поэтому одиночный шумный кадр на границе свайпа
- * не определяет результат целиком.
+ * В отличие от telescoping sum (last-first), усреднение меняет метрику
+ * и снижает вклад одного граничного выброса, но не исключает влияние шума.
  * ============================================================================ */
 
 /* Число крайних пакетов, по которому берётся среднее. Должно быть >= 2
@@ -458,6 +476,11 @@ static bool process_fifo_batch(void) {
         for (uint8_t i = 0; i < n; i++) {
             uint8_t u = buf[i * 4 + 0], d = buf[i * 4 + 1], l = buf[i * 4 + 2], r = buf[i * 4 + 3];
 
+#ifdef APDS_RAW_DEBUG
+            static uint8_t raw_divider;
+            if ((raw_divider++ & 7u) == 0)
+                apds_log("RAW %u %u %u %u\r\n", u,d,l,r);
+#endif
             /* Фильтр: насыщение или шум (пороги задаются в apds9960_config.h) */
             if (u > APDS_FIFO_SATURATION_MAX || d > APDS_FIFO_SATURATION_MAX ||
                 l > APDS_FIFO_SATURATION_MAX || r > APDS_FIFO_SATURATION_MAX) continue;
@@ -509,14 +532,14 @@ static int16_t edge_avg(const int16_t *ring) {
 static bool decode_gesture(void) {
     if (g_first_cnt == 0) {
 #ifdef APDS9960_DEBUG
-        printf("DEC: no data\r\n");
+        apds_log("DEC: no data\r\n");
 #endif
         return false;
     }
 
     if (g_packet_count < EDGE_MIN_PACKETS) {
 #ifdef APDS9960_DEBUG
-        printf("DEC: too few packets (%d)\r\n", g_packet_count);
+        apds_log("DEC: too few packets (%d)\r\n", g_packet_count);
 #endif
         return false;
     }
@@ -528,24 +551,24 @@ static bool decode_gesture(void) {
     int16_t abs_lr = lr_delta < 0 ? (int16_t)-lr_delta : lr_delta;
 
 #ifdef APDS9960_DEBUG
-    printf("DEC: ud=%d lr=%d pkts=%d thr=%d\r\n",
+    apds_log("DEC: ud=%d lr=%d pkts=%d thr=%d\r\n",
            ud_delta, lr_delta, g_packet_count, SENSITIVITY_1);
 #endif
 
     if (abs_ud < SENSITIVITY_1 && abs_lr < SENSITIVITY_1) {
 #ifdef APDS9960_DEBUG
-        printf("DEC: no motion (below threshold)\r\n");
+        apds_log("DEC: no motion (below threshold)\r\n");
 #endif
         return false;
     }
 
     if (abs_ud > abs_lr) {
-        g_motion = (ud_delta > 0) ? GESTURE_UP : GESTURE_DOWN;
+        g_motion = (ud_delta > 0) ? GESTURE_DOWN : GESTURE_UP;
     } else {
-        g_motion = (lr_delta > 0) ? GESTURE_LEFT : GESTURE_RIGHT;
+        g_motion = (lr_delta > 0) ? GESTURE_RIGHT : GESTURE_LEFT;
     }
 #ifdef APDS9960_DEBUG
-    printf("DEC: motion=%d\r\n", g_motion);
+    apds_log("DEC: motion=%d\r\n", g_motion);
 #endif
     return true;
 }
@@ -560,10 +583,10 @@ static bool decode_gesture(void) {
 static bool configure_registers(void) {
     if (!wr(REG_ENABLE, 0x00)) return false;
 
-    Delay_Ms(1);
+    APDS_DELAY_MS(1);
 
     /* --- Тайминги --- */
-    if (!wr(REG_ATIME, 0xDB)) return false;    /* ALS интегрирование 140 мс */
+    if (!wr(REG_ATIME, 0xDB)) return false;    /* ALS integration ~103 ms (ALS disabled). */
     if (!wr(REG_WTIME, 0xFF)) return false;    /* ожидание 2.8 мс */
 
     /* --- Proximity --- */
@@ -593,6 +616,19 @@ static bool configure_registers(void) {
     uint8_t gconf2 = ((uint8_t)APDS_GLDRIVE << GCONF2_GLDRIVE_SHIFT) |
                      ((uint8_t)APDS_GGAIN << GCONF2_GGAIN_SHIFT) |
                      ((uint8_t)APDS_GWTIME);
+#if APDS_CLONE_A8_PROFILE
+    /* Verified 20 alternating gestures on the 0xA8 board: avoid the
+     * severe motion saturation of the generic 8x/100mA settings. */
+    if (g_sensor_id == APDS9960_ID_3)
+        gconf2 = (uint8_t)((1u << GCONF2_GGAIN_SHIFT) |
+                          (2u << GCONF2_GLDRIVE_SHIFT) | APDS_GWTIME);
+#endif
+#if APDS_CLONE_9E_PROFILE
+    /* Measured 0x9E board saturates all UDLR at 0x61. Use 1x/12.5mA
+     * (the effective pre-fix settings), without changing the register map. */
+    if (g_sensor_id == APDS9960_ID_4)
+        gconf2 = (uint8_t)((3u << GCONF2_GLDRIVE_SHIFT) | APDS_GWTIME);
+#endif
     if (!wr(REG_GCONF2, gconf2)) return false;
 
     if (!wr(REG_GOFFSET_U, 0x00)) return false;
@@ -605,12 +641,8 @@ static bool configure_registers(void) {
 
     if (!wr(REG_GCONF3, 0x00)) return false;
 
-    /* GCONF4: GMODE=1 (gesture mode), GIEN по APDS_INT_MODE */
-    uint8_t gconf4 = GC4_GMODE;
-#if APDS_INT_MODE == 1
-    gconf4 |= GC4_GIEN;   /* Gesture Interrupt Enable */
-#endif
-    if (!wr(REG_GCONF4, gconf4)) return false;
+    if (!wr(REG_GCONF4, GC4_GFIFO_CLR)) return false;
+    if (!wr(REG_GCONF4, (uint8_t)(GC4_GMODE | (g_irq_enabled ? GC4_GIEN : 0)))) return false;
 
     /* --- Включение --- */
     if (!wr(REG_ENABLE, EN_PON | EN_PEN | EN_GEN | EN_WEN)) return false;
@@ -627,6 +659,7 @@ static bool sensor_reinit(void) {
         if (!wr(REG_GPENTH, g_cal_gpenth)) return false;
         if (!wr(REG_GEXTH, g_cal_gexth)) return false;
     }
+    g_discard_pending = 0;
     return true;
 }
 
@@ -674,6 +707,7 @@ static void recover_fifo_overflow(void) {
  * Возвращает: true если датчик отвечает и настроен. */
 bool apds_init(void) {
     uint8_t id;
+    g_irq_enabled = APDS_INT_MODE;
     if (!rd(REG_ID, &id)) {
         g_last_error = APDS_ERR_I2C;
         return false;
@@ -683,6 +717,8 @@ bool apds_init(void) {
         g_last_error = APDS_ERR_INVALID_ID;
         return false;
     }
+
+    g_sensor_id = id;
 
     for (uint8_t attempt = 0; attempt < RETRY_LIMIT; attempt++) {
         if (configure_registers()) {
@@ -701,7 +737,7 @@ bool apds_init(void) {
                 return true;
             }
         }
-        Delay_Ms(50);
+        APDS_DELAY_MS(50);
     }
 
     g_last_error = APDS_ERR_SENSOR_HANG;
@@ -710,7 +746,7 @@ bool apds_init(void) {
 
 /* Перевод датчика в режим сна.
  * Отключает PEN, GEN, WEN — остаётся только PON.
- * Потребление: ~1 мкА (питание только на логику).
+ * PON-only: около 38 мкА номинально (не измерено для модуля).
  * Возвращает: true если запись ENABLE успешна. */
 bool apds_sleep(void) {
     if (!wr(REG_ENABLE, EN_PON)) {
@@ -724,7 +760,7 @@ bool apds_sleep(void) {
 /* Полное отключение датчика (максимальная экономия энергии).
  * Отключает PON + все остальные функции.
  * Внутренний генератор и ИК-диод выключены полностью.
- * Потребление: <1 мкА.
+ * Sleep ток: около 1 мкА типично; для клона не измерен.
  * Для пробуждения необходимо apds_wakeup(). */
 bool apds_shutdown(void) {
     if (!wr(REG_ENABLE, 0x00)) {
@@ -746,8 +782,8 @@ bool apds_wakeup(void) {
         return false;
     }
 
-    /* Шаг 2:等待 генератор (1 мс достаточно для startup) */
-    Delay_Ms(1);
+    /* Шаг 2: пауза после PON; свежие данные появятся позже. */
+    APDS_DELAY_MS(1);
 
     /* Шаг 3: включаем proximity + gesture + wait */
     if (!wr(REG_ENABLE, EN_PON | EN_PEN | EN_GEN | EN_WEN)) {
@@ -771,11 +807,16 @@ bool apds_wakeup(void) {
     gesture_reset();
     g_reinit_count = 0;
 
+    g_discard_pending = 1;
     g_last_error = APDS_ERR_NONE;
     return true;
 }
 
 bool apds_available(void) {
+    if (g_discard_pending && !sensor_reinit()) {
+        g_last_error = APDS_ERR_I2C;
+        return false;
+    }
     uint8_t gs;
     if (!rd(REG_GSTATUS, &gs)) {
         g_last_error = APDS_ERR_I2C;
@@ -798,18 +839,18 @@ bool apds_available(void) {
  *   1. Сбрасывает состояние
  *   2. Цикл пока GVALID=1 (реальный дедлайн по SysTick, до APDS_GESTURE_TIMEOUT_MS):
  *      a. Читает GSTATUS
- *      b. Если GVALID=0 -> жест физически завершён, декодируем
- *      c. Если GFOV=1 -> переполнение, выходим
+ *      b. Сначала проверяем GFOV: повреждённый жест не декодируется
+ *      c. Если GVALID=0 -> engine завершён, FIFO пуст, декодируем
  *      d. Обрабатываем батч FIFO (process_fifo_batch, одна I2C-транзакция на весь батч)
  *      e. Небольшая пауза перед следующим опросом GSTATUS
- *   3. Декодируем финальное направление
+ *   3. При deadline отбрасываем данные с APDS_ERR_TIMEOUT
  *
  * @note При сбое I2C в середине жеста возвращается GESTURE_NONE — частично
  * накопленные данные не декодируются, т.к. направление по обрывку данных
  * недостоверно. Диагностика: apds_getLastError() == APDS_ERR_I2C и
  * apds_getLastI2CStatus().
  *
- * @note Дедлайн считается по SysTick->CNT (аппаратный таймер, считает ВНИЗ на
+ * @note Дедлайн считается по SysTick->CNT (аппаратный таймер, считает ВВЕРХ на
  * CH32V003), а не по счётчику итераций — иначе цикл может завершиться заметно
  * раньше APDS_GESTURE_TIMEOUT_MS (например, если I2C-транзакции внутри цикла
  * суммарно занимают больше времени, чем предполагает фиксированная задержка),
@@ -818,8 +859,19 @@ bool apds_available(void) {
  * отдельный жест).
  *
  * Возвращает: gesture_t — тип жеста или GESTURE_NONE (в т.ч. при сбое I2C). */
+static gesture_t gesture_finish(gesture_t result) {
+#if APDS_OWN_SYSTICK
+    SysTick->CTLR = 0;
+#endif
+    return result;
+}
+
 gesture_t apds_readGesture(void) {
     gesture_reset();
+    if (g_discard_pending && !sensor_reinit()) {
+        g_last_error = APDS_ERR_I2C;
+        return gesture_finish(GESTURE_NONE);
+    }
     g_last_error = APDS_ERR_NONE;
 
 #if APDS_OWN_SYSTICK
@@ -838,33 +890,38 @@ gesture_t apds_readGesture(void) {
 
         uint8_t gs;
         if (!rd(REG_GSTATUS, &gs)) {
+            g_discard_pending = 1;
             g_last_error = APDS_ERR_I2C;
-            return GESTURE_NONE;
-        }
-
-        if (!(gs & GST_GVALID)) {
-            decode_gesture();
-            return g_motion;
+            return gesture_finish(GESTURE_NONE);
         }
 
         if (gs & GST_GFOV) {
             recover_fifo_overflow();
-            return GESTURE_NONE;
+            return gesture_finish(GESTURE_NONE);
+        }
+
+        if (!(gs & GST_GVALID)) {
+            decode_gesture();
+            return gesture_finish(g_motion);
         }
 
         if (!process_fifo_batch()) {
+            g_discard_pending = 1;
             g_last_error = APDS_ERR_I2C;
-            return GESTURE_NONE;
+            return gesture_finish(GESTURE_NONE);
         }
 
         poll_delay();
     }
 
-    decode_gesture();
-    return g_motion;
+    gesture_reset();
+    g_discard_pending = 1;
+    g_last_error = APDS_ERR_TIMEOUT;
+    return gesture_finish(GESTURE_NONE);
 }
 
 bool apds_readProximity(uint8_t *value) {
+    if (!value) { g_last_error = APDS_ERR_INVALID_ARG; return false; }
     if (!rd(REG_PDATA, value)) {
         g_last_error = APDS_ERR_I2C;
         return false;
@@ -874,6 +931,7 @@ bool apds_readProximity(uint8_t *value) {
 }
 
 bool apds_readStatus(uint8_t *value) {
+    if (!value) { g_last_error = APDS_ERR_INVALID_ARG; return false; }
     if (!rd(REG_STATUS, value)) {
         g_last_error = APDS_ERR_I2C;
         return false;
@@ -919,27 +977,18 @@ bool apds_recalibrate(void) {
  * apds_getLastI2CStatus()). При успехе g_last_error НЕ перезаписывается.
  * ============================================================================ */
 
-void apds_enableInterrupt(void) {
-    /* GMODE=1 | GIEN=1: gesture interrupt при GVALID=1 */
-    if (!wr(REG_GCONF4, GC4_GMODE | GC4_GIEN)) {
+static void set_interrupt(uint8_t enabled) {
+    uint8_t gc4;
+    if (!rd(REG_GCONF4, &gc4) ||
+        !wr(REG_GCONF4, (uint8_t)((gc4 & GC4_GMODE) | (enabled ? GC4_GIEN : 0)))) {
         g_last_error = APDS_ERR_I2C;
+        return;
     }
+    g_irq_enabled = enabled;
 }
-
-void apds_disableInterrupt(void) {
-    /* GMODE=1, GIEN=0: interrupt отключен */
-    if (!wr(REG_GCONF4, GC4_GMODE)) {
-        g_last_error = APDS_ERR_I2C;
-    }
-}
-
+void apds_enableInterrupt(void) { set_interrupt(1); }
+void apds_disableInterrupt(void) { set_interrupt(0); }
 void apds_clearInterrupt(void) {
-    /* Чтение GSTATUS проверяет GVALID/GFOV, но не сбрасывает GINT:
-     * GINT снимается полным опустошением FIFO (datasheet APDS-9960).
-     * Функция сохранена в API для совместимости; в типовой схеме
-     * (EXTI по фронту + дренаж FIFO в apds_readGesture) вызов опционален. */
     uint8_t dummy;
-    if (!rd(REG_GSTATUS, &dummy)) {
-        g_last_error = APDS_ERR_I2C;
-    }
+    if (!rd(REG_GSTATUS, &dummy)) g_last_error = APDS_ERR_I2C;
 }

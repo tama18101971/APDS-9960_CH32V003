@@ -1,12 +1,14 @@
 #ifndef APDS9960_H
 #define APDS9960_H
 
+#define APDS9960_VERSION "1.4.0"
+
 /*
  * apds9960.h — Драйвер распознавания жестов для APDS9960 (CH32V003)
  *
  * Поддерживает: влево, вправо, вверх, вниз.
  * Интерфейс: I2C (адрес 0x39).
- * Потребление RAM: ~20 байт статика + ~8 байт стек.
+ * Потребление RAM: см. измерения сборки и -fstack-usage.
  */
 
 #include <stdint.h>
@@ -32,11 +34,14 @@ typedef enum {
  * ============================================================================ */
 
 /* Отладочный вывод: раскомментируйте следующую строку или определите
- * APDS9960_DEBUG при сборке (-DAPDS9960_DEBUG) для включения printf */
+ * APDS9960_DEBUG при сборке (-DAPDS9960_DEBUG) для включения UART-логов */
 /* #define APDS9960_DEBUG */
 
 
 /* Коды ошибок драйвера */
+#define APDS_ERR_TIMEOUT        6
+#define APDS_ERR_INVALID_ARG    7
+
 #define APDS_ERR_NONE           0   /* Ошибок нет */
 #define APDS_ERR_I2C            1   /* Ошибка I2C (NACK, таймаут) */
 #define APDS_ERR_FIFO_OVERFLOW  2   /* Переполнение FIFO */
@@ -57,7 +62,7 @@ bool apds_init(void);
 
 /* Перевод датчика в режим сна.
  * Отключает proximity, gesture и wait, оставляя только PON.
- * Датчик потребляет минимальный ток (~1 мкА).
+ * PON-only: около 38 мкА номинально, без тока модуля/подтяжек.
  * Возвращает: true если запись ENABLE успешна. */
 bool apds_sleep(void);
 
@@ -69,7 +74,7 @@ bool apds_wakeup(void);
 
 /* Полное отключение датчика (максимальная экономия энергии).
  * Отключает PON + все остальные функции, включая ИК-диод.
- * Потребление: <1 мкА.
+ * Sleep ток: около 1 мкА типично по datasheet; для клона не измерен.
  * Для пробуждения необходимо apds_wakeup().
  * Возвращает: true если запись ENABLE успешна. */
 bool apds_shutdown(void);
@@ -87,21 +92,25 @@ bool apds_available(void);
  * Алгоритм:
  *   1. Фильтрует и считает действительные FIFO-пакеты
  *   2. Вычисляет Ratio: (U-D)*100/(U+D) и (L-R)*100/(L+R)
- *   3. Накапливает разности Ratio соседних пакетов, пока GVALID=1
+ *   3. Сравнивает средние Ratio первых двух и последних двух пакетов
  *   4. Определяет направление по доминирующей оси
  *
  * @note При сбое I2C частично накопленные данные НЕ декодируются:
  * возвращается GESTURE_NONE, а apds_getLastError() == APDS_ERR_I2C.
  *
+ * При дедлайне возвращает NONE с APDS_ERR_TIMEOUT; частичные данные
+ * отбрасываются, следующий вызов сначала восстанавливает FIFO.
  * Возвращает: gesture_t — тип жеста или GESTURE_NONE */
 gesture_t apds_readGesture(void);
 
 /* Чтение текущего значения proximity-канала (0-255).
- * Возвращает: true если чтение успешно. */
+ * value должен быть non-NULL; NULL даёт APDS_ERR_INVALID_ARG.
+ * Возвращает: true если чтение успешно; свежесть конверсии не гарантируется. */
 bool apds_readProximity(uint8_t *value);
 
 /* Чтение регистра STATUS (0x93) для диагностики.
- * Возвращает: true если чтение успешно. */
+ * value должен быть non-NULL; NULL даёт APDS_ERR_INVALID_ARG.
+ * Возвращает: true если чтение успешно; свежесть конверсии не гарантируется. */
 bool apds_readStatus(uint8_t *value);
 
 /* Получение кода последней ошибки драйвера.
@@ -109,10 +118,11 @@ bool apds_readStatus(uint8_t *value);
 uint8_t apds_getLastError(void);
 
 /* Получение сырого статуса последней НЕудачной I2C-транзакции
- * (коды драйвера I2C-CH32V003 v7.0.1 из i2c.h):
+ * (коды драйвера I2C-CH32V003 v7.2.1 из i2c.h):
  *   0 = I2C_OK, 1 = I2C_NACK (нет ACK от датчика),
  *   2 = I2C_ERR_TIMEOUT (таймаут шины), 3 = I2C_ERR_CLK,
- *   4 = I2C_ERR_BERR (ошибка шины), 5 = I2C_ERR_ARLO (потеря арбитража).
+ *   4 = I2C_ERR_BERR (ошибка шины), 5 = I2C_ERR_ARLO (потеря арбитража),
+ *   6 = I2C_ERR_RECOVERY (повторите i2c_init после устранения сбоя).
  * Обновляется только при сбоях; успех не сбрасывает предыдущий статус.
  * Интерпретируйте совместно с apds_getLastError() == APDS_ERR_I2C.
  * Возвращает: код i2c.h (см. выше). */
@@ -122,11 +132,11 @@ uint8_t apds_getLastI2CStatus(void);
  * 0 = нормальная работа, >0 = возможны проблемы с датчиком. */
 uint8_t apds_getReinitCount(void);
 
-/* Переинициализация датчика с повторной калибровкой порогов proximity.
+/* Повторная калибровка порогов proximity без полной переинициализации.
  * Полезно при изменении условий освещения или положения датчика.
  * Доступна только если APDS_ENABLE_CALIBRATION = 1; при 0 возвращает
  * false с apds_getLastError() == APDS_ERR_UNSUPPORTED.
- * Возвращает: true если калибровка успешна. */
+ * true означает успешную запись выбранных порогов, включая fallback. */
 bool apds_recalibrate(void);
 
 /* Включение прерывания жеста (GIEN=1).
@@ -138,13 +148,10 @@ void apds_enableInterrupt(void);
  * При сбое I2C фиксирует apds_getLastError() = APDS_ERR_I2C. */
 void apds_disableInterrupt(void);
 
-/* Сброс прерывания: чтение GSTATUS проверяет флаги GVALID/GFOV, но НЕ
- * сбрасывает GINT в сенсоре. GINT снимается только полным опустошением
- * FIFO (это делает apds_readGesture()); регистров прямого сброса
- * gesture-прерывания у APDS9960 нет (IFORCE/PICLEAR/AICLEAR относятся
- * к proximity/ALS-прерываниям). В типовой схеме (EXTI по фронту)
- * вызов опционален: apds_available() читает GSTATUS сам.
- * При сбое I2C фиксирует apds_getLastError() = APDS_ERR_I2C. */
+/* Compatibility status read: does not clear GINT or FIFO.
+ * Normal completion drains FIFO; recovery uses GCONF4.GFIFO_CLR.
+ * Non-reentrant: call all APDS APIs from one main context, never from ISR.
+ * On read failure records APDS_ERR_I2C. */
 void apds_clearInterrupt(void);
 
 #endif /* APDS9960_H */

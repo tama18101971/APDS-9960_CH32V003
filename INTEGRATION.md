@@ -1,320 +1,74 @@
-# Integrating the APDS9960 Driver as a Library in Other Projects
+# Integrating APDS-9960 1.4.0
 
-🇬🇧 English | [🇷🇺 Русский](INTEGRATION_RU.md)
+[Русский](INTEGRATION_RU.md) · [API/configuration](README.md)
 
-This document describes how to use the APDS9960 gesture driver (`apds9960.*`,
-`apds9960_config.h`, `apds9960_regs.h`, `int_config.*`) in **other** PlatformIO projects on CH32V003,
-without copying `main.c` (it is only a demo example for this repository).
+## PlatformIO library dependency
 
-The I2C driver is included as an external dependency (`I2C-CH32V003`) via `lib_deps`.
-
-## 1. Library Files
-
-| File | Required? | Purpose |
-|------|-----------|---------|
-| `apds9960_regs.h` | Always | APDS9960 register map |
-| `apds9960_config.h` | Always | Shared compile-time driver configuration |
-| `apds9960.h` / `apds9960.c` | Always | Gesture driver itself |
-| `int_config.h` / `int_config.c` | Only if `APDS_INT_MODE=1` | EXTI3 (PC3) for interrupt mode |
-
-The I2C driver (`i2c.h` / `i2c.c`) is an **external dependency**
-[`I2C-CH32V003`](https://github.com/tama18101971/I2C-CH32V003.git#v7.0.1).
-Connected via `lib_deps` in `platformio.ini`, no need to copy it into your project.
-
-If the new project only works in polling mode (`APDS_INT_MODE=0`),
-`int_config.h` / `int_config.c` can be omitted entirely.
-
-## 2. Target Project Requirements
-
-The driver is written for a specific platform and is NOT MCU-agnostic:
-
-- PlatformIO platform `ch32v`, framework `noneos-sdk` (NOT Arduino, NOT FreeRTOS).
-- Actual CH32V003 chip (or register-compatible with I2C1/EXTI/SysTick).
-- The target project's `platformio.ini` must contain at minimum:
+Use NoneOS-SDK on CH32V003. Install the Community-PIO-CH32V platform if needed; do not substitute Arduino or STM32 HAL. A minimal target configuration:
 
 ```ini
-[env:my_board]
-platform = ch32v
-board = ch32v003f4p6_evt_r0   ; or another CH32V003 board
-framework = noneos-sdk
-lib_deps =
-    https://github.com/tama18101971/I2C-CH32V003.git#v7.0.1
-```
-
-For Method C, also add the library itself (see section 5.2).
-
-- Free pins: **PC1 (SDA)**, **PC2 (SCL)**, and (only for interrupt mode)
-  **PC3 (INT)**. If these pins are occupied by other peripherals in the target
-  project, you need to either free them or override the interrupt pin parameters
-  (`APDS_INT_PORT`, `APDS_INT_PIN`, `APDS_INT_LINE`, `APDS_INT_PORT_SOURCE`,
-  `APDS_INT_PIN_SOURCE`) via `build_flags` (see section 9).
-- I2C1 bus is free (or already used only by devices compatible by address —
-  APDS9960 sits on `0x39`).
-
-## 3. Method A — Quick Copy (for one-time integration)
-
-The simplest option, no separate git repository needed.
-
-1. Create a `lib/APDS9960/` folder in the target project (PlatformIO automatically
-   includes everything from `lib/*` into the build, without mixing with `src/`):
-
-   ```
-   your_project/
-     lib/
-       APDS9960/
-         apds9960.h
-         apds9960.c
-         apds9960_config.h
-         apds9960_regs.h
-         int_config.h      (optional)
-         int_config.c      (optional)
-     src/
-       main.c              (your own main() — NOT from this repository)
-   ```
-
-2. Copy the files from section 1 (without `main.c`).
-3. Add the I2C dependency in `platformio.ini`:
-
-   ```ini
-   lib_deps =
-       https://github.com/tama18101971/I2C-CH32V003.git#v7.0.1
-   ```
-
-4. In your `src/main.c`, include as usual:
-
-   ```c
-   #include "i2c.h"
-   #include "apds9960.h"
-   #if APDS_INT_MODE == 1
-   #include "int_config.h"
-   #endif
-   ```
-
-5. `pio run` — PlatformIO will pick up `lib/APDS9960/` and `I2C-CH32V003` automatically.
-
-**Downside of Method A:** when bugs are fixed in this repository, changes must be
-manually copied to every project that has a local copy.
-
-## 4. Method B — Shared Local Folder (multiple local projects, one developer)
-
-If you have multiple projects on one machine and don't want to duplicate files —
-keep the library in one place and connect it via `lib_extra_dirs`.
-
-1. Place the driver files (without `main.c`) in a separate folder, e.g.:
-   `C:\Projects\shared_libs\APDS9960_CH32V003\` (flat, or inside a `src/` subfolder —
-   PlatformIO searches for headers/sources recursively).
-
-2. In `platformio.ini` of **each** project that needs the driver:
-
-   ```ini
-   [env:my_board]
-   platform = ch32v
-   board = ch32v003f4p6_evt_r0
-   framework = noneos-sdk
-   lib_extra_dirs = C:\Projects\shared_libs
-   ```
-
-3. `pio run` will include `APDS9960_CH32V003` as a regular library from
-   `lib_extra_dirs`.
-
-**Pro:** single source of truth on disk, edit in one place — picked up everywhere
-on next build. **Con:** works only on this machine, not suitable for CI/other
-developers without folder synchronization.
-
-## 5. Method C — Separate Git Repository + `lib_deps` (recommended for multiple projects)
-
-The most correct approach when the driver is used in multiple projects and/or
-by multiple people/machines: extract the driver into its own git repository
-(or git submodule) and connect via `lib_deps` — PlatformIO will download and
-cache the library automatically during build.
-
-### 5.1. Preparing the Library Repository (one-time)
-
-This repository already has a ready-made structure for publishing as a library:
-
-```
-APDS-9960_CH32V003/            (git repository root)
-  library.json
-  src/
-    apds9960.h
-    apds9960.c
-    apds9960_config.h
-    apds9960_regs.h
-    int_config.h
-    int_config.c
-  examples/
-    basic/
-      main.c                   (demo example, NOT compiled as part of the library)
-```
-
-See `library.json` in the repository root. It already includes the `I2C-CH32V003`
-dependency and excludes `examples/` from library compilation.
-
-If you are creating your **own** library repository — copy the files from `src/`
-and create an analogous `library.json`.
-
-### 5.2. Connecting in the Target Project
-
-```ini
-[env:my_board]
+[env:ch32v003f4p6_evt_r0]
 platform = ch32v
 board = ch32v003f4p6_evt_r0
 framework = noneos-sdk
 lib_deps =
-    https://github.com/tama18101971/APDS-9960_CH32V003.git
+    https://github.com/tama18101971/APDS-9960_CH32V003.git#v1.4.0
+build_flags = -DAPDS_INT_MODE=0
 ```
 
-Or with version pinning (tag/commit/branch):
+`v1.4.0` must exist on GitHub before installation by tag. I2C-CH32V003 v7.2.1 is automatically installed from library.json. Keep one copy of the APDS library and one I2C version; do not compile the repository demo main into your application. Framework/system startup remains the target project's responsibility.
 
-```ini
-lib_deps =
-    https://github.com/tama18101971/APDS-9960_CH32V003.git#v1.0.0
-```
+## Manual copy / shared local library
 
-If you are creating your **own** fork/repository of the library — replace the
-path with your own: `<your_account>/APDS9960_CH32V003.git`.
+Copy the entire `src/` folder to `lib/APDS9960/src/`, or use a local PlatformIO library directory. Required core files:
 
-`I2C-CH32V003` is installed **automatically** — it is declared in the `dependencies`
-field of `library.json`, so there is no need to list it in `lib_deps`.
+- `apds9960.c/h`, `apds9960_config.h`, `apds9960_regs.h`;
+- `apds9960_log.c/h` for the supplied logger/debug support;
+- `int_config.c/h` when using APDS EXTI helpers (optional for pure polling).
 
-`pio run` will clone the repository into `.pio/libdeps/<env>/` on first build.
+When copying without library.json, explicitly add `https://github.com/tama18101971/I2C-CH32V003.git#v7.2.1` to target lib_deps. The supplied logger uses UART1 and requires initialization before any logging. With diagnostic flags off and no logger calls, linker GC removes its unused code. Do not replace it with unconfigured stdio if a no-heap footprint is required.
 
-**Pro:** single source of truth, versioning, works on any machine and in CI.
-**Con:** requires initial setup (git repository + `library.json`).
+## Initialization and service loop
 
-## 6. Minimal Usage Example (after connecting by any method)
+Include `<ch32v00x.h>`, `<debug.h>`, `"i2c.h"`, `"apds9960.h"`; include `"int_config.h"` when using its helpers. Initialize in this order:
 
 ```c
-#include <ch32v00x.h>
-#include <debug.h>
-#include "i2c.h"
-#include "apds9960.h"
-#if APDS_INT_MODE == 1
-#include "int_config.h"
-#endif
-
-int main(void) {
+bool app_sensor_init(void) {
     SystemCoreClockUpdate();
     Delay_Init();
-    USART_Printf_Init(115200);
-
-    uint8_t i2c_st = i2c_init(400000);   /* Fast-mode I2C, sensor and I2C-CH32V003 both support it */
-    if (i2c_st != I2C_OK) {              /* rejected before any sensor access */
-        printf("i2c_init failed (%d)\r\n", i2c_st);
-        while (1) {}
-    }
-
-    if (!apds_init()) {
-        printf("APDS9960 not responding! err=%d i2c=%d\r\n",
-               apds_getLastError(), apds_getLastI2CStatus());
-        while (1) {}
-    }
-
-#if APDS_INT_MODE == 1
-    apds_exti_init();
-    apds_enableInterrupt();
-#endif
-
-    while (1) {
-#if APDS_INT_MODE == 1
-        while (g_apds_int_flag == 0) { __WFI(); }
-        g_apds_int_flag = 0;
-        apds_clearInterrupt();
-#endif
-        if (apds_available()) {
-            gesture_t g = apds_readGesture();
-            switch (g) {
-                case GESTURE_LEFT:  printf("LEFT\r\n");  break;
-                case GESTURE_RIGHT: printf("RIGHT\r\n"); break;
-                case GESTURE_UP:    printf("UP\r\n");    break;
-                case GESTURE_DOWN:  printf("DOWN\r\n");  break;
-                default: break;
-            }
-        }
-    }
+    USART_Printf_Init(115200); /* Required by example/debug logging. */
+    if (i2c_init(400000) != I2C_OK) return false;
+    return apds_init();
 }
 ```
 
-Full working example (both modes, with ISR example) — see `examples/basic/main.c`
-in this repository.
+The caller must handle a false return and must not proceed to sensor use after failed init. For a complete executable including fault handlers/retry behavior, use [examples/basic/main.c](examples/basic/main.c).
 
-## 7. Custom EXTI Handler (multiple EXTI lines)
+Call APIs only from one main context. The ISR sets a byte flag; it never reads I2C. Output pointers are non-NULL. Capture last error before the next API can replace it. `apds_available()==false` with NONE means no ready data. `apds_readGesture()==NONE` can also mean timeout, overflow or I2C fault. Let the driver resynchronize a failed stream; do not decode or flush its tail manually as another gesture.
 
-On CH32V003, all EXTI lines 0-7 share a single vector (`EXTI7_0_IRQHandler`).
-The library provides two options for handling additional EXTI lines:
+The maintained example checks both the flag and active-low physical INT level with bounded polling. It deliberately does not implement CPU sleep; an unprotected `if(flag==0) WFI` can lose a wakeup. Revisit system-level sleep design separately if needed.
 
-### Option A: Override the entire handler
+## Shared EXTI vector
 
-The library defines a **strong** `EXTI7_0_IRQHandler` by default because the
-NoneOS-SDK weak fallback loops forever. If your application must own all EXTI
-lines, add `-DAPDS_PROVIDE_EXTI_ISR=0` to `build_flags`, then define your own
-handler. Use `apds_handle_exti()` to check APDS9960 and `apds_clear_exti()` to
-clear its pending bit:
+All EXTI0..7 lines share EXTI7_0_IRQHandler. Default `APDS_PROVIDE_EXTI_ISR=1` supplies a strong handler overriding the SDK's looping weak fallback. To own the vector, set `-DAPDS_PROVIDE_EXTI_ISR=0` project-wide and implement:
 
 ```c
 #include "int_config.h"
-
 void EXTI7_0_IRQHandler(void) __attribute__((interrupt("WCH-Interrupt-fast")));
 void EXTI7_0_IRQHandler(void) {
-    /* Check APDS9960 — sets g_apds_int_flag, pending bit still active */
     apds_handle_exti();
-
-    /* Check your other EXTI lines while pending bits are still set */
-    if (EXTI_GetITStatus(EXTI_Line5) != RESET) {
-        /* ... handle EXTI5 ... */
-        EXTI_ClearITPendingBit(EXTI_Line5);
-    }
-
-    /* Clear APDS9960 pending bit last */
+    /* Handle and clear any other EXTI0..7 lines here. No I2C calls. */
     apds_clear_exti();
 }
 ```
 
-### Option B: Override the weak callback
+Alternatively, keep the default handler and override the weak `apds_exti_callback()` to service other lines. Callback runs after the APDS pending bit has been cleared. It must clear any other asserted pending sources and stay within the public I2C timing contract. `apds_exti_enable/disable` acts on the whole NVIC vector, not just the sensor line.
 
-If you only need to add logic after the default handling, override `apds_exti_callback()`.
-The default ISR will handle APDS9960 first, then call your callback:
+The repository example supplies a minimal custom handler when the provide-ISR option is0, so that CI configuration is a real link fixture. Your application must still implement its own handler if it disables the library's.
 
-```c
-#include "int_config.h"
+## INT pin relocation
 
-void apds_exti_callback(void) {
-    /* Called after default handler has processed APDS9960 */
-    if (EXTI_GetITStatus(EXTI_Line5) != RESET) {
-        /* ... handle EXTI5 ... */
-        EXTI_ClearITPendingBit(EXTI_Line5);
-    }
-}
-```
-
-### EXTI API functions
-
-| Function | Purpose |
-|----------|---------|
-| `apds_handle_exti()` | Check `APDS_INT_LINE`, set `g_apds_int_flag`. Does NOT clear pending bit. |
-| `apds_clear_exti()` | Clear pending bit for `APDS_INT_LINE`. |
-| `apds_exti_callback()` | Weak callback, called from default `EXTI7_0_IRQHandler`. |
-
-## 8. Pin Connections (same regardless of integration method)
-
-| CH32V003 | APDS9960 | Function |
-|----------|----------|----------|
-| PC1 | SDA | I2C data |
-| PC2 | SCL | I2C clock |
-| PC3 | INT | Gesture interrupt (active-low), only for `APDS_INT_MODE=1` |
-| PD5 | — | UART TX (diagnostics, optional) |
-
-Sensor I2C address: `0x39`.
-
-## 9. Project-Specific Configuration
-
-Configure driver parameters for the **entire build** via `build_flags` in
-`platformio.ini` (e.g. `-DAPDS_INT_MODE=0`). Defining a value in `main.c` before
-`#include "apds9960.h"` affects only that translation unit, not separately
-compiled `apds9960.c`, and is therefore unsupported. Defaults and range checks
-are in `apds9960_config.h`.
-
-Interrupt pin parameters from `int_config.h` are also overridden via `build_flags`:
+Set all six matching parameters together; this default example keeps PC3:
 
 ```ini
 build_flags =
@@ -323,60 +77,33 @@ build_flags =
     -DAPDS_INT_LINE=EXTI_Line3
     -DAPDS_INT_PORT_SOURCE=GPIO_PortSourceGPIOC
     -DAPDS_INT_PIN_SOURCE=GPIO_PinSource3
+    -DAPDS_INT_GPIO_CLOCK=RCC_APB2Periph_GPIOC
 ```
+
+AFIO and selected port clocks are enabled by apds_exti_init. Read the already-low INT level before waiting for a new falling edge. PC1/PC2 remain the I2C library's documented default pins; APDS INT overrides do not remap I2C.
+
+## Shared SysTick and custom delays
+
+With OWN=1, readGesture owns and normalizes SysTick for its call, then stops it. Do not share it concurrently. With OWN=0, the driver uses an iteration budget but default Delay_Ms still resets/reprograms SysTick. To preserve application SysTick:
 
 ```ini
 build_flags =
-    -DAPDS_GAIN=3
-    -DAPDS_LED_CURRENT=0
-    -DAPDS_GGAIN=3
-    -DAPDS_GLDRIVE=0
-    -DAPDS_PROX_THRESHOLD=50
-    -DAPDS_GESTURE_EXIT_TH=30
-    -DAPDS_GESTURE_TIMEOUT_MS=300
-    -DAPDS_GWTIME=1
-    -DAPDS_ENABLE_CALIBRATION=1
-    -DAPDS_INT_MODE=1
-    -DAPDS_GESTURE_SENSITIVITY=5
-    ; -DAPDS9960_DEBUG
+    -DAPDS_OWN_SYSTICK=0
+    -DAPDS_DELAY_MS=app_apds_delay_ms
 ```
 
-The complete list and accepted ranges are in `apds9960_config.h`.
+Link `void app_apds_delay_ms(uint32_t ms)` in application code. It must wait at least the requested duration without touching SysTick. The driver declares the selected external function. This only controls APDS delays; verify timing-resource contracts of all other components independently. Changing CPU/I2C clocks requires the relevant successful reinitialization.
 
-## 10. Resource Budget (consider for new projects)
+## Profiles, faults and migration
 
-On the CH32V003 chip (RAM 2 KB, Flash 16 KB), the driver itself uses approximately:
+All four IDs remain accepted. Default profiles apply only to gesture gain/drive for 0xA8 and 0x9E; they do not alter register addresses or proximity gain/drive. To tune manually, disable the matching profile, then set APDS_GGAIN/APDS_GLDRIVE/LED_BOOST. A profile does not certify every module with that ID. See [README](README.md) for nominal pulse currents and [hardware results](HARDWARE_TEST_RU.md).
 
-- **RAM:** ~21 bytes static + up to ~150 bytes stack at peak (batch FIFO read)
-- **Flash:** ~3.3 KB (`apds9960.o` + `int_config.o` `.text`, without I2C library)
+I2C_ERR_RECOVERY means PE is disabled: fix the physical fault, obtain successful i2c_init, then reinitialize APDS. Repeated SDA-low/ARLO is not a reason to keep retrying forever or classify partial gestures as valid. wakeup restores retained configuration; power-cycling the sensor requires full init.
 
-If the target project already uses a significant portion of Flash/RAM with other
-code — verify the actual budget via `pio run` (output "RAM:" / "Flash:").
+For1.3.x users: corrected GCONF2 and direction signs can change sensitivity/mounting behavior. Preserve error values0..5 while handling added TIMEOUT6 and INVALID_ARG7. Remove post-gesture discard loops. Calibration may succeed by writing fallback thresholds; it does not promise new independent samples in every background condition.
 
-## 11. Compatibility Checklist Before Porting
+## Verification and package boundary
 
-- [ ] Target project uses `platform = ch32v`, `framework = noneos-sdk`
-- [ ] PC1/PC2 (and PC3, if interrupt mode) are free
-- [ ] I2C1 is not occupied by another device at address `0x39`
-- [ ] Enough Flash/RAM available (see section 10)
-- [ ] `lib_deps` with `I2C-CH32V003` added to `platformio.ini`
+Build the target project, inspect actual linked Flash/RAM, and test the first gesture after sleep, timeout, overflow and reinitialization. The measured demo footprint is not your application's total. Full stack including your ISR/callback remains your responsibility.
 
-## 12. Common Porting Issues
-
-| Symptom | Cause | Solution |
-|---------|-------|----------|
-| `multiple definition of 'EXTI7_0_IRQHandler'` | Your project and `int_config.c` both define a strong ISR | Add `-DAPDS_PROVIDE_EXTI_ISR=0`; call `apds_handle_exti()` / `apds_clear_exti()` from your ISR (see section 7). |
-| `apds_init()` returns `false` | Incorrect I2C wiring, or PC1/PC2 occupied by other peripherals | Check pins, use `APDS9960_DEBUG` to print ID |
-| Gestures not detected | Signal too weak / incorrect calibration | Increase `APDS_GAIN` / `APDS_GGAIN`, check lighting (avoid direct sunlight) |
-| Gestures "duplicated" | Old version of `apds9960.c` with artificial `apds_readGesture()` cutoff by iteration count | Ensure the latest driver version from this repository is copied |
-| Build can't find `ch32v00x.h` / `debug.h` | Wrong `framework` / `platform` in target project's `platformio.ini` | See section 2 |
-| Build can't find `i2c.h` | `lib_deps` with `I2C-CH32V003` not added to `platformio.ini` | Add `https://github.com/tama18101971/I2C-CH32V003.git#v7.0.1` to `lib_deps` |
-| `main()` conflict when connecting via `lib_deps` on the entire repository | `main.c` accidentally ended up in the library | Do not copy/include `main.c` in the library repository (see sections 1 and 5.1) |
-
-## 13. Back-Syncing Fixes
-
-If you find a bug or improve the algorithm after porting to another project —
-back-port the fix to this repository (source of truth), then update copies/
-dependencies in other projects using the same method they were connected with
-(Method A — manually copy again, Method B — editing the single folder on disk
-is automatically picked up, Method C — update tag/commit in `lib_deps`).
+The library package excludes examples/tests/logs/editor/CI files. The GitHub repository retains them for reproducibility. Native host regression uses the installed pinned i2c.h and does not test I2C implementation. Original0xAB/alternative 0x9C boards and broad optical conditions were not physically qualified in this release. Version and migration details: [CHANGELOG.md](CHANGELOG.md).
