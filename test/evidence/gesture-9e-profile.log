@@ -1,51 +1,101 @@
-23.19 DEC: ud=2 lr=-9 pkts=11 thr=5
-DEC: motion=1
-LEFT
-24.23 DEC: ud=-1 lr=17 pkts=22 thr=5
-DEC: motion=2
-RIGHT
-34.44 DEC: ud=-5 lr=15 pkts=16 thr=5
-DEC: motion=2
-RIGHT
-37.30 DEC: ud=2 lr=-20 pkts=18 thr=5
-DEC: motion=1
-LEFT
-38.50 DEC: ud=-6 lr=12 pkts=14 thr=5
-DEC: motion=2
-RIGHT
-40.36 DEC: ud=3 lr=-15 pkts=15 thr=5
-DEC: motion=1
-LEFT
-41.80 DEC: ud=-3 lr=21 pkts=20 thr=5
-DEC: motion=2
-RIGHT
-44.83 DEC: ud=0 lr=-9 pkts=8 thr=5
-DEC: motion=1
-LEFT
-45.84 DEC: ud=-2 lr=16 pkts=20 thr=5
-DEC: motion=2
-RIGHT
-48.91 DEC: ud=-18 lr=7 pkts=13 thr=5
-DEC: motion=3
-UP
-50.14 DEC: ud=28 lr=5 pkts=20 thr=5
-DEC: motion=4
-DOWN
-52.22 DEC: ud=-29 lr=2 pkts=27 thr=5
-DEC: motion=3
-UP
-53.47 DEC: ud=30 lr=2 pkts=29 thr=5
-DEC: motion=4
-DOWN
-55.11 DEC: ud=-41 lr=3 pkts=26 thr=5
-DEC: motion=3
-UP
-56.31 DEC: ud=39 lr=-1 pkts=25 thr=5
-DEC: motion=4
-DOWN
-58.17 DEC: ud=-32 lr=-6 pkts=23 thr=5
-DEC: mot58.38 ion=3
-UP
-59.61 DEC: ud=36 lr=8 pkts=22 thr=5
-DEC: motion=4
-DOWN
+23.19 DEC: ud=2 lr=-9 pkts=11 thr=5
+
+DEC: motion=1
+
+LEFT
+
+24.23 DEC: ud=-1 lr=17 pkts=22 thr=5
+
+DEC: motion=2
+
+RIGHT
+
+34.44 DEC: ud=-5 lr=15 pkts=16 thr=5
+
+DEC: motion=2
+
+RIGHT
+
+37.30 DEC: ud=2 lr=-20 pkts=18 thr=5
+
+DEC: motion=1
+
+LEFT
+
+38.50 DEC: ud=-6 lr=12 pkts=14 thr=5
+
+DEC: motion=2
+
+RIGHT
+
+40.36 DEC: ud=3 lr=-15 pkts=15 thr=5
+
+DEC: motion=1
+
+LEFT
+
+41.80 DEC: ud=-3 lr=21 pkts=20 thr=5
+
+DEC: motion=2
+
+RIGHT
+
+44.83 DEC: ud=0 lr=-9 pkts=8 thr=5
+
+DEC: motion=1
+
+LEFT
+
+45.84 DEC: ud=-2 lr=16 pkts=20 thr=5
+
+DEC: motion=2
+
+RIGHT
+
+48.91 DEC: ud=-18 lr=7 pkts=13 thr=5
+
+DEC: motion=3
+
+UP
+
+50.14 DEC: ud=28 lr=5 pkts=20 thr=5
+
+DEC: motion=4
+
+DOWN
+
+52.22 DEC: ud=-29 lr=2 pkts=27 thr=5
+
+DEC: motion=3
+
+UP
+
+53.47 DEC: ud=30 lr=2 pkts=29 thr=5
+
+DEC: motion=4
+
+DOWN
+
+55.11 DEC: ud=-41 lr=3 pkts=26 thr=5
+
+DEC: motion=3
+
+UP
+
+56.31 DEC: ud=39 lr=-1 pkts=25 thr=5
+
+DEC: motion=4
+
+DOWN
+
+58.17 DEC: ud=-32 lr=-6 pkts=23 thr=5
+
+DEC: mot58.38 ion=3
+
+UP
+
+59.61 DEC: ud=36 lr=8 pkts=22 thr=5
+
+DEC: motion=4
+
+DOWN

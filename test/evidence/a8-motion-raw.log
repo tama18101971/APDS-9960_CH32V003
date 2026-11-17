@@ -1,107 +1,213 @@
-RAW 255 255 255 154
-RAW 255 255 255 255
-RAW 255 255 126 255
-RAW 55 16 24 64
-DEC: ud=71 lr=32 pkts=9 thr=5
-DEC: motion=4
-DOWN
-RAW 255 255 255 255
-RAW 255 255 255 255
-RAW 52 12 25 60
-DEC: ud=35 lr=-22 pkts=4 thr=5
-DEC: motion=4
-DOWN
-RAW 255 255 255 255
-RAW 255 255 255 255
-RAW 59 15 24 66
-DEC: ud=69 lr=21 pkts=8 thr=5
-DEC: motion=4
-DOWN
-RAW 255 255 255 255
-RAW 255 255 255 255
-RAW 51 12 24 53
-DEC: ud=34 lr=-19 pkts=5 thr=5
-DEC: motion=4
-DOWN
-RAW 255 255 255 255
-RAW 255 255 255 255
-RAW 255 255 66 255
-RAW 45 7 25 63
-DEC: ud=67 lr=23 pkts=8 thr=5
-DEC: motion=4
-DOWN
-RAW 255 255 255 255
-RAW 255 255 255 255
-RAW 47 7 24 57
-DEC: ud=43 lr=-24 pkts=5 thr=5
-DEC: motion=4
-DOWN
-RAW 255 255 255 255
-RAW 255 255 255 255
-RAW 96 120 24 163
-DEC: ud=68 lr=25 pkts=7 thr=5
-DEC: motion=4
-DOWN
-RAW 255 255 125 255
-RAW 255 255 255 255
-RAW 255 255 163 58
-DEC: ud=0 lr=-3 pkts=4 thr=5
-DEC: no motion (below threshold)
-RAW 255 255 255 255
-RAW 255 255 255 255
-DEC: ud=78 lr=-39 pkts=5 thr=5
-DEC: motion=4
-DOWN
-RAW 122 255 255 255
-RAW 255 255 255 255
-RAW 255 41 255 230
-DEC: ud=-7 lr=-34 pkts=6 thr=5
-DEC: motion=1
-LEFT
-RAW 255 226 255 255
-RAW 255 255 255 255
-RAW 52 8 21 54
-DEC: ud=72 lr=-22 pkts=5 thr=5
-DEC: motion=4
-DOWN
-RAW 255 255 255 255
-RAW 255 255 255 255
-RAW 54 11 18 55
-DEC: ud=-18 lr=-27 pkts=5 thr=5
-DEC: motion=1
-LEFT
-RAW 255 255 255 255
-RAW 255 255 255 255
-DEC: ud=72 lr=-14 pkts=5 thr=5
-DEC: motion=4
-DOWN
-RAW 255 255 255 255
-RAW 255 255 255 255
-RAW 255 30 255 220
-DEC: ud=-11 lr=-27 pkts=6 thr=5
-DEC: motion=1
-LEFT
-RAW 255 223 255 255
-RAW 255 255 255 255
-RAW 255 255 255 255
-DEC: ud=68 lr=-30 pkts=5 thr=5
-DEC: motion=4
-DOWN
-RAW 144 255 255 255
-RAW 255 255 255 255
-RAW 255 255 255 255
-RAW 55 7 19 51
-DEC: ud=-3 lr=-2 pkts=4 thr=5
-DEC: no motion (below threshold)
-RAW 255 255 255 255
-RAW 255 255 255 255
-RAW 51 15 24 56
-DEC: ud=52 lr=-11 pkts=4 thr=5
-DEC: motion=4
-DOWN
-RAW 255 255 255 255
-RAW 255 255 255 255
-RAW 55 8 18 52
-DEC: ud=-17 lr=-23 pkts=6 thr=5
-DEC: motion=1
-LEFT
+RAW 255 255 255 154
+
+RAW 255 255 255 255
+
+RAW 255 255 126 255
+
+RAW 55 16 24 64
+
+DEC: ud=71 lr=32 pkts=9 thr=5
+
+DEC: motion=4
+
+DOWN
+
+RAW 255 255 255 255
+
+RAW 255 255 255 255
+
+RAW 52 12 25 60
+
+DEC: ud=35 lr=-22 pkts=4 thr=5
+
+DEC: motion=4
+
+DOWN
+
+RAW 255 255 255 255
+
+RAW 255 255 255 255
+
+RAW 59 15 24 66
+
+DEC: ud=69 lr=21 pkts=8 thr=5
+
+DEC: motion=4
+
+DOWN
+
+RAW 255 255 255 255
+
+RAW 255 255 255 255
+
+RAW 51 12 24 53
+
+DEC: ud=34 lr=-19 pkts=5 thr=5
+
+DEC: motion=4
+
+DOWN
+
+RAW 255 255 255 255
+
+RAW 255 255 255 255
+
+RAW 255 255 66 255
+
+RAW 45 7 25 63
+
+DEC: ud=67 lr=23 pkts=8 thr=5
+
+DEC: motion=4
+
+DOWN
+
+RAW 255 255 255 255
+
+RAW 255 255 255 255
+
+RAW 47 7 24 57
+
+DEC: ud=43 lr=-24 pkts=5 thr=5
+
+DEC: motion=4
+
+DOWN
+
+RAW 255 255 255 255
+
+RAW 255 255 255 255
+
+RAW 96 120 24 163
+
+DEC: ud=68 lr=25 pkts=7 thr=5
+
+DEC: motion=4
+
+DOWN
+
+RAW 255 255 125 255
+
+RAW 255 255 255 255
+
+RAW 255 255 163 58
+
+DEC: ud=0 lr=-3 pkts=4 thr=5
+
+DEC: no motion (below threshold)
+
+RAW 255 255 255 255
+
+RAW 255 255 255 255
+
+DEC: ud=78 lr=-39 pkts=5 thr=5
+
+DEC: motion=4
+
+DOWN
+
+RAW 122 255 255 255
+
+RAW 255 255 255 255
+
+RAW 255 41 255 230
+
+DEC: ud=-7 lr=-34 pkts=6 thr=5
+
+DEC: motion=1
+
+LEFT
+
+RAW 255 226 255 255
+
+RAW 255 255 255 255
+
+RAW 52 8 21 54
+
+DEC: ud=72 lr=-22 pkts=5 thr=5
+
+DEC: motion=4
+
+DOWN
+
+RAW 255 255 255 255
+
+RAW 255 255 255 255
+
+RAW 54 11 18 55
+
+DEC: ud=-18 lr=-27 pkts=5 thr=5
+
+DEC: motion=1
+
+LEFT
+
+RAW 255 255 255 255
+
+RAW 255 255 255 255
+
+DEC: ud=72 lr=-14 pkts=5 thr=5
+
+DEC: motion=4
+
+DOWN
+
+RAW 255 255 255 255
+
+RAW 255 255 255 255
+
+RAW 255 30 255 220
+
+DEC: ud=-11 lr=-27 pkts=6 thr=5
+
+DEC: motion=1
+
+LEFT
+
+RAW 255 223 255 255
+
+RAW 255 255 255 255
+
+RAW 255 255 255 255
+
+DEC: ud=68 lr=-30 pkts=5 thr=5
+
+DEC: motion=4
+
+DOWN
+
+RAW 144 255 255 255
+
+RAW 255 255 255 255
+
+RAW 255 255 255 255
+
+RAW 55 7 19 51
+
+DEC: ud=-3 lr=-2 pkts=4 thr=5
+
+DEC: no motion (below threshold)
+
+RAW 255 255 255 255
+
+RAW 255 255 255 255
+
+RAW 51 15 24 56
+
+DEC: ud=52 lr=-11 pkts=4 thr=5
+
+DEC: motion=4
+
+DOWN
+
+RAW 255 255 255 255
+
+RAW 255 255 255 255
+
+RAW 55 8 18 52
+
+DEC: ud=-17 lr=-23 pkts=6 thr=5
+
+DEC: motion=1
+
+LEFT

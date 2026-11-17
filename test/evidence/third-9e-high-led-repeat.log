@@ -365,4 +365,3 @@ Sensor recovered.
 BUS reg=AF status=5
 
 SENSOR HANG (i2c=5), re-init...
-

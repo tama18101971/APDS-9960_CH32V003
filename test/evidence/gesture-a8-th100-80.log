@@ -1,27 +1,53 @@
-21.12 DEC: too few packets (2)
-24.23 DEC: too few packets (3)
-25.89 DEC: ud=21 lr=1 pkts=4 thr=5
-DEC: motion=4
-DOWN
-27.36 DEC: too few packets (3)
-28.78 DEC: ud=58 lr=3 pkts=7 thr=5
-DEC: motion=4
-DOWN
-30.00 DEC: too few packets (2)
-31.44 DEC: ud=17 lr=7 pkts=5 thr=5
-DEC: motion=4
-DOWN
-32.89 DEC: too few packets (3)
-34.11 DEC: ud=40 lr=16 pkts=8 thr=5
-DEC: motion=4
-DOWN
-39.83 DEC: too few packets (3)
-41.03 DEC: too few packets (3)
-42.66 DEC: too few packets (3)
-43.89 DEC: too few packets (2)
-45.34 DEC: too few packets (3)
-46.55 DEC: too few packets (3)
-47.98 DEC: too few packets (3)
-48.98 DEC: too few packets (2)
-50.42 DEC: too few packets (3)
-51.44 DEC: too few packets (1)
+21.12 DEC: too few packets (2)
+
+24.23 DEC: too few packets (3)
+
+25.89 DEC: ud=21 lr=1 pkts=4 thr=5
+
+DEC: motion=4
+
+DOWN
+
+27.36 DEC: too few packets (3)
+
+28.78 DEC: ud=58 lr=3 pkts=7 thr=5
+
+DEC: motion=4
+
+DOWN
+
+30.00 DEC: too few packets (2)
+
+31.44 DEC: ud=17 lr=7 pkts=5 thr=5
+
+DEC: motion=4
+
+DOWN
+
+32.89 DEC: too few packets (3)
+
+34.11 DEC: ud=40 lr=16 pkts=8 thr=5
+
+DEC: motion=4
+
+DOWN
+
+39.83 DEC: too few packets (3)
+
+41.03 DEC: too few packets (3)
+
+42.66 DEC: too few packets (3)
+
+43.89 DEC: too few packets (2)
+
+45.34 DEC: too few packets (3)
+
+46.55 DEC: too few packets (3)
+
+47.98 DEC: too few packets (3)
+
+48.98 DEC: too few packets (2)
+
+50.42 DEC: too few packets (3)
+
+51.44 DEC: too few packets (1)

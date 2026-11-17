@@ -171,4 +171,3 @@ CAL: FAIL (saturated, valid=10) using defaults gpenth=50 gexth=30
 Sensor recovered.
 
 SENSOR HANG (i2c=5), re-init...
-

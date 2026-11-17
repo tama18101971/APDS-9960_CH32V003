@@ -1,4 +1,7 @@
-APDS9960 gesture driver init...
-CHIP ID=0xA8
-Mode: INTERRUPT (INT=PC3)
-APDS9960 ready.
+APDS9960 gesture driver init...
+
+CHIP ID=0xA8
+
+Mode: INTERRUPT (INT=PC3)
+
+APDS9960 ready.

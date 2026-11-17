@@ -7,4 +7,3 @@ ERROR: APDS9960 not responding! err=1 i2c=5
 Scanning I2C bus...
 
   device found at 0x39
-

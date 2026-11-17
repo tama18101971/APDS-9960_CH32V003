@@ -1,121 +1,241 @@
-RAW 53 53 120 22
-RAW 239 217 210 232
-RAW 17 22 3 29
-DEC: ud=-13 lr=-129 pkts=11 thr=5
-DEC: motion=1
-LEFT
-RAW 106 99 87 136
-RAW 255 249 255 255
-RAW 223 193 255 131
-DEC: ud=22 lr=131 pkts=17 thr=5
-DEC: motion=2
-RIGHT
-RAW 114 106 162 81
-RAW 196 165 176 181
-RAW 26 28 9 39
-DEC: ud=-8 lr=-132 pkts=21 thr=5
-DEC: motion=1
-LEFT
-RAW 91 87 74 118
-RAW 234 202 232 214
-RAW 164 139 198 73
-DEC: ud=20 lr=134 pkts=20 thr=5
-DEC: motion=2
-RIGHT
-RAW 201 184 255 155
-RAW 255 233 252 254
-RAW 57 72 38 76
-DEC: ud=-42 lr=-108 pkts=15 thr=5
-DEC: motion=1
-LEFT
-RAW 33 53 32 62
-RAW 255 220 245 253
-RAW 255 255 255 255
-DEC: ud=40 lr=122 pkts=14 thr=5
-DEC: motion=2
-RIGHT
-RAW 14 9 39 4
-RAW 255 255 255 255
-RAW 255 255 255 255
-RAW 36 59 32 57
-DEC: ud=-44 lr=-123 pkts=13 thr=5
-DEC: motion=1
-LEFT
-RAW 33 51 33 55
-RAW 230 211 210 255
-RAW 255 255 255 255
-RAW 57 39 61 4
-DEC: ud=52 lr=123 pkts=15 thr=5
-DEC: motion=2
-RIGHT
-RAW 188 162 218 155
-RAW 158 148 141 160
-RAW 39 53 26 53
-DEC: ud=-43 lr=-115 pkts=27 thr=5
-DEC: motion=1
-LEFT
-RAW 35 53 32 57
-RAW 222 200 207 240
-RAW 255 255 255 255
-DEC: ud=54 lr=91 pkts=15 thr=5
-DEC: motion=2
-RIGHT
-RAW 67 6 58 45
-RAW 255 255 255 255
-RAW 0 4 2 2
-DEC: ud=-121 lr=29 pkts=5 thr=5
-DEC: motion=3
-UP
-RAW 255 254 255 233
-RAW 248 139 201 166
-DEC: ud=140 lr=-14 pkts=11 thr=5
-DEC: motion=4
-DOWN
-RAW 64 6 51 34
-RAW 255 255 255 255
-RAW 255 255 255 249
-DEC: ud=-142 lr=3 pkts=10 thr=5
-DEC: motion=3
-UP
-RAW 74 138 154 94
-RAW 255 255 255 255
-RAW 255 146 229 188
-DEC: ud=145 lr=-10 pkts=9 thr=5
-DEC: motion=4
-DOWN
-RAW 165 26 140 102
-RAW 255 255 255 255
-RAW 222 255 255 176
-DEC: ud=-148 lr=5 pkts=8 thr=5
-DEC: motion=3
-UP
-RAW 113 205 234 145
-RAW 255 255 255 255
-RAW 255 255 255 255
-DEC: ud=147 lr=-28 pkts=7 thr=5
-DEC: motion=4
-DOWN
-RAW 104 9 86 59
-RAW 255 255 255 255
-RAW 255 255 255 255
-DEC: ud=-146 lr=9 pkts=5 thr=5
-DEC: motion=3
-UP
-RAW 130 208 232 148
-RAW 255 255 255 255
-RAW 217 97 165 129
-DEC: ud=136 lr=-19 pkts=9 thr=5
-DEC: motion=4
-DOWN
-RAW 255 110 255 255
-RAW 255 255 255 255
-RAW 241 255 255 184
-DEC: ud=-141 lr=27 pkts=4 thr=5
-DEC: motion=3
-UP
-RAW 255 255 255 255
-RAW 255 255 255 255
-RAW 20 0 10 7
-DEC: ud=142 lr=-5 pkts=5 thr=5
-DEC: motion=4
-DOWN
+RAW 53 53 120 22
+
+RAW 239 217 210 232
+
+RAW 17 22 3 29
+
+DEC: ud=-13 lr=-129 pkts=11 thr=5
+
+DEC: motion=1
+
+LEFT
+
+RAW 106 99 87 136
+
+RAW 255 249 255 255
+
+RAW 223 193 255 131
+
+DEC: ud=22 lr=131 pkts=17 thr=5
+
+DEC: motion=2
+
+RIGHT
+
+RAW 114 106 162 81
+
+RAW 196 165 176 181
+
+RAW 26 28 9 39
+
+DEC: ud=-8 lr=-132 pkts=21 thr=5
+
+DEC: motion=1
+
+LEFT
+
+RAW 91 87 74 118
+
+RAW 234 202 232 214
+
+RAW 164 139 198 73
+
+DEC: ud=20 lr=134 pkts=20 thr=5
+
+DEC: motion=2
+
+RIGHT
+
+RAW 201 184 255 155
+
+RAW 255 233 252 254
+
+RAW 57 72 38 76
+
+DEC: ud=-42 lr=-108 pkts=15 thr=5
+
+DEC: motion=1
+
+LEFT
+
+RAW 33 53 32 62
+
+RAW 255 220 245 253
+
+RAW 255 255 255 255
+
+DEC: ud=40 lr=122 pkts=14 thr=5
+
+DEC: motion=2
+
+RIGHT
+
+RAW 14 9 39 4
+
+RAW 255 255 255 255
+
+RAW 255 255 255 255
+
+RAW 36 59 32 57
+
+DEC: ud=-44 lr=-123 pkts=13 thr=5
+
+DEC: motion=1
+
+LEFT
+
+RAW 33 51 33 55
+
+RAW 230 211 210 255
+
+RAW 255 255 255 255
+
+RAW 57 39 61 4
+
+DEC: ud=52 lr=123 pkts=15 thr=5
+
+DEC: motion=2
+
+RIGHT
+
+RAW 188 162 218 155
+
+RAW 158 148 141 160
+
+RAW 39 53 26 53
+
+DEC: ud=-43 lr=-115 pkts=27 thr=5
+
+DEC: motion=1
+
+LEFT
+
+RAW 35 53 32 57
+
+RAW 222 200 207 240
+
+RAW 255 255 255 255
+
+DEC: ud=54 lr=91 pkts=15 thr=5
+
+DEC: motion=2
+
+RIGHT
+
+RAW 67 6 58 45
+
+RAW 255 255 255 255
+
+RAW 0 4 2 2
+
+DEC: ud=-121 lr=29 pkts=5 thr=5
+
+DEC: motion=3
+
+UP
+
+RAW 255 254 255 233
+
+RAW 248 139 201 166
+
+DEC: ud=140 lr=-14 pkts=11 thr=5
+
+DEC: motion=4
+
+DOWN
+
+RAW 64 6 51 34
+
+RAW 255 255 255 255
+
+RAW 255 255 255 249
+
+DEC: ud=-142 lr=3 pkts=10 thr=5
+
+DEC: motion=3
+
+UP
+
+RAW 74 138 154 94
+
+RAW 255 255 255 255
+
+RAW 255 146 229 188
+
+DEC: ud=145 lr=-10 pkts=9 thr=5
+
+DEC: motion=4
+
+DOWN
+
+RAW 165 26 140 102
+
+RAW 255 255 255 255
+
+RAW 222 255 255 176
+
+DEC: ud=-148 lr=5 pkts=8 thr=5
+
+DEC: motion=3
+
+UP
+
+RAW 113 205 234 145
+
+RAW 255 255 255 255
+
+RAW 255 255 255 255
+
+DEC: ud=147 lr=-28 pkts=7 thr=5
+
+DEC: motion=4
+
+DOWN
+
+RAW 104 9 86 59
+
+RAW 255 255 255 255
+
+RAW 255 255 255 255
+
+DEC: ud=-146 lr=9 pkts=5 thr=5
+
+DEC: motion=3
+
+UP
+
+RAW 130 208 232 148
+
+RAW 255 255 255 255
+
+RAW 217 97 165 129
+
+DEC: ud=136 lr=-19 pkts=9 thr=5
+
+DEC: motion=4
+
+DOWN
+
+RAW 255 110 255 255
+
+RAW 255 255 255 255
+
+RAW 241 255 255 184
+
+DEC: ud=-141 lr=27 pkts=4 thr=5
+
+DEC: motion=3
+
+UP
+
+RAW 255 255 255 255
+
+RAW 255 255 255 255
+
+RAW 20 0 10 7
+
+DEC: ud=142 lr=-5 pkts=5 thr=5
+
+DEC: motion=4
+
+DOWN
