@@ -407,6 +407,15 @@ static uint8_t  g_ring_idx;
 static uint8_t  g_packet_count;
 
 static gesture_t g_motion;
+static uint8_t g_rotation_quarters;
+
+/* Columns follow gesture_t from GESTURE_LEFT through GESTURE_DOWN. */
+static const uint8_t gesture_rotation[4][4] = {
+    {GESTURE_LEFT,  GESTURE_RIGHT, GESTURE_UP,    GESTURE_DOWN},
+    {GESTURE_UP,    GESTURE_DOWN,  GESTURE_RIGHT, GESTURE_LEFT},
+    {GESTURE_RIGHT, GESTURE_LEFT,  GESTURE_DOWN,  GESTURE_UP},
+    {GESTURE_DOWN,  GESTURE_UP,    GESTURE_LEFT,  GESTURE_RIGHT},
+};
 
 /* g_reinit_count — Счётчик последовательных переинициализаций.
  * Сбрасывается при успешном чтении GSTATUS.
@@ -567,6 +576,7 @@ static bool decode_gesture(void) {
     } else {
         g_motion = (lr_delta > 0) ? GESTURE_RIGHT : GESTURE_LEFT;
     }
+    g_motion = (gesture_t)gesture_rotation[g_rotation_quarters][g_motion - GESTURE_LEFT];
 #ifdef APDS9960_DEBUG
     apds_log("DEC: motion=%d\r\n", g_motion);
 #endif
@@ -918,6 +928,24 @@ gesture_t apds_readGesture(void) {
     g_discard_pending = 1;
     g_last_error = APDS_ERR_TIMEOUT;
     return gesture_finish(GESTURE_NONE);
+}
+
+bool apds_setRotation(uint16_t degrees) {
+    switch (degrees) {
+        case 0:   g_rotation_quarters = 0; break;
+        case 90:  g_rotation_quarters = 1; break;
+        case 180: g_rotation_quarters = 2; break;
+        case 270: g_rotation_quarters = 3; break;
+        default:
+            g_last_error = APDS_ERR_INVALID_ARG;
+            return false;
+    }
+    g_last_error = APDS_ERR_NONE;
+    return true;
+}
+
+uint16_t apds_getRotation(void) {
+    return (uint16_t)(g_rotation_quarters * 90u);
 }
 
 bool apds_readProximity(uint8_t *value) {

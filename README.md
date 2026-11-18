@@ -76,7 +76,8 @@ These are board measurements and software tuning profiles, not alternate registe
 |---|---|
 | `apds_init()` | Check any supported ID, configure engines/FIFO, calibrate if enabled. `true` includes successful fallback threshold writes. |
 | `apds_available()` | Check GSTATUS, resynchronize after an aborted stream, recover overflow. `false` can mean no data or error; inspect last error immediately. |
-| `apds_readGesture()` | Blocking read returning a `gesture_t`; I2C fault, overflow and deadline do not decode partial data. |
+| `apds_readGesture()` | Blocking read returning a `gesture_t` in the configured orientation. I2C faults, overflow and timeouts discard partial gestures. |
+| `apds_setRotation(degrees)` / `apds_getRotation()` | Set or read the mounting angle in degrees at runtime. |
 | `apds_readProximity(uint8_t*)` | Raw PDATA read; does not guarantee a fresh conversion. |
 | `apds_readStatus(uint8_t*)` | Raw STATUS read. |
 | `apds_sleep()` | ENABLE=PON only; roughly 38 uA nominal sensor state, not a measured board value. |

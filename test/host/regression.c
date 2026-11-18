@@ -111,6 +111,45 @@ static void test_fifo_math(void) {
  uint8_t a[]={255,0,128,1,200,2};sort_u8(a,6);for(unsigned i=1;i<6;i++)CHECK(a[i-1]<=a[i]);
 #endif
 }
+static void test_rotation(void) {
+ const uint16_t degrees[] = {0, 90, 180, 270};
+ const gesture_t expected[][4] = {
+   {GESTURE_UP, GESTURE_RIGHT, GESTURE_DOWN, GESTURE_LEFT},
+   {GESTURE_RIGHT, GESTURE_DOWN, GESTURE_LEFT, GESTURE_UP},
+   {GESTURE_DOWN, GESTURE_LEFT, GESTURE_UP, GESTURE_RIGHT},
+   {GESTURE_LEFT, GESTURE_UP, GESTURE_RIGHT, GESTURE_DOWN},
+ };
+ reset_model();
+ CHECK(apds_getRotation() == 0);
+ for (unsigned i = 0; i < 4; ++i) {
+   CHECK(apds_setRotation(degrees[i]));
+   CHECK(apds_getRotation() == degrees[i]);
+   reset_model();
+   load_axis(8, 0, -1); CHECK(apds_readGesture() == expected[i][0]);
+   load_axis(8, 2,  1); CHECK(apds_readGesture() == expected[i][1]);
+   load_axis(8, 0,  1); CHECK(apds_readGesture() == expected[i][2]);
+   load_axis(8, 2, -1); CHECK(apds_readGesture() == expected[i][3]);
+   CHECK(apds_readGesture() == GESTURE_NONE);
+ }
+ CHECK(!apds_setRotation(45));
+ CHECK(!apds_setRotation(360));
+ CHECK(apds_getLastError() == APDS_ERR_INVALID_ARG);
+ CHECK(apds_getRotation() == 270);
+ CHECK(apds_init());
+ CHECK(apds_getRotation() == 270);
+ CHECK(apds_shutdown());
+ CHECK(apds_wakeup());
+ CHECK(!apds_available());
+ CHECK(apds_getRotation() == 270);
+ regs[REG_GSTATUS] = GST_GFOV;
+ CHECK(!apds_available());
+ CHECK(apds_getLastError() == APDS_ERR_FIFO_OVERFLOW);
+ CHECK(apds_getRotation() == 270);
+ load_axis(8, 0, 1);
+ CHECK(apds_readGesture() == GESTURE_RIGHT);
+ CHECK(apds_setRotation(0));
+}
+
 static void reproduce(void) {
 #if APDS_CLONE_A8_PROFILE
  reset_model();regs[REG_ID]=0xA8;CHECK(apds_init());CHECK(regs[REG_GCONF2]==((1u<<5)|(2u<<3)|APDS_GWTIME));
@@ -134,4 +173,4 @@ static void reproduce(void) {
 #endif
 }
 
-int main(void){test_api();test_fifo_math();reproduce();printf("RESULT checks=%u reproduced=%u harness_failures=%u own=%d cal=%d max=%d\n",checks,observations,failures,APDS_OWN_SYSTICK,APDS_ENABLE_CALIBRATION,APDS_CAL_PROX_MAX);return failures?1:0;}
+int main(void){test_api();test_fifo_math();test_rotation();reproduce();printf("RESULT checks=%u reproduced=%u harness_failures=%u own=%d cal=%d max=%d\n",checks,observations,failures,APDS_OWN_SYSTICK,APDS_ENABLE_CALIBRATION,APDS_CAL_PROX_MAX);return failures?1:0;}

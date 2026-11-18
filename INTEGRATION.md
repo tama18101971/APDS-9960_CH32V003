@@ -44,6 +44,13 @@ bool app_sensor_init(void) {
 
 The caller must handle a false return and must not proceed to sensor use after failed init. For a complete executable including fault handlers/retry behavior, use [examples/basic/main.c](examples/basic/main.c).
 
+Set the mounting angle with `apds_setRotation(degrees)`, using 0, 90, 180
+or 270 degrees. Look at the sensor from its optical face. At 0° the IR LED
+is on the left and pin 1 is at the upper right. Positive angles rotate
+clockwise from that position. `apds_readGesture()` returns the direction
+as seen by the observer. The angle survives sensor reinitialization and
+defaults to 0° at MCU reset. [APDS-9960 datasheet, Figure 11](https://cdn.sparkfun.com/assets/learn_tutorials/3/2/1/Avago-APDS-9960-datasheet.pdf#page=17)
+
 Call APIs only from one main context. The ISR sets a byte flag; it never reads I2C. Output pointers are non-NULL. Capture last error before the next API can replace it. `apds_available()==false` with NONE means no ready data. `apds_readGesture()==NONE` can also mean timeout, overflow or I2C fault. Let the driver resynchronize a failed stream; do not decode or flush its tail manually as another gesture.
 
 The maintained example checks both the flag and active-low physical INT level with bounded polling. It deliberately does not implement CPU sleep; an unprotected `if(flag==0) WFI` can lose a wakeup. Revisit system-level sleep design separately if needed.

@@ -103,6 +103,16 @@ bool apds_available(void);
  * Возвращает: gesture_t — тип жеста или GESTURE_NONE */
 gesture_t apds_readGesture(void);
 
+/* Set the clockwise rotation of the mounted sensor as seen from its optical
+ * face. 0 is the APDS-9960 datasheet Figure 11 orientation (IR LED on the left,
+ * pin 1 on the upper right). Valid values are 0, 90, 180 and 270 degrees.
+ * The next apds_readGesture() returns directions in the observer's frame.
+ * The setting defaults to 0 after MCU reset and survives sensor reinitialization.
+ * An invalid value returns false with APDS_ERR_INVALID_ARG.
+ */
+bool apds_setRotation(uint16_t degrees);
+uint16_t apds_getRotation(void);
+
 /* Чтение текущего значения proximity-канала (0-255).
  * value должен быть non-NULL; NULL даёт APDS_ERR_INVALID_ARG.
  * Возвращает: true если чтение успешно; свежесть конверсии не гарантируется. */

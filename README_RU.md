@@ -76,7 +76,8 @@ if (apds_available()) {
 |---|---|
 | `apds_init()` | Проверка разрешённого ID, конфигурация engines/FIFO, калибровка при включённой опции. Успех включает успешную запись fallback-порогов. |
 | `apds_available()` | GSTATUS, восстановление границы потока после обрыва, recovery overflow. `false` означает отсутствие данных либо ошибку — немедленно читайте last error. |
-| `apds_readGesture()` | Блокирующее чтение `gesture_t`; I2C fault, overflow и deadline не декодируют частичный поток. |
+| `apds_readGesture()` | Блокирующее чтение `gesture_t` с учётом ориентации. При ошибке I²C, переполнении или тайм-ауте частичный жест отбрасывается. |
+| `apds_setRotation(degrees)` / `apds_getRotation()` | Установка и чтение угла монтажа в градусах во время работы. |
 | `apds_readProximity(uint8_t*)` | Сырой PDATA; свежая конверсия не гарантируется. |
 | `apds_readStatus(uint8_t*)` | Сырой STATUS. |
 | `apds_sleep()` | ENABLE=PON; около 38 мкА номинально для состояния сенсора, не измеренный ток модуля. |

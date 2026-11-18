@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Add runtime mounting rotation for four-direction gesture results, with 0°
+  matching the sensor orientation in the APDS-9960 datasheet.
+
 ## 1.4.0 — 2026-11-17
 
 ### Fixed
