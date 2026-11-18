@@ -12,13 +12,13 @@ using System.Windows.Forms;
 internal sealed class GestureTerminal : Form
 {
     private static readonly Regex StateLine = new Regex(
-        @"^STATE v=1 addr=([0-9A-F]{8}) ack=(\d+) run=([01]) int=([01]) irq=(\d+) err=(\d+) raw=(\d+)$");
+        @"^STATE v=2 addr=([0-9A-F]{8}) ack=(\d+) run=([01]) int=([01]) rot=(0|90|180|270) irq=(\d+) err=(\d+) raw=(\d+)$");
     private static readonly Regex GestureLine = new Regex(
         @"^GESTURE (LEFT|RIGHT|UP|DOWN) source=(POLL|EXTI|PIN)$");
     private static readonly Dictionary<string, string> Directions =
         new Dictionary<string, string> {
-            { "UP", "← Влево" }, { "DOWN", "→ Вправо" },
-            { "RIGHT", "↑ Вверх" }, { "LEFT", "↓ Вниз" }
+            { "UP", "↑ Вверх" }, { "DOWN", "↓ Вниз" },
+            { "RIGHT", "→ Вправо" }, { "LEFT", "← Влево" }
         };
 
     private readonly SerialPort port;
@@ -28,6 +28,10 @@ internal sealed class GestureTerminal : Form
     private readonly Button stopButton = new Button { Text = "Остановить тест", AutoSize = true };
     private readonly CheckBox interruptBox = new CheckBox {
         Text = "Прерывания (INT → PC3)", AutoSize = true, Margin = new Padding(18, 8, 0, 0)
+    };
+    private readonly ComboBox rotationBox = new ComboBox {
+        DropDownStyle = ComboBoxStyle.DropDownList, Width = 75, AccessibleName = "Поворот датчика",
+        AccessibleDescription = "По часовой стрелке при взгляде со стороны оптики"
     };
     private readonly Label status = new Label { AutoSize = true, Padding = new Padding(3, 7, 0, 10) };
     private readonly RichTextBox journal = new RichTextBox {
@@ -42,10 +46,12 @@ internal sealed class GestureTerminal : Form
     private string input = "";
     private long lastState = -60000;
     private bool busy;
-    private bool updatingBox;
+    private bool updatingControls;
     private bool connected;
     private bool running;
     private bool interrupt;
+    private int rotation;
+    private bool rotationNeedsSync;
     private uint ack;
     private string edges = "0";
     private string error = "0";
@@ -77,7 +83,7 @@ internal sealed class GestureTerminal : Form
         Text = "APDS-9960 — терминал жестов";
         Font = new Font("Segoe UI", 10F);
         ClientSize = new Size(736, 456);
-        MinimumSize = new Size(568, 310);
+        MinimumSize = new Size(640, 310);
         StartPosition = FormStartPosition.CenterScreen;
         var layout = new TableLayoutPanel {
             Dock = DockStyle.Fill, ColumnCount = 1, RowCount = 3, Padding = new Padding(16)
@@ -86,24 +92,39 @@ internal sealed class GestureTerminal : Form
         layout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         layout.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
         var toolbar = new FlowLayoutPanel { AutoSize = true, Dock = DockStyle.Fill, WrapContents = false };
-        toolbar.Controls.AddRange(new Control[] { startButton, stopButton, interruptBox });
+        var rotationLabel = new Label {
+            Text = "Поворот", AutoSize = true, Margin = new Padding(18, 8, 0, 0)
+        };
+        rotationBox.Items.AddRange(new object[] { "0°", "90°", "180°", "270°" });
+        rotationBox.SelectedIndex = 0;
+        toolbar.Controls.AddRange(new Control[] {
+            startButton, stopButton, interruptBox, rotationLabel, rotationBox
+        });
         layout.Controls.Add(toolbar, 0, 0);
         layout.Controls.Add(status, 0, 1);
         layout.Controls.Add(journal, 0, 2);
         Controls.Add(layout);
 
         Shown += async (sender, args) => await Connect();
-        startButton.Click += async (sender, args) => await Apply(true, interrupt);
-        stopButton.Click += async (sender, args) => await Apply(false, interrupt);
+        startButton.Click += async (sender, args) => await Apply(true, interrupt, rotation);
+        stopButton.Click += async (sender, args) => await Apply(false, interrupt, rotation);
         interruptBox.CheckedChanged += async (sender, args) => {
-            if (!updatingBox) { await Apply(running, interruptBox.Checked); }
+            if (!updatingControls) { await Apply(running, interruptBox.Checked, rotation); }
         };
+        rotationBox.SelectionChangeCommitted += async (sender, args) => {
+            int index = rotationBox.SelectedIndex;
+            if (index < 0 || index * 90 == rotation) { return; }
+            // Let the native drop-down finish handling the click or key press.
+            await Task.Yield();
+            await Apply(running, interrupt, index * 90);
+        };
+        rotationBox.DropDownClosed += (sender, args) => rotationNeedsSync = true;
         timer.Tick += (sender, args) => Receive();
         FormClosing += async (sender, args) => {
             if (busy || (Present && running))
             {
                 args.Cancel = true;
-                if (!busy && await Apply(false, interrupt)) { Close(); }
+                if (!busy && await Apply(false, interrupt, rotation)) { Close(); }
             }
         };
         FormClosed += (sender, args) => {
@@ -169,15 +190,21 @@ internal sealed class GestureTerminal : Form
         return RunTool(wlink, "--chip CH32V003 sdi-print enable");
     }
 
-    private async Task<bool> Apply(bool run, bool useInterrupt)
+    private async Task<bool> Apply(bool run, bool useInterrupt, int degrees)
     {
-        if (!Present || busy) { UpdateControls(); return false; }
+        if (!Present || busy)
+        {
+            rotationNeedsSync = true;
+            UpdateControls();
+            return false;
+        }
         busy = true;
         operation = "Применяю команду";
         pendingTag = (ack % 65535) + 1;
         confirmation = new TaskCompletionSource<bool>();
         Task<bool> reply = confirmation.Task;
         uint command = 0xA5000000u | (pendingTag << 8) |
+                       ((uint)(degrees / 90) << 2) |
                        (run ? 1u : 0u) | (useInterrupt ? 2u : 0u);
         UpdateControls();
         try
@@ -199,12 +226,12 @@ internal sealed class GestureTerminal : Form
             {
                 throw new TimeoutException("Прошивка не подтвердила команду.");
             }
-            if (error != "0" || running != run || interrupt != useInterrupt)
+            if (error != "0" || running != run || interrupt != useInterrupt || rotation != degrees)
             {
                 throw new InvalidOperationException(String.Format(
                     "Команда не выполнена. Ошибка драйвера {0}, I²C {1}.", error, rawError));
             }
-            string mode = useInterrupt ? "прерывания PC3" : "опрос";
+            string mode = (useInterrupt ? "прерывания PC3" : "опрос") + " · поворот " + rotation + "°";
             Append(run ? "Тест идёт · " + mode : "Тест остановлен · режим " + mode);
             return true;
         }
@@ -217,6 +244,7 @@ internal sealed class GestureTerminal : Form
         {
             confirmation = null;
             busy = false;
+            rotationNeedsSync = true;
             UpdateControls();
         }
     }
@@ -261,9 +289,15 @@ internal sealed class GestureTerminal : Form
             ack = tag;
             running = state.Groups[3].Value == "1";
             interrupt = state.Groups[4].Value == "1";
-            edges = state.Groups[5].Value;
-            error = state.Groups[6].Value;
-            rawError = state.Groups[7].Value;
+            int reportedRotation = Int32.Parse(state.Groups[5].Value, CultureInfo.InvariantCulture);
+            if (rotation != reportedRotation)
+            {
+                rotation = reportedRotation;
+                rotationNeedsSync = true;
+            }
+            edges = state.Groups[6].Value;
+            error = state.Groups[7].Value;
+            rawError = state.Groups[8].Value;
             if (ack == pendingTag && confirmation != null) { confirmation.TrySetResult(true); }
             return;
         }
@@ -287,11 +321,17 @@ internal sealed class GestureTerminal : Form
         startButton.Enabled = available && !running;
         stopButton.Enabled = available && running;
         interruptBox.Enabled = available;
+        rotationBox.Enabled = available;
         if (!busy)
         {
-            updatingBox = true;
+            updatingControls = true;
             interruptBox.Checked = interrupt;
-            updatingBox = false;
+            updatingControls = false;
+        }
+        if (!busy && rotationNeedsSync && !rotationBox.DroppedDown)
+        {
+            rotationBox.SelectedIndex = rotation / 90;
+            rotationNeedsSync = false;
         }
         string state = busy || !connected ? operation :
             !Present ? "Нет ответа прошивки терминала" : running ? "Тест идёт" : "Тест остановлен";

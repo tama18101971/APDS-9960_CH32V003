@@ -9,10 +9,11 @@
 
 #define I2C_HZ 100000u
 #define COMMAND_MAGIC 0xA5000000u
-#define COMMAND_MASK 0xFF0000FCu
+#define COMMAND_MASK 0xFF0000F0u
 
 /* One aligned SRAM word written by WCH-Link over SDI. Bits 8–23 are the
- * command ID, bit 0 starts the test, bit 1 selects hardware interrupts. */
+ * command ID, bit 0 starts the test, bit 1 selects hardware interrupts,
+ * and bits 2–3 give the rotation in clockwise quarter turns. */
 volatile uint32_t apds_terminal_command;
 
 static volatile uint32_t s_edges;
@@ -34,10 +35,10 @@ void apds_exti_callback(void)
 
 static void report_state(void)
 {
-    sdi_log("\r\nSTATE v=1 addr=%08lX ack=%u run=%u int=%u irq=%lu err=%u raw=%u\r\n",
+    sdi_log("\r\nSTATE v=2 addr=%08lX ack=%u run=%u int=%u rot=%u irq=%lu err=%u raw=%u\r\n",
             (unsigned long)(uintptr_t)&apds_terminal_command, (unsigned)s_ack,
-            (unsigned)s_running, (unsigned)s_interrupt, (unsigned long)s_edges,
-            s_error, s_raw_error);
+            (unsigned)s_running, (unsigned)s_interrupt, (unsigned)apds_getRotation(),
+            (unsigned long)s_edges, s_error, s_raw_error);
 }
 
 static void disable_exti(void)
@@ -115,6 +116,7 @@ static void handle_command(uint32_t command)
 
     bool run = (command & 1u) != 0;
     bool interrupt = (command & 2u) != 0;
+    (void)apds_setRotation((uint16_t)(((command >> 2) & 3u) * 90u));
     s_error = APDS_ERR_NONE;
     s_raw_error = 0;
     if (run != s_running || (run && interrupt != s_interrupt))
