@@ -1,9 +1,12 @@
 # Changelog
 
-## Unreleased
+## 1.5.0
 
-- Add runtime mounting rotation for four-direction gesture results, with 0°
-  matching the sensor orientation in the APDS-9960 datasheet.
+- Add runtime mounting rotation with apds_setRotation() and apds_getRotation().
+  The default 0° follows Figure 11 of the APDS-9960 datasheet.
+- Include the Windows SDI gesture terminal source, firmware, build script,
+  sensor diagnostics, and guided gesture tests in the package. The terminal
+  supports start/stop, polling or hardware INT, and live orientation changes.
 
 ## 1.4.0 — 2026-11-17
 

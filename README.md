@@ -1,8 +1,12 @@
 # APDS-9960 gesture driver for CH32V003
 
-Version **1.4.0** · [Русский](README_RU.md) · [Changelog](CHANGELOG.md) · MIT
+Version **1.5.0** · [Русский](README_RU.md) · [Changelog](CHANGELOG.md) · MIT
 
 Integer-only, single-instance C driver for LEFT, RIGHT, UP and DOWN gestures on CH32V003 with NoneOS-SDK. Uses hardware I2C1 through [I2C-CH32V003 v7.2.1](https://github.com/tama18101971/I2C-CH32V003/tree/v7.2.1). No Arduino, RTOS or dynamic allocation in the driver/demo. RGB/ALS and standalone proximity mode are not provided; raw proximity/status reads are available.
+
+## Windows SDI gesture terminal
+
+The release includes the Windows terminal and CH32V003 firmware sources. View decoded directions live over WCH-Link, start or stop the test, switch between polling and hardware INT, and set the mounting rotation from the terminal. The firmware uses the same library API as other applications. See the [terminal build and usage guide](tools/apds9960_sdi/README.md).
 
 ## Build and wiring
 
@@ -32,10 +36,10 @@ See [INTEGRATION.md](INTEGRATION.md). Pin this release in the target project's `
 
 ```ini
 lib_deps =
-    https://github.com/tama18101971/APDS-9960_CH32V003.git#v1.4.0
+    https://github.com/tama18101971/APDS-9960_CH32V003.git#v1.5.0
 ```
 
-The tag must be published before this URL can resolve. The manifest pins the I2C dependency to `v7.2.1`. The library exports `src/`; `examples/`, tests, logs, editor configuration and CI are excluded from the package.
+The tag must be published before this URL can resolve. The manifest pins I2C to `v7.2.1`. The package includes the driver in `src/` and the standalone SDI tools in `tools/apds9960_sdi/`. PlatformIO compiles only the driver when the package is used as a dependency.
 
 Initialize `SystemCoreClockUpdate()`, `Delay_Init()` and `i2c_init(400000)` before `apds_init()`. Initialize UART with `USART_Printf_Init(115200)` before using the example logger or any debug/trace mode. All sensor APIs belong to one main execution context, never an ISR; output pointers must be valid and non-NULL.
 
@@ -90,7 +94,7 @@ These are board measurements and software tuning profiles, not alternate registe
 | `apds_getLastI2CStatus()` | Sticky status of the last failed transaction; success does not clear it. |
 | `apds_getReinitCount()` | Overflow-recovery counter, reset by a normal available/init/wakeup path; direct successful readGesture does not reset it. |
 
-`gesture_t`: NONE=0, LEFT=1, RIGHT=2, UP=3, DOWN=4. Directions use the unrotated datasheet package coordinates; application mounting can rotate them.
+`gesture_t`: NONE=0, LEFT=1, RIGHT=2, UP=3, DOWN=4. The default 0° uses the datasheet package coordinates. Call `apds_setRotation(90)` to report directions for a sensor mounted 90° clockwise, viewed from the optical face. The angle survives sensor reinitialization and resets to 0° when the MCU resets.
 
 | Driver error | Value |
 |---|---:|
@@ -180,7 +184,8 @@ Measured with GCC12.2.0, `-Os`, ch32v1.1.0+499971a, NoneOS-SDK2.30000.0+4fcf972 
 
 | Scope | Flash/code bytes | RAM bytes |
 |---|---:|---:|
-| Full default demo |7952|380 (includes256 byte stack reservation)|
+| Full default demo, v1.5.0 |7992|380 (includes 256-byte stack reservation)|
+| Full default demo, v1.4.0 |7952|380 (includes 256-byte stack reservation)|
 | APDS+EXTI objects before linker GC |3736 text +1 initialized data|30BSS +1 initialized data|
 | Separate UART logger object |436 text|0 static|
 

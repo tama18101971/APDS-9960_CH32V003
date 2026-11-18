@@ -2,7 +2,7 @@
 
 ## Project
 
-APDS-9960 1.4.0 gesture driver for CH32V003, NoneOS-SDK, bare-metal C99.
+APDS-9960 1.5.0 gesture driver for CH32V003, NoneOS-SDK, bare-metal C99.
 LEFT/RIGHT/UP/DOWN only. Accepted IDs:0xAB/0x9C/0xA8/0x9E; preserve clone support.
 
 ## Build, test and package
@@ -11,7 +11,7 @@ LEFT/RIGHT/UP/DOWN only. Accepted IDs:0xAB/0x9C/0xA8/0x9E; preserve clone suppor
 pio run
 python test/host/run.py
 pio run -t compiledb
-pio pkg pack . -o .pio/release/APDS-9960_CH32V003-1.4.0.tar.gz
+pio pkg pack . -o .pio/release/APDS-9960_CH32V003-1.5.0.tar.gz
 ```
 
 Upload only when requested; the last attached third specimen failed hardware tests and
@@ -77,7 +77,7 @@ change; verify with `clangd --check=src/apds9960.c` (exit 0 = clean).
 
 ## Implementation and contracts
 
-- library.json version1.4.0; platformio.ini and library dependency pin I2C v7.2.1.
+- library.json version1.5.0; platformio.ini and library dependency pin I2C v7.2.1.
 - All tunables/defaults/range guards:src/apds9960_config.h; apply flags project-wide.
 - ID0xA8 profile:2x/25 mA base gesture drive. ID0x9E:1x/12.5 mA. Both optional.
   LED_BOOST scales both proximity and gesture. These are empirical board settings,

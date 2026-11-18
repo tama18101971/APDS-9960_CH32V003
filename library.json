@@ -1,6 +1,6 @@
 {
   "name": "APDS-9960_CH32V003",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "description": "Gesture driver for APDS9960 on CH32V003 (NoneOS-SDK)",
   "frameworks": "noneos-sdk",
   "platforms": "ch32v",
@@ -40,6 +40,12 @@
     ],
     "include": [
       "src/*",
+      "tools/apds9960_sdi/GestureTerminal.cs",
+      "tools/apds9960_sdi/README.md",
+      "tools/apds9960_sdi/*.ps1",
+      "tools/apds9960_sdi/monitor.py",
+      "tools/apds9960_sdi/platformio.ini",
+      "tools/apds9960_sdi/src/*",
       "library.json",
       "LICENSE",
       "README.md",

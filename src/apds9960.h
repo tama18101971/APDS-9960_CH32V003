@@ -1,7 +1,7 @@
 #ifndef APDS9960_H
 #define APDS9960_H
 
-#define APDS9960_VERSION "1.4.0"
+#define APDS9960_VERSION "1.5.0"
 
 /*
  * apds9960.h — Драйвер распознавания жестов для APDS9960 (CH32V003)

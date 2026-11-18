@@ -1,4 +1,4 @@
-# Integrating APDS-9960 1.4.0
+# Integrating APDS-9960 1.5.0
 
 [Русский](INTEGRATION_RU.md) · [API/configuration](README.md)
 
@@ -12,11 +12,11 @@ platform = ch32v
 board = ch32v003f4p6_evt_r0
 framework = noneos-sdk
 lib_deps =
-    https://github.com/tama18101971/APDS-9960_CH32V003.git#v1.4.0
+    https://github.com/tama18101971/APDS-9960_CH32V003.git#v1.5.0
 build_flags = -DAPDS_INT_MODE=0
 ```
 
-`v1.4.0` must exist on GitHub before installation by tag. I2C-CH32V003 v7.2.1 is automatically installed from library.json. Keep one copy of the APDS library and one I2C version; do not compile the repository demo main into your application. Framework/system startup remains the target project's responsibility.
+`v1.5.0` must exist on GitHub before installation by tag. I2C-CH32V003 v7.2.1 is automatically installed from library.json. Keep one copy of the APDS library and one I2C version; do not compile the repository demo main into your application. Framework/system startup remains the target project's responsibility.
 
 ## Manual copy / shared local library
 
@@ -114,3 +114,5 @@ For1.3.x users: corrected GCONF2 and direction signs can change sensitivity/moun
 Build the target project, inspect actual linked Flash/RAM, and test the first gesture after sleep, timeout, overflow and reinitialization. The measured demo footprint is not your application's total. Full stack including your ISR/callback remains your responsibility.
 
 The library package excludes examples/tests/logs/editor/CI files. The GitHub repository retains them for reproducibility. Native host regression uses the installed pinned i2c.h and does not test I2C implementation. Original0xAB/alternative 0x9C boards and broad optical conditions were not physically qualified in this release. Version and migration details: [CHANGELOG.md](CHANGELOG.md).
+
+For a Windows SDI example covering rotation and INT, see the [gesture terminal](tools/apds9960_sdi/README.md).
